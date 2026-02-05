@@ -1,10 +1,12 @@
-              export const runtime = "nodejs";
+export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
-
 import { v4 as uuidv4 } from "uuid";
+
+// 👇 IMPORTANT — dynamic require for compatibility
+const pdfParse = require("pdf-parse");
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,36 +15,33 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("pdf") as File;
 
-    console.log("📄 File:", file?.name, file?.type);
-
     if (!file || file.type !== "application/pdf") {
       return NextResponse.json({ error: "Please upload a PDF" }, { status: 400 });
     }
 
-    console.log("📦 Loading pdf-parse...");
-    const pdfModule = await import("pdf-parse");
-const pdfParse = (pdfModule as any).default || pdfModule;
+    console.log("📄 Processing:", file.name);
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    console.log("🧠 Extracting text from PDF...");
-    const pdfData = await pdfParse(buffer);
+    // Convert file to buffer
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
-    const text = pdfData.text;
-    console.log("✅ Text extracted length:", text.length);
+    // 🧠 Extract text from PDF
+    const data = await pdfParse(buffer);
+    const text = data.text;
 
+    console.log("✅ Extracted text length:", text.length);
+
+    // 📁 Save to /data folder in project root
     const documentId = uuidv4();
-    const dir = path.join(process.cwd(), "data");
-    const filePath = path.join(dir, `${documentId}.json`);
+    const dataDir = path.join(process.cwd(), "data");
+    const filePath = path.join(dataDir, `${documentId}.json`);
 
-    console.log("💾 Saving to:", filePath);
-
-    await fs.mkdir(dir, { recursive: true });
+    await fs.mkdir(dataDir, { recursive: true });
     await fs.writeFile(filePath, JSON.stringify({ text }));
 
-    console.log("🎉 File saved successfully");
+    console.log("💾 Saved to:", filePath);
 
     return NextResponse.json({ success: true, documentId });
-
   } catch (error) {
     console.error("❌ UPLOAD ERROR:", error);
     return NextResponse.json(

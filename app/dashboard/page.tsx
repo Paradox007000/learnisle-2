@@ -76,18 +76,7 @@ export default function Dashboard() {
   }
 };
     
-    if (files) {
-      setDragOver(false);
-
-      const newFile = {
-        id: Date.now(),
-        name: files.name,
-        type: files.name.split('.').pop()?.toLowerCase() || 'unknown',
-        lastOpened: 'Just now'
-      };
-      setFiles(prev => [newFile, ...prev]);
-    }
-  };
+   
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -298,8 +287,8 @@ export default function Dashboard() {
 
           {/* FILES LIST */}
           <div>
-            {file.map((file) => (
-              <div key={files.id} style={{
+            {files.map((file) => (
+              <div key={file.id} style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -350,4 +339,4 @@ export default function Dashboard() {
       </div>
     </>
   );
-
+}
