@@ -1,8 +1,9 @@
-export const runtime = "nodejs";
+              export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+
 import { v4 as uuidv4 } from "uuid";
 
 export async function POST(req: NextRequest) {
@@ -19,7 +20,8 @@ export async function POST(req: NextRequest) {
     }
 
     console.log("📦 Loading pdf-parse...");
-    const pdfParse = (await import("pdf-parse")).default;
+    const pdfModule = await import("pdf-parse");
+const pdfParse = (pdfModule as any).default || pdfModule;
 
     const buffer = Buffer.from(await file.arrayBuffer());
     console.log("🧠 Extracting text from PDF...");

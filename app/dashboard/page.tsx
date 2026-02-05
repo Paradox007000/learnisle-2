@@ -33,22 +33,56 @@ export default function Dashboard() {
     setMounted(true);
   }, []);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>) => {
-    let file: File | null = null;
+  const handleFileUpload = async (
+  e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>
+) => {
+  e.preventDefault();
+
+  let file: File | null = null;
+
+  if ("dataTransfer" in e) {
+    file = e.dataTransfer.files[0];
+  } else {
+    file = e.target.files?.[0] || null;
+  }
+
+  if (!file) return;
+
+  setDragOver(false);
+
+  // ✅ Show file in UI immediately (your existing behavior)
+  const newFile = {
+    id: Date.now(),
+    name: file.name,
+    type: file.name.split(".").pop()?.toLowerCase() || "unknown",
+    lastOpened: "Just now",
+  };
+  setFiles((prev) => [newFile, ...prev]);
+
+  // ✅ SEND FILE TO BACKEND
+  const formData = new FormData();
+  formData.append("pdf", file); // must be called "pdf"
+
+  try {
+    const res = await fetch("/api/process-pdf", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    console.log("✅ Server response:", data);
+  } catch (err) {
+    console.error("❌ Upload failed:", err);
+  }
+};
     
-    if ('dataTransfer' in e && (e as React.DragEvent).dataTransfer) {
-      file = (e as React.DragEvent).dataTransfer.files[0];
-    } else if ('target' in e && (e as React.ChangeEvent<HTMLInputElement>).target) {
-      file = (e as React.ChangeEvent<HTMLInputElement>).target.files?.[0] || null;
-    }
-    
-    if (file) {
+    if (files) {
       setDragOver(false);
 
       const newFile = {
         id: Date.now(),
-        name: file.name,
-        type: file.name.split('.').pop()?.toLowerCase() || 'unknown',
+        name: files.name,
+        type: files.name.split('.').pop()?.toLowerCase() || 'unknown',
         lastOpened: 'Just now'
       };
       setFiles(prev => [newFile, ...prev]);
@@ -264,8 +298,8 @@ export default function Dashboard() {
 
           {/* FILES LIST */}
           <div>
-            {files.map((file) => (
-              <div key={file.id} style={{
+            {file.map((file) => (
+              <div key={files.id} style={{
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'space-between',
@@ -316,4 +350,4 @@ export default function Dashboard() {
       </div>
     </>
   );
-}
+
