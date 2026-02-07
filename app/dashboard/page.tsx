@@ -63,17 +63,22 @@ export default function Dashboard() {
   const formData = new FormData();
   formData.append("pdf", file); // must be called "pdf"
 
-  try {
-    const res = await fetch("/api/process-pdf", {
-      method: "POST",
-      body: formData,
-    });
+try {
+  const res = await fetch("/api/process-pdf", {
+    method: "POST",
+    body: formData,
+  });
 
-    const data = await res.json();
-    console.log("✅ Server response:", data);
-  } catch (err) {
-    console.error("❌ Upload failed:", err);
-  }
+  const data: { success?: boolean; documentId?: string; error?: string } = await res.json();
+  console.log("✅ Server response:", data);
+
+  if (data.success) {
+  console.log("📄 PDF processed and saved. Ready for Document page.");
+}
+
+} catch (err) {
+  console.error("❌ Upload failed:", err);
+}
 };
     
    
