@@ -1,8 +1,16 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+// lib/firebase.ts
 
-// Your web app's Firebase configuration
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { 
+  getAuth, 
+  GoogleAuthProvider 
+} from "firebase/auth";
+
+import { 
+  getStorage 
+} from "firebase/storage";
+
+// 🔥 Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyDYayckEnpn7dlHtfVgOkmfEkkr_79LSpQ",
   authDomain: "blackbook-3d094.firebaseapp.com",
@@ -12,8 +20,12 @@ const firebaseConfig = {
   appId: "1:617661678418:web:9392b6fcfd2b036027f08b"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// ✅ Prevent re-initializing in Next.js
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
+// ✅ Auth
 export const auth = getAuth(app);
 export const provider = new GoogleAuthProvider();
+
+// ✅ Storage
+export const storage = getStorage(app);
