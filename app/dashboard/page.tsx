@@ -34,54 +34,46 @@ export default function Dashboard() {
   }, []);
 
   const handleFileUpload = async (
-  e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>
-) => {
-  e.preventDefault();
+    e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>
+  ) => {
+    e.preventDefault();
+    let file: File | null = null;
+    if ("dataTransfer" in e) {
+      file = e.dataTransfer.files[0];
+    } else {
+      file = e.target.files?.[0] || null;
+    }
+    if (!file) return;
 
-  let file: File | null = null;
+    setDragOver(false);
 
-  if ("dataTransfer" in e) {
-    file = e.dataTransfer.files[0];
-  } else {
-    file = e.target.files?.[0] || null;
-  }
+    // Show file in UI immediately
+    const newFile = {
+      id: Date.now(),
+      name: file.name,
+      type: file.name.split(".").pop()?.toLowerCase() || "unknown",
+      lastOpened: "Just now",
+    };
+    setFiles((prev) => [newFile, ...prev]);
 
-  if (!file) return;
+    // Send file to backend
+    const formData = new FormData();
+    formData.append("pdf", file); // must be called "pdf"
 
-  setDragOver(false);
-
-  // ✅ Show file in UI immediately (your existing behavior)
-  const newFile = {
-    id: Date.now(),
-    name: file.name,
-    type: file.name.split(".").pop()?.toLowerCase() || "unknown",
-    lastOpened: "Just now",
+    try {
+      const res = await fetch("/api/process-pdf", {
+        method: "POST",
+        body: formData,
+      });
+      const data: { success?: boolean; documentId?: string; error?: string } = await res.json();
+      console.log("✅ Server response:", data);
+      if (data.success) {
+        console.log("📄 PDF processed and saved. Ready for Document page.");
+      }
+    } catch (err) {
+      console.error("❌ Upload failed:", err);
+    }
   };
-  setFiles((prev) => [newFile, ...prev]);
-
-  // ✅ SEND FILE TO BACKEND
-  const formData = new FormData();
-  formData.append("pdf", file); // must be called "pdf"
-
-try {
-  const res = await fetch("/api/process-pdf", {
-    method: "POST",
-    body: formData,
-  });
-
-  const data: { success?: boolean; documentId?: string; error?: string } = await res.json();
-  console.log("✅ Server response:", data);
-
-  if (data.success) {
-  console.log("📄 PDF processed and saved. Ready for Document page.");
-}
-
-} catch (err) {
-  console.error("❌ Upload failed:", err);
-}
-};
-    
-   
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -103,143 +95,109 @@ try {
 
   return (
     <>
-      {/* MENU FIRST - highest z-index */}
+      {/* MENU */}
       {isMenuOpen && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '300px',
-            height: '100vh',
-            background: 'white',
-            zIndex: 999999,
-            boxShadow: '5px 0 20px rgba(0,0,0,0.3)',
-            padding: '40px 20px',
-            transform: 'translateX(0)',
-            transition: 'transform 0.3s ease'
-          }}
-        >
-          <button 
-            onClick={() => setIsMenuOpen(false)}
-            style={{ 
-              position: 'absolute', 
-              top: '20px', 
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '300px',
+          height: '100vh',
+          background: 'white',
+          zIndex: 999999,
+          boxShadow: '5px 0 20px rgba(0,0,0,0.3)',
+          padding: '40px 20px',
+          transform: 'translateX(0)',
+          transition: 'transform 0.3s ease'
+        }}>
+          <button onClick={() => setIsMenuOpen(false)}
+            style={{
+              position: 'absolute',
+              top: '20px',
               right: '20px',
               fontSize: '30px',
               background: 'none',
               border: 'none',
               cursor: 'pointer'
             }}
-          >
-            ×
-          </button>
-          
+          >×</button>
+
           <div style={{ marginTop: '20px' }}>
-            <Link href="/arcade" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#e3f2fd', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>
-              🎮 Arcade
-            </Link>
-            <Link href="/document" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#e3f2fd', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>
-              📄 Document
-            </Link>
-            <Link href="/podcast" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#e3f2fd', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>
-              🎙️ Podcast
-            </Link>
-            <Link href="/flashcards" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#e3f2fd', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>
-              🃏 Flashcards
-            </Link>
+            <Link href="/arcade" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#e3f2fd', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>🎮 Arcade</Link>
+            <Link href="/document" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#e3f2fd', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>📄 Document</Link>
+            <Link href="/podcast" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#e3f2fd', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>🎙️ Podcast</Link>
+            <Link href="/flashcards" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#e3f2fd', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>🃏 Flashcards</Link>
             <hr style={{ margin: '20px 0', border: 'none', height: '1px', background: '#ddd' }} />
-            <Link href="/mimi" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#fce4ec', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>
-              😺 Mimi
-            </Link>
+            <Link href="/mimi" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#fce4ec', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>😺 Mimi</Link>
             <hr style={{ margin: '20px 0', border: 'none', height: '1px', background: '#ddd' }} />
-            <Link href="/account" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#f5f5f5', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>
-              👤 Account
-            </Link>
+            <Link href="/account" onClick={() => setIsMenuOpen(false)} style={{ display: 'block', padding: '15px', marginBottom: '10px', borderRadius: '10px', background: '#f5f5f5', textDecoration: 'none', color: 'black', fontWeight: 'bold' }}>👤 Account</Link>
           </div>
         </div>
       )}
 
       {isMenuOpen && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            background: 'rgba(0,0,0,0.5)',
-            zIndex: 99999
-          }}
+        <div style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.5)', zIndex: 99999 }}
           onClick={() => setIsMenuOpen(false)}
         />
       )}
 
       {/* MAIN CONTENT */}
-      <div style={{ paddingTop: '80px', minHeight: '100vh', background: isDark ? '#282727ff':'#f5f5f5' }}>
-      {/* HEADER */}
-<header style={{
-       position: 'fixed',
-      top: 0, left: 0, right: 0,
-      height: '80px',
-      background: 'white',
-      boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-      display: 'flex',
-      alignItems: 'center',
-      padding: '0 20px',
-      zIndex: 1000
-   }}>
-     <button
-      onClick={() => {
-       console.log('🔥 MENU TOGGLE');
-       setIsMenuOpen(!isMenuOpen);
-    }}
-    style={{
-      background: isDark ? '#38385bff' : '#f0f0f0',
-      color: isDark ? 'white' : '#333',
-      border: 'none',
-      padding: '12px 20px',
-      borderRadius: '8px',
-      fontSize: '16px',
-      fontWeight: 'bold',
-      cursor: 'pointer'
-    }}
-  >
-    ☰ MENU
-   </button>
-  
-   <h1 style={{ 
-    marginLeft: '20px', 
-    fontSize: '28px', 
-    fontWeight: 'bold', 
-    color: isDark ? 'white' : '#a57373ff'  // ← Black light, white dark
-   }}>
-    learnisle
-  </h1>
+      <div style={{ paddingTop: '80px', minHeight: '100vh', background: isDark ? '#282727ff' : '#f5f5f5' }}>
+        {/* HEADER */}
+        <header style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0,
+          height: '80px',
+          background: 'white',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          padding: '0 20px',
+          zIndex: 1000
+        }}>
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            style={{
+              background: isDark ? '#38385bff' : '#f0f0f0',
+              color: isDark ? 'white' : '#333',
+              border: 'none',
+              padding: '12px 20px',
+              borderRadius: '8px',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              cursor: 'pointer'
+            }}
+          >☰ MENU</button>
 
-  {/* THEME TOGGLE BUTTON - right corner */}
-  {mounted && (
-    <button
-      onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      style={{
-        marginLeft: 'auto',
-        padding: '8px 12px',
-        borderRadius: '50%',
-        background: isDark ? '#080808ff' : '#f0f0f0',
-        border: '1px solid rgba(0,0,0,0.1)',
-        cursor: 'pointer',
-        fontSize: '18px'
-      }}
-    >
-      {theme === 'dark' ? '☀️' : '🌙'}
-    </button>
-  )}
-</header>
+          <h1 style={{ marginLeft: '20px', fontSize: '28px', fontWeight: 'bold', color: isDark ? 'white' : '#a57373ff' }}>
+            learnisle
+          </h1>
+
+          {/* RIGHT SIDE: Account shortcut + Theme toggle */}
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }}>
+            <Link href="/account" style={{ fontSize: "24px", textDecoration: "none" }}>👤</Link>
+            {mounted && (
+              <button
+                onClick={() => setTheme(isDark ? 'light' : 'dark')}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '50%',
+                  background: isDark ? '#080808ff' : '#f0f0f0',
+                  border: '1px solid rgba(0,0,0,0.1)',
+                  cursor: 'pointer',
+                  fontSize: '18px'
+                }}
+              >
+                {theme === 'dark' ? '☀️' : '🌙'}
+              </button>
+            )}
+          </div>
+        </header>
 
         {/* MAIN CONTENT AREA */}
         <div style={{ padding: '120px 20px 40px', maxWidth: '800px', margin: '0 auto' }}>
           {/* LARGER DRAG & DROP UPLOAD ZONE */}
-          <div 
+          <div
             style={{
               border: dragOver ? '3px dashed #2196f3' : '2px dashed #a5a3a3ff',
               borderRadius: '20px',
@@ -256,36 +214,25 @@ try {
             onDrop={handleFileUpload}
             onClick={() => document.getElementById('file-upload')?.click()}
           >
-            <input 
+            <input
               id="file-upload"
-              type="file" 
-              onChange={handleFileUpload} 
-              style={{ display: 'none' }} 
+              type="file"
+              onChange={handleFileUpload}
+              style={{ display: 'none' }}
               accept=".pdf,.doc,.docx"
             />
-            <div style={{ fontSize: '48px', marginBottom: '16px' 
-        
-            }}>📄</div>
+            <div style={{ fontSize: '48px', marginBottom: '16px' }}>📄</div>
             <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#333', marginBottom: '12px' }}>
               Drop PDF here or click to upload
             </div>
             <div style={{ fontSize: '16px', color: '#666' }}>
               Your files will appear in My Files below
             </div>
-          </div> 
+          </div>
 
           {/* MY FILES SECTION */}
-          <div style={{ 
-            marginBottom: '20px',
-            paddingBottom: '15px',
-            borderBottom: '2px solid #a5a3a3ff'
-          }}>
-            <h2 style={{ 
-              fontSize: '22px', 
-              fontWeight: 'bold', 
-              color: '#1976d2',
-              marginBottom: '10px'
-            }}>
+          <div style={{ marginBottom: '20px', paddingBottom: '15px', borderBottom: '2px solid #a5a3a3ff' }}>
+            <h2 style={{ fontSize: '22px', fontWeight: 'bold', color: '#1976d2', marginBottom: '10px' }}>
               My Files
             </h2>
           </div>
