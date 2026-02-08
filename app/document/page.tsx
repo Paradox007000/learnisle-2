@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import TopBar from "@/components/ui/TopBar";
 
 export default function DocumentPage() {
   const [notes, setNotes] = useState("Loading notes...");
@@ -40,7 +41,13 @@ export default function DocumentPage() {
   };
 
   return (
-    <div style={{ display: "flex", height: "100vh", background: "#f5f5f5" }}>
+  <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+    
+    {/* 🌸 TOP MENU BAR */}
+    <TopBar />
+
+    {/* MAIN CONTENT */}
+    <div style={{ display: "flex", flex: 1, background: "#FFFDF7" }}>
       
       {/* 📄 LEFT SIDE — NOTES */}
       <div
@@ -48,27 +55,37 @@ export default function DocumentPage() {
           flex: 2,
           padding: "40px",
           overflowY: "auto",
-          background: "white",
         }}
       >
-        <h1 style={{ marginBottom: "20px" }}>📄 Study Notes</h1>
-        <div style={{ whiteSpace: "pre-wrap", lineHeight: "1.6" }}>
-          {notes}
+        <div
+          style={{
+            background: "#FFFFFF",
+            borderRadius: "16px",
+            padding: "32px",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+          }}
+        >
+          <h1 style={{ marginBottom: "20px", color: "#3A4F41" }}>
+            📄 Study Notes
+          </h1>
+          <div style={{ whiteSpace: "pre-wrap", lineHeight: "1.7", color: "#444" }}>
+            {notes}
+          </div>
         </div>
       </div>
 
-      {/* 🤖 RIGHT SIDE — CHATBOT */}
+      {/* 🤖 RIGHT SIDE — MIMI CHAT */}
       <div
         style={{
           flex: 1,
-          borderLeft: "1px solid #ddd",
+          borderLeft: "1px solid #F0EAE2",
           display: "flex",
           flexDirection: "column",
-          background: "#fafafa",
+          background: "#FFF9F2",
         }}
       >
-        <div style={{ padding: "20px", borderBottom: "1px solid #ddd" }}>
-          <h2>🤖 Ask About This Document</h2>
+        <div style={{ padding: "20px", borderBottom: "1px solid #F0EAE2" }}>
+          <h2 style={{ color: "#5C4033" }}>Chat with Mimi</h2>
         </div>
 
         <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
@@ -85,7 +102,8 @@ export default function DocumentPage() {
                   display: "inline-block",
                   padding: "10px 14px",
                   borderRadius: "12px",
-                  background: msg.role === "user" ? "#d1e7dd" : "#e2e3e5",
+                  background:
+                    msg.role === "user" ? "#D8F3DC" : "#FDE2E4",
                 }}
               >
                 {msg.text}
@@ -94,21 +112,24 @@ export default function DocumentPage() {
           ))}
         </div>
 
-        <div style={{ padding: "15px", borderTop: "1px solid #ddd" }}>
+        <div style={{ padding: "15px", borderTop: "1px solid #F0EAE2" }}>
           <input
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
-            placeholder="Ask something about the document..."
+            placeholder="Ask Mimi about your document..."
             style={{
               width: "100%",
-              padding: "10px",
-              borderRadius: "8px",
-              border: "1px solid #ccc",
+              padding: "12px",
+              borderRadius: "10px",
+              border: "1px solid #EADFD6",
             }}
             onKeyDown={(e) => e.key === "Enter" && askQuestion()}
           />
         </div>
       </div>
     </div>
-  );
+  </div>
+);
+
+  
 }
