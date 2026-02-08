@@ -67,9 +67,13 @@ export default function Dashboard() {
       });
       const data: { success?: boolean; documentId?: string; error?: string } = await res.json();
       console.log("✅ Server response:", data);
-      if (data.success) {
-        console.log("📄 PDF processed and saved. Ready for Document page.");
-      }
+      if (data.success && data.documentId) {
+  console.log("📄 PDF processed and saved.");
+  
+  // ✅ Save latest documentId
+  localStorage.setItem("latestDoc", data.documentId);
+}
+
     } catch (err) {
       console.error("❌ Upload failed:", err);
     }
@@ -292,3 +296,4 @@ export default function Dashboard() {
     </>
   );
 }
+

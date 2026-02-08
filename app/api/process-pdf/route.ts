@@ -15,8 +15,19 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
     const file = formData.get("pdf") as File;
 
-    if (!file || file.type !== "application/pdf") {
-      return NextResponse.json({ error: "Please upload a PDF" }, { status: 400 });
+    // ✅ Safer validation
+    if (!file) {
+      return NextResponse.json(
+        { error: "No file uploaded" },
+        { status: 400 }
+      );
+    }
+
+    if (!file.name.toLowerCase().endsWith(".pdf")) {
+      return NextResponse.json(
+        { error: "Only PDF files allowed" },
+        { status: 400 }
+      );
     }
 
     console.log("📄 Processing:", file.name);
@@ -34,7 +45,7 @@ export async function POST(req: NextRequest) {
     // 📁 Save to /data folder in project root
     const documentId = uuidv4();
     const dataDir = path.join(process.cwd(), "data");
-    const filePath = path.join(dataDir, `${documentId}.json`);
+    const filePath = path.join(dataDir, `${documentId}.json`); // ✅ FIXED
 
     await fs.mkdir(dataDir, { recursive: true });
     await fs.writeFile(filePath, JSON.stringify({ text }));
@@ -42,6 +53,7 @@ export async function POST(req: NextRequest) {
     console.log("💾 Saved to:", filePath);
 
     return NextResponse.json({ success: true, documentId });
+
   } catch (error) {
     console.error("❌ UPLOAD ERROR:", error);
     return NextResponse.json(
