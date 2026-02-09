@@ -17,12 +17,10 @@ export default function FlashcardsPage() {
     const fetchFlashcards = async () => {
       try {
         const res = await fetch("/api/get-flashcards");
-
         const data = await res.json();
 
         if (!res.ok) {
-          setError(data.error || "Please upload PDF first.");
-          setLoading(false);
+          setError(data.error || "Something went wrong.");
           return;
         }
 
@@ -32,8 +30,8 @@ export default function FlashcardsPage() {
           setFlashcards(data.flashcards);
         }
       } catch (err) {
-        console.error("Flashcard fetch error:", err);
-        setError("Something went wrong while generating flashcards.");
+        console.error("Fetch error:", err);
+        setError("Failed to load flashcards.");
       } finally {
         setLoading(false);
       }
@@ -77,7 +75,6 @@ export default function FlashcardsPage() {
               background: "#ffffff",
               boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
               cursor: "pointer",
-              transition: "0.3s ease",
               minHeight: "140px",
               display: "flex",
               alignItems: "center",

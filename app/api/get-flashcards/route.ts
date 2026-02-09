@@ -6,14 +6,20 @@ import path from "path";
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY!,
+  apiKey: process.env.GEMINI_API_KEY,
 });
 
 export async function GET() {
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      return NextResponse.json(
+        { error: "GEMINI_API_KEY missing in .env.local" },
+        { status: 500 }
+      );
+    }
+
     const dir = path.join(process.cwd(), "data");
 
-    // Check if data folder exists
     try {
       await fs.access(dir);
     } catch {
@@ -32,17 +38,14 @@ export async function GET() {
       );
     }
 
-    // Get latest file
     const sorted = await Promise.all(
       files.map(async (file) => {
-        const filePath = path.join(dir, file);
-        const stats = await fs.stat(filePath);
+        const stats = await fs.stat(path.join(dir, file));
         return { file, time: stats.mtime.getTime() };
       })
     );
 
     sorted.sort((a, b) => b.time - a.time);
-
     const latestFile = sorted[0].file;
 
     const fileData = JSON.parse(
@@ -59,22 +62,32 @@ export async function GET() {
     }
 
     const response = await ai.models.generateContent({
-      model: "gemini-1.5-flash",
+  model: "models/gemini-2.5-flash",
+
       contents: `
-Generate 5 study flashcards from this text.
+Generate exactly 5 study flashcards.
 
-Return ONLY in this format:
+Format strictly like this:
 
-Q: Question here
-A: Answer here
+Q: Question
+A: Answer
 
 TEXT:
 ${documentText}
-`,
+      `,
     });
 
     const aiText =
-      response.candidates?.[0]?.content?.parts?.[0]?.text || "";
+      response.candidates?.[0]?.content?.parts
+        ?.map((p: any) => p.text)
+        .join("") || "";
+
+    if (!aiText) {
+      return NextResponse.json(
+        { error: "AI returned empty response." },
+        { status: 500 }
+      );
+    }
 
     const cards = aiText
       .split("Q:")
@@ -88,7 +101,15 @@ ${documentText}
       })
       .filter((c) => c.question && c.answer);
 
+    if (!cards.length) {
+      return NextResponse.json(
+        { error: "No flashcards generated." },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({ flashcards: cards });
+
   } catch (error) {
     console.error("FLASHCARD ERROR:", error);
     return NextResponse.json(
@@ -97,6 +118,3 @@ ${documentText}
     );
   }
 }
-
-
-
