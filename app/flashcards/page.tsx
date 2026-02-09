@@ -11,7 +11,8 @@ export default function FlashcardsPage() {
   const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [flippedIndex, setFlippedIndex] = useState<number | null>(null);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [flipped, setFlipped] = useState(false);
 
   useEffect(() => {
     const fetchFlashcards = async () => {
@@ -19,8 +20,10 @@ export default function FlashcardsPage() {
         const res = await fetch("/api/get-flashcards");
         const data = await res.json();
 
-        if (!res.ok) {
+         if (!res.ok) {
           setError(data.error || "Something went wrong.");
+          return;
+
           return;
         }
 
@@ -40,54 +43,95 @@ export default function FlashcardsPage() {
     fetchFlashcards();
   }, []);
 
+  const nextCard = () => {
+    setFlipped(false);
+    setCurrentIndex((prev) =>
+      prev === flashcards.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevCard = () => {
+    setFlipped(false);
+    setCurrentIndex((prev) =>
+      prev === 0 ? flashcards.length - 1 : prev - 1
+    );
+  };
+
   if (loading) {
     return (
-      <div style={{ padding: "40px", textAlign: "center" }}>
-        <h2>Generating Flashcards...</h2>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-white to-rose-50">
+        <h2 className="text-2xl font-semibold text-gray-700 animate-pulse">
+          Generating Flashcards...
+        </h2>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{ padding: "40px", textAlign: "center" }}>
-        <h2>{error}</h2>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-50 via-white to-rose-50">
+        <h2 className="text-xl font-semibold text-red-500">{error}</h2>
       </div>
     );
   }
 
-  return (
-    <div style={{ padding: "40px", maxWidth: "900px", margin: "0 auto" }}>
-      <h1 style={{ marginBottom: "30px", textAlign: "center" }}>
-        🃏 Flashcards
-      </h1>
+  const card = flashcards[currentIndex];
 
-      <div style={{ display: "grid", gap: "20px" }}>
-        {flashcards.map((card, index) => (
-          <div
-            key={index}
-            onClick={() =>
-              setFlippedIndex(flippedIndex === index ? null : index)
-            }
-            style={{
-              padding: "25px",
-              borderRadius: "20px",
-              background: "#ffffff",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
-              cursor: "pointer",
-              minHeight: "140px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              textAlign: "center",
-              fontSize: "16px",
-              fontWeight: "500",
-            }}
-          >
-            {flippedIndex === index ? card.answer : card.question}
-          </div>
-        ))}
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-pink-50 via-white to-rose-50 px-6">
+
+      {/* Heading */}
+      <div className="text-center mb-10">
+        <h1 className="text-4xl font-bold text-gray-800">Flashcards</h1>
+        <p className="text-gray-500 mt-2">
+          {currentIndex + 1} / {flashcards.length}
+        </p>
       </div>
+
+      {/* Card */}
+      <div
+        className="relative w-full max-w-xl h-[350px] perspective cursor-pointer"
+        onClick={() => setFlipped(!flipped)}
+      >
+        <div
+          className={`relative w-full h-full transition-transform duration-500 transform-style-preserve-3d ${
+            flipped ? "rotate-y-180" : ""
+          }`}
+        >
+          {/* Front */}
+          <div className="absolute w-full h-full backface-hidden bg-white rounded-3xl shadow-2xl flex items-center justify-center p-10 text-center">
+            <p className="text-xl font-medium text-gray-800 leading-relaxed">
+              {card.question}
+            </p>
+          </div>
+
+          {/* Back - Soft Faded Pink */}
+          <div className="absolute w-full h-full backface-hidden rotate-y-180 bg-pink-100 text-pink-700 rounded-3xl shadow-2xl flex items-center justify-center p-10 text-center">
+            <p className="text-xl font-medium leading-relaxed">
+              {card.answer}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation Buttons */}
+<div className="flex gap-6 mt-10">
+  <button
+    onClick={prevCard}
+    className="px-6 py-3 rounded-xl bg-pink-100 text-black shadow-md hover:bg-pink-200 transition font-medium"
+  >
+     Previous
+  </button>
+
+  <button
+    onClick={nextCard}
+    className="px-6 py-3 rounded-xl bg-pink-100 text-black shadow-md hover:bg-pink-200 transition font-medium"
+  >
+    Next 
+  </button>
+</div>
+
     </div>
   );
 }
+
