@@ -88,29 +88,57 @@ export default function DocumentPage() {
           <h2 style={{ color: "#5C4033" }}>Chat with Mimi</h2>
         </div>
 
-        <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
-          {messages.map((msg, i) => (
-            <div
-              key={i}
-              style={{
-                marginBottom: "12px",
-                textAlign: msg.role === "user" ? "right" : "left",
-              }}
-            >
-              <span
-                style={{
-                  display: "inline-block",
-                  padding: "10px 14px",
-                  borderRadius: "12px",
-                  background:
-                    msg.role === "user" ? "#D8F3DC" : "#FDE2E4",
-                }}
-              >
-                {msg.text}
-              </span>
-            </div>
-          ))}
+<div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
+  {messages.map((msg, i) => (
+    <div
+      key={i}
+      style={{
+        marginBottom: "16px",
+        display: "flex",
+        justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+        alignItems: "flex-end",
+        gap: "10px",
+      }}
+    >
+      {/* 🤖 Mimi Avatar for AI */}
+      {msg.role === "ai" && (
+        <div
+          style={{
+            width: "36px",
+            height: "36px",
+            borderRadius: "50%",
+            overflow: "hidden",
+            background: "#FFEFF6",
+            border: "2px solid #FFD6E7",
+            flexShrink: 0,
+          }}
+        >
+          <img
+            src="/mascot.png"
+            alt="Mimi"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
         </div>
+      )}
+
+      {/* 💬 Message Bubble */}
+      <div
+        style={{
+          maxWidth: "70%",
+          padding: "12px 16px",
+          borderRadius: "18px",
+          background: msg.role === "user" ? "#DDF4E4" : "#FFFFFF",
+          border: msg.role === "ai" ? "1px solid #F1F1F1" : "none",
+          boxShadow:
+            msg.role === "ai" ? "0 2px 6px rgba(0,0,0,0.04)" : "none",
+          lineHeight: "1.5",
+        }}
+      >
+        {msg.text}
+      </div>
+    </div>
+  ))}
+</div>
 
         <div style={{ padding: "15px", borderTop: "1px solid #F0EAE2" }}>
           <input
