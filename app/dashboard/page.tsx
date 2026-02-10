@@ -171,11 +171,17 @@ export default function Dashboard() {
               fontWeight: 'bold',
               cursor: 'pointer'
             }}
-          >☰ MENU</button>
+          > ☰MENU</button>
 
-          <h1 style={{ marginLeft: '20px', fontSize: '28px', fontWeight: 'bold', color: isDark ? 'white' : '#a57373ff' }}>
-            learnisle
-          </h1>
+          <div className="w-full flex items-center py-4 pl-10">
+  <img
+    src="/logo.png"
+    alt="Learnisle Logo"
+    className="h-28 object-contain"
+  />
+</div>
+
+
 
           {/* RIGHT SIDE: Account shortcut + Theme toggle */}
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }}>
@@ -296,4 +302,3 @@ export default function Dashboard() {
     </>
   );
 }
-

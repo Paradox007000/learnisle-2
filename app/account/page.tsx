@@ -2,16 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { ArrowLeft } from "lucide-react";
 import { signOut, onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark";
-
   const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
@@ -36,46 +32,46 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f5f2] dark:bg-zinc-900 px-8 py-8 transition">
+    <div className="min-h-screen bg-[#FFF9F2] px-8 py-8">
 
       {/* TOP BAR */}
-      <div className="flex justify-between items-center mb-6">
+<div className="flex justify-between items-center mb-6">
 
-        {/* Back */}
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="flex items-center gap-2 text-[#6b4f3b] font-semibold"
-        >
-          <ArrowLeft size={18} />
-          Back
-        </button>
+  {/* Left Side - Back + Logo */}
+  <div className="flex items-center gap-4">
 
-        {/* Right controls */}
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => setTheme(isDark ? "light" : "dark")}
-            className="w-11 h-11 rounded-full bg-white dark:bg-zinc-800 
-                       shadow-md flex items-center justify-center text-lg"
-          >
-            {isDark ? "☀️" : "🌙"}
-          </button>
+    {/* Back */}
+    <button
+      onClick={() => router.push("/dashboard")}
+      className="flex items-center gap-2 text-black font-semibold"
+    >
+      <ArrowLeft size={18} />
+      Back
+    </button>
 
-          <button
-            onClick={logout}
-            className="px-4 py-2 bg-[#8b5e3c] text-white rounded-lg text-sm font-semibold shadow-md"
-          >
-            Logout
-          </button>
-        </div>
-      </div>
+   
+
+  </div>
+
+  {/* Logout */}
+  <button
+    onClick={logout}
+    className="px-4 py-2 bg-[#FFD6E7] text-black rounded-lg text-sm font-semibold shadow-md"
+  >
+    Logout
+  </button>
+
+</div>
+
+
 
       {/* USER BOX */}
-      <div className="bg-gradient-to-r from-[#f3e5d8] via-[#ecd7c5] to-[#e6c8b0]
+      <div className="bg-gradient-to-r from-[#FFEFF6] via-[#FFE4F0] to-[#FFD6E7]
                       rounded-3xl p-7 shadow-lg mb-10 
-                      border border-[#8b5e3c]/20 flex items-center gap-6">
+                      border border-pink-200 flex items-center gap-6">
 
-        <div className="w-16 h-16 rounded-full bg-[#8b5e3c] 
-                        text-white flex items-center justify-center 
+        <div className="w-16 h-16 rounded-full bg-[#FFD6E7] 
+                        text-black flex items-center justify-center 
                         text-xl font-bold shadow-md">
           {user?.displayName?.charAt(0).toUpperCase() ||
             user?.email?.charAt(0).toUpperCase() ||
@@ -83,15 +79,15 @@ export default function ProfilePage() {
         </div>
 
         <div>
-          <h1 className="text-2xl font-bold text-[#6b4f3b] tracking-tight">
+          <h1 className="text-2xl font-bold text-black tracking-tight">
             Hello, {user?.displayName || user?.email?.split("@")[0] || "User"} 👋
           </h1>
 
-          <p className="text-sm text-zinc-700 mt-1 font-medium">
+          <p className="text-sm text-black mt-1 font-medium">
             {user?.email}
           </p>
 
-          <p className="mt-2 text-lg font-bold text-[#8b5e3c]">
+          <p className="mt-2 text-lg font-bold text-black">
             🏆 Level {level} • {xp} XP
           </p>
         </div>
@@ -100,38 +96,38 @@ export default function ProfilePage() {
       {/* STATS + PROGRESS */}
       <div className="flex gap-16 items-start mb-12">
 
- {/* 4 Horizontal Rectangular Boxes */}
-<div className="grid grid-cols-2 gap-4 flex-1 max-w-4xl">
+        {/* 4 Boxes */}
+        <div className="grid grid-cols-2 gap-4 flex-1 max-w-4xl">
 
-  {[
-    ["📂 Files Uploaded", 0, "files"],
-    ["🃏 Flashcards", 0, "cards"],
-    ["🔥 Streak", 0, "days"],
-    ["🎯 Accuracy", "0%", "rate"],
-  ].map(([title, value, sub], i) => (
-    <div
-      key={i}
-      className="bg-white rounded-2xl 
-                 h-32 w-full  
-                 flex flex-col justify-center items-start  
-                 shadow-md border border-[#8b5e3c]/20 p-5"
-    >
-      <p className="text-base font-bold text-[#6b4f3b]">
-        {title}
-      </p>
+          {[
+            ["📂 Files Uploaded", 0, "files"],
+            ["🃏 Flashcards", 0, "cards"],
+            ["🔥 Streak", 0, "days"],
+            ["🎯 Accuracy", "0%", "rate"],
+          ].map(([title, value, sub], i) => (
+            <div
+              key={i}
+              className="bg-white rounded-2xl 
+                         h-32 w-full  
+                         flex flex-col justify-center items-start  
+                         shadow-md border border-pink-200 p-5"
+            >
+              <p className="text-base font-bold text-black">
+                {title}
+              </p>
 
-      <h2 className="text-3xl font-bold mt-1 text-[#8b5e3c]">
-        {value}
-      </h2>
+              <h2 className="text-3xl font-bold mt-1 text-black">
+                {value}
+              </h2>
 
-      <p className="text-sm font-semibold text-[#6b4f3b]/70 mt-0.5">
-        {sub}
-      </p>
-    </div>
-  ))}
-</div>
+              <p className="text-sm font-semibold text-black/70 mt-0.5">
+                {sub}
+              </p>
+            </div>
+          ))}
+        </div>
 
-        {/* RIGHT SIDE: Progress + Hours beside it */}
+        {/* RIGHT SIDE */}
         <div className="flex flex-row items-center gap-6">
 
           {/* Progress Circle */}
@@ -142,7 +138,7 @@ export default function ProfilePage() {
                 cx="88"
                 cy="88"
                 r="70"
-                stroke="#e8ded6"
+                stroke="#FCE7F3"
                 strokeWidth="14"
                 fill="transparent"
               />
@@ -150,7 +146,7 @@ export default function ProfilePage() {
                 cx="88"
                 cy="88"
                 r="70"
-                stroke="#8b5e3c"
+                stroke="#FFD6E7"
                 strokeWidth="14"
                 fill="transparent"
                 strokeDasharray="440"
@@ -160,23 +156,23 @@ export default function ProfilePage() {
             </svg>
 
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <p className="text-3xl font-bold text-[#8b5e3c]">
+              <p className="text-3xl font-bold text-black">
                 {progress}%
               </p>
-              <p className="text-sm font-semibold text-[#6b4f3b]">
+              <p className="text-sm font-semibold text-black">
                 📊 Progress
               </p>
             </div>
           </div>
 
-          {/* Hours Spent Box (slightly bigger width) */}
-          <div className="bg-white rounded-2xl p-5 shadow-md border border-[#8b5e3c]/20 w-52 flex flex-col items-center">
+          {/* Hours Box */}
+          <div className="bg-white rounded-2xl p-5 shadow-md border border-pink-200 w-52 flex flex-col items-center">
 
-            <h3 className="text-base font-bold text-[#6b4f3b] mb-2">
+            <h3 className="text-base font-bold text-black mb-2">
               ⏳ Hours
             </h3>
 
-            <p className="text-lg font-bold text-[#8b5e3c] mb-2">
+            <p className="text-lg font-bold text-black mb-2">
               0 H
             </p>
 
@@ -184,13 +180,13 @@ export default function ProfilePage() {
               {[10, 20, 15, 25, 18, 22, 12].map((height, i) => (
                 <div
                   key={i}
-                  className="bg-[#8b5e3c]/60 rounded-md w-4"
+                  className="bg-[#FFD6E7] rounded-md w-4"
                   style={{ height: `${height}%` }}
                 />
               ))}
             </div>
 
-            <div className="flex justify-between text-xs text-[#6b4f3b]/70 mt-1 w-full">
+            <div className="flex justify-between text-xs text-black/70 mt-1 w-full">
               <span>Su</span>
               <span>M</span>
               <span>T</span>
@@ -208,22 +204,20 @@ export default function ProfilePage() {
       {/* BOTTOM SECTION */}
       <div className="space-y-6">
 
-        {/* Achievements */}
-        <div className="bg-white rounded-2xl p-6 shadow-md border border-[#8b5e3c]/20">
-          <h3 className="text-xl font-bold text-[#6b4f3b] mb-3">
+        <div className="bg-white rounded-2xl p-6 shadow-md border border-pink-200">
+          <h3 className="text-xl font-bold text-black mb-3">
             🏅 Achievements
           </h3>
-          <p className="text-sm text-zinc-600">
+          <p className="text-sm text-black/70">
             No achievements yet.
           </p>
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-2xl p-6 shadow-md border border-[#8b5e3c]/20">
-          <h3 className="text-xl font-bold text-[#6b4f3b] mb-3">
+        <div className="bg-white rounded-2xl p-6 shadow-md border border-pink-200">
+          <h3 className="text-xl font-bold text-black mb-3">
             📜 Recent Activity
           </h3>
-          <p className="text-sm text-zinc-600">
+          <p className="text-sm text-black/70">
             No activity yet.
           </p>
         </div>
@@ -233,7 +227,6 @@ export default function ProfilePage() {
     </div>
   );
 }
-
 
 
 
