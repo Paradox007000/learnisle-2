@@ -50,6 +50,11 @@ ${limitedText}`,
     });
 
     const notes = response.text || "No notes generated.";
+    // 💾 Save notes for podcast feature
+const notesPath = path.join(process.cwd(), "data", "latest-notes.txt");
+await fs.writeFile(notesPath, notes, "utf-8");
+console.log("💾 Notes saved for podcast");
+
 
     console.log("🧠 Notes preview:", notes.slice(0, 200));
 
