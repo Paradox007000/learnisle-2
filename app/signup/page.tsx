@@ -39,49 +39,70 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-center mb-6">
+    <div
+  className="min-h-screen flex items-center justify-center"
+  style={{
+    background: "linear-gradient(to bottom, #FFF6EC, #E6F7F2)",
+  }}
+>
+ <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl">
+        <h1 className="text-2xl font-bold text-center mb-6 text-black">
           Create an account
         </h1>
 
         <form className="space-y-4" onSubmit={handleSignup}>
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-black">
+              Email
+            </Label>
             <Input
               id="email"
               type="email"
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="text-black"
             />
           </div>
 
           <div>
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password" className="text-black">
+              Password
+            </Label>
             <Input
               id="password"
               type="password"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="text-black"
             />
           </div>
 
-          <Button className="w-full" type="submit">
+          <Button
+            className="w-full bg-[#FFB7D5] hover:opacity-90 text-black rounded-xl"
+            type="submit"
+          >
             Sign Up
           </Button>
         </form>
 
-        <div className="my-4 text-center text-sm text-gray-500">— OR —</div>
+        <div className="my-4 text-center text-sm text-black">— OR —</div>
 
-        <Button variant="outline" className="w-full" onClick={handleGoogleSignup}>
+        <Button
+          variant="outline"
+          className="w-full text-black rounded-xl"
+          onClick={handleGoogleSignup}
+        >
           Continue with Google
         </Button>
 
-        <p className="text-sm text-center text-gray-600 mt-4">
+        <p className="text-sm text-center text-black mt-4">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-600 hover:underline">
+          <Link
+            href="/login"
+            className="text-[#FFB7D5] font-semibold hover:opacity-80 transition"
+          >
             Login
           </Link>
         </p>
@@ -89,3 +110,4 @@ export default function SignupPage() {
     </div>
   );
 }
+
