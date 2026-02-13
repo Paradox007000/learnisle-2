@@ -171,7 +171,7 @@ export default function Dashboard() {
               fontWeight: 'bold',
               cursor: 'pointer'
             }}
-          > ☰MENU</button>
+          > ☰</button>
 
           <div className="w-full flex items-center py-4 pl-10">
   <img
@@ -180,9 +180,6 @@ export default function Dashboard() {
     className="h-28 object-contain"
   />
 </div>
-
-
-
           {/* RIGHT SIDE: Account shortcut + Theme toggle */}
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }}>
             <Link href="/account" style={{ fontSize: "24px", textDecoration: "none" }}>👤</Link>

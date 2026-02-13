@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import TopBar from "@/components/ui/TopBar";
 
 interface Flashcard {
   question: string;
@@ -13,6 +15,7 @@ export default function FlashcardsPage() {
   const [error, setError] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // ✅ MENU STATE
 
   useEffect(() => {
     const fetchFlashcards = async () => {
@@ -78,22 +81,71 @@ export default function FlashcardsPage() {
   return (
     <div className="min-h-screen flex flex-col bg-[#FFFDF7]">
 
-      {/* Simple Header — Only Learnisle */}
-      <header className="h-20 flex items-center justify-center border-b border-pink-100 bg-white">
-       <div className="w-full flex items-center py-4 px-6">
-  <img
-    src="/logo.png"
-    alt="Learnisle Logo"
-    className="h-28 object-contain"
-  />
-</div>
+      {/* 🌸 TOP MENU BAR */}
+      <TopBar openMenu={() => setIsMenuOpen(true)} />
 
+      {/* MENU DRAWER */}
+      {isMenuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "300px",
+            height: "100vh",
+            background: "white",
+            zIndex: 999999,
+            boxShadow: "5px 0 20px rgba(0,0,0,0.3)",
+            padding: "40px 20px",
+            transition: "transform 0.3s ease",
+          }}
+        >
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            style={{
+              position: "absolute",
+              top: "20px",
+              right: "20px",
+              fontSize: "30px",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            ×
+          </button>
 
-      </header>
+          <div style={{ marginTop: "20px" }}>
+            <Link href="/arcade" onClick={() => setIsMenuOpen(false)} style={menuStyle}>🎮 Arcade</Link>
+            <Link href="/document" onClick={() => setIsMenuOpen(false)} style={menuStyle}>📄 Document</Link>
+            <Link href="/podcast" onClick={() => setIsMenuOpen(false)} style={menuStyle}>🎙️ Podcast</Link>
+            <Link href="/flashcards" onClick={() => setIsMenuOpen(false)} style={menuStyle}>🃏 Flashcards</Link>
+            <hr style={dividerStyle} />
+            <Link href="/mimi" onClick={() => setIsMenuOpen(false)} style={{ ...menuStyle, background: "#fce4ec" }}>😺 Mimi</Link>
+            <hr style={dividerStyle} />
+            <Link href="/account" onClick={() => setIsMenuOpen(false)} style={{ ...menuStyle, background: "#f5f5f5" }}>👤 Account</Link>
+          </div>
+        </div>
+      )}
 
+      {isMenuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.5)",
+            zIndex: 99999,
+          }}
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
+
+      {/* MAIN CONTENT */}
       <div className="flex flex-col items-center justify-center flex-1 px-6">
 
-        {/* Heading */}
         <div className="text-center mb-10">
           <h2 className="text-4xl font-bold text-black">Flashcards</h2>
           <p className="text-gray-500 mt-2">
@@ -101,7 +153,6 @@ export default function FlashcardsPage() {
           </p>
         </div>
 
-        {/* Card */}
         <div
           className="relative w-full max-w-xl h-[350px] perspective cursor-pointer"
           onClick={() => setFlipped(!flipped)}
@@ -111,14 +162,12 @@ export default function FlashcardsPage() {
               flipped ? "rotate-y-180" : ""
             }`}
           >
-            {/* Front */}
             <div className="absolute w-full h-full backface-hidden bg-white rounded-3xl shadow-xl flex items-center justify-center p-10 text-center">
               <p className="text-xl font-medium text-black leading-relaxed">
                 {card.question}
               </p>
             </div>
 
-            {/* Back - Faded Pink */}
             <div className="absolute w-full h-full backface-hidden rotate-y-180 bg-pink-100 text-black rounded-3xl shadow-xl flex items-center justify-center p-10 text-center">
               <p className="text-xl font-medium leading-relaxed">
                 {card.answer}
@@ -127,7 +176,6 @@ export default function FlashcardsPage() {
           </div>
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex gap-6 mt-10">
           <button
             onClick={prevCard}
@@ -149,5 +197,20 @@ export default function FlashcardsPage() {
   );
 }
 
+const menuStyle = {
+  display: "block",
+  padding: "15px",
+  marginBottom: "10px",
+  borderRadius: "10px",
+  background: "#e3f2fd",
+  textDecoration: "none",
+  color: "black",
+  fontWeight: "bold",
+};
 
-
+const dividerStyle = {
+  margin: "20px 0",
+  border: "none",
+  height: "1px",
+  background: "#ddd",
+};
