@@ -148,7 +148,8 @@ export default function Dashboard() {
       )}
 
       {/* MAIN CONTENT */}
-     <div style={{ paddingTop: '80px', minHeight: '100vh', background: '#FFFDF7' }}>
+     <div className="min-h-screen pt-20 bg-[#FFFDF7] dark:bg-[#282727]">
+
 
         {/* HEADER */}
         <header style={{
