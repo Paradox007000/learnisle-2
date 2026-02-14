@@ -10,14 +10,25 @@ export default function DocumentPage() {
   const [messages, setMessages] = useState<
     { role: "user" | "ai"; text: string }[]
   >([]);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // ✅ MENU STATE
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // 📄 Load AI Notes
+  // ✅ LOAD SAVED NOTES (DO NOT GENERATE AGAIN)
   useEffect(() => {
     const fetchNotes = async () => {
-      const res = await fetch("/api/generate-notes", { method: "POST" });
-      const data = await res.json();
-      setNotes(data.notes || "No notes generated.");
+      try {
+        const res = await fetch("/api/get-notes");
+
+        if (!res.ok) {
+          setNotes("Generate notes first 📄");
+          return;
+        }
+
+        const data = await res.json();
+        setNotes(data.notes || "No notes generated.");
+      } catch (err) {
+        console.error("Notes load error:", err);
+        setNotes("Failed to load notes.");
+      }
     };
 
     fetchNotes();
@@ -39,16 +50,16 @@ export default function DocumentPage() {
 
     const data = await res.json();
     const aiMessage = { role: "ai" as const, text: data.answer };
+
     setMessages((prev) => [...prev, aiMessage]);
   };
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      
-      {/* 🌸 TOP MENU BAR */}
+      {/* 🌸 TOP BAR */}
       <TopBar openMenu={() => setIsMenuOpen(true)} />
 
-      {/* MENU DRAWER */}
+      {/* 📂 MENU DRAWER */}
       {isMenuOpen && (
         <div
           style={{
@@ -61,7 +72,6 @@ export default function DocumentPage() {
             zIndex: 999999,
             boxShadow: "5px 0 20px rgba(0,0,0,0.3)",
             padding: "40px 20px",
-            transition: "transform 0.3s ease",
           }}
         >
           <button
@@ -94,6 +104,7 @@ export default function DocumentPage() {
 
       {isMenuOpen && (
         <div
+          onClick={() => setIsMenuOpen(false)}
           style={{
             position: "fixed",
             top: 0,
@@ -103,14 +114,13 @@ export default function DocumentPage() {
             background: "rgba(0,0,0,0.5)",
             zIndex: 99999,
           }}
-          onClick={() => setIsMenuOpen(false)}
         />
       )}
 
       {/* MAIN CONTENT */}
       <div style={{ display: "flex", flex: 1, background: "#FFFDF7" }}>
         
-        {/* 📄 LEFT SIDE — NOTES */}
+        {/* 📄 NOTES */}
         <div
           style={{
             flex: 2,
@@ -129,13 +139,20 @@ export default function DocumentPage() {
             <h1 style={{ marginBottom: "20px", color: "#3A4F41" }}>
               📄 Study Notes
             </h1>
-            <div style={{ whiteSpace: "pre-wrap", lineHeight: "1.7", color: "#444" }}>
+
+            <div
+              style={{
+                whiteSpace: "pre-wrap",
+                lineHeight: "1.7",
+                color: "#444",
+              }}
+            >
               {notes}
             </div>
           </div>
         </div>
 
-        {/* 🤖 RIGHT SIDE — MIMI CHAT */}
+        {/* 🤖 MIMI CHAT */}
         <div
           style={{
             flex: 1,
@@ -156,29 +173,21 @@ export default function DocumentPage() {
                 style={{
                   marginBottom: "16px",
                   display: "flex",
-                  justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
-                  alignItems: "flex-end",
+                  justifyContent:
+                    msg.role === "user" ? "flex-end" : "flex-start",
                   gap: "10px",
                 }}
               >
                 {msg.role === "ai" && (
-                  <div
+                  <img
+                    src="/mascot.png"
+                    alt="Mimi"
                     style={{
                       width: "36px",
                       height: "36px",
                       borderRadius: "50%",
-                      overflow: "hidden",
-                      background: "#FFEFF6",
-                      border: "2px solid #FFD6E7",
-                      flexShrink: 0,
                     }}
-                  >
-                    <img
-                      src="/mascot.png"
-                      alt="Mimi"
-                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                    />
-                  </div>
+                  />
                 )}
 
                 <div
@@ -186,11 +195,12 @@ export default function DocumentPage() {
                     maxWidth: "70%",
                     padding: "12px 16px",
                     borderRadius: "18px",
-                    background: msg.role === "user" ? "#DDF4E4" : "#FFFFFF",
-                    border: msg.role === "ai" ? "1px solid #F1F1F1" : "none",
-                    boxShadow:
-                      msg.role === "ai" ? "0 2px 6px rgba(0,0,0,0.04)" : "none",
-                    lineHeight: "1.5",
+                    background:
+                      msg.role === "user" ? "#DDF4E4" : "#FFFFFF",
+                    border:
+                      msg.role === "ai"
+                        ? "1px solid #F1F1F1"
+                        : "none",
                   }}
                 >
                   {msg.text}
@@ -204,13 +214,13 @@ export default function DocumentPage() {
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
               placeholder="Ask Mimi about your document..."
+              onKeyDown={(e) => e.key === "Enter" && askQuestion()}
               style={{
                 width: "100%",
                 padding: "12px",
                 borderRadius: "10px",
                 border: "1px solid #EADFD6",
               }}
-              onKeyDown={(e) => e.key === "Enter" && askQuestion()}
             />
           </div>
         </div>

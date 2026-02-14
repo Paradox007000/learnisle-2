@@ -3,139 +3,328 @@
 import TopBar from "@/components/ui/TopBar";
 import { useEffect, useRef, useState } from "react";
 
+/* ------------------------------------------------ */
+/* 🧹 CLEAN MARKDOWN FOR SPEECH                     */
+/* ------------------------------------------------ */
+function cleanForSpeech(text: string) {
+  return text
+    .replace(/\*\*/g, "")
+    .replace(/\*/g, "")
+    .replace(/^- /gm, "")
+    .replace(/^• /gm, "")
+    .replace(/^#+\s/gm, "")
+    .replace(/\n{2,}/g, "\n")
+    .trim();
+}
+
 export default function PodcastPage() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const captionRef = useRef<HTMLDivElement | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+
   const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState("Preparing podcast...");
+  const [captions, setCaptions] = useState("");
+  const [playing, setPlaying] = useState(false);
+
+  // ⭐ NEW — word highlighting
+  const [words, setWords] = useState<string[]>([]);
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+
+  /* ------------------------------------------------ */
+  /* 🎙️ PODCAST + SPEECH                             */
+  /* ------------------------------------------------ */
 
   useEffect(() => {
-    const playPodcast = async () => {
+    // prevent restarting if already speaking
+    if (speechSynthesis.speaking || speechSynthesis.pending) {
+      setLoading(false);
+      setPlaying(true);
+      setStatus("Now playing 🎧");
+      return;
+    }
+
+    const startPodcast = async () => {
       try {
-        // 1️⃣ Get AI notes
-        const notesRes = await fetch("/api/generate-notes", { method: "POST" });
-        const { notes } = await notesRes.json();
+        setStatus("Fetching your notes...");
+        setProgress(30);
 
-        // 2️⃣ Convert notes to podcast audio
-        const voiceRes = await fetch("/api/generate-podcast", {
-          method: "POST",
-          body: JSON.stringify({ text: notes }),
-          headers: { "Content-Type": "application/json" },
-        });
+        const res = await fetch("/api/get-notes");
+        if (!res.ok) throw new Error("No notes");
 
-        if (!voiceRes.ok) throw new Error("Podcast API failed");
+        const { notes } = await res.json();
 
-        const blob = await voiceRes.blob();
-        const url = URL.createObjectURL(blob);
+        setCaptions(notes);
 
-        if (audioRef.current) {
-          audioRef.current.src = url;
-          audioRef.current.play();
-        }
+        const cleanText = cleanForSpeech(notes);
 
-        setLoading(false);
+        // split words for highlighting
+        const wordArray = cleanText.split(/\s+/);
+        setWords(wordArray);
+
+        setStatus("Preparing Mimi's voice...");
+        setProgress(70);
+
+        const speech = new SpeechSynthesisUtterance(cleanText);
+
+        const voices = speechSynthesis.getVoices();
+        const bestVoice =
+          voices.find(v => v.name.toLowerCase().includes("female")) ||
+          voices.find(v => v.lang.includes("en")) ||
+          voices[0];
+
+        if (bestVoice) speech.voice = bestVoice;
+
+        speech.rate = 0.95;
+        speech.pitch = 1.15;
+
+        /* ✅ START EVENT */
+        speech.onstart = () => {
+          setLoading(false);
+          setPlaying(true);
+          setStatus("Now playing 🎧");
+          setProgress(100);
+        };
+
+        /* ✅ LIVE WORD TRACKING */
+        speech.onboundary = (event) => {
+          if (event.name === "word") {
+            const spokenText = cleanText.substring(0, event.charIndex);
+            const index = spokenText.split(/\s+/).length - 1;
+            setCurrentWordIndex(index);
+          }
+        };
+
+        /* ✅ END EVENT */
+        speech.onend = () => {
+          setPlaying(false);
+          setStatus("Podcast finished ✨");
+        };
+
+        utteranceRef.current = speech;
+
+        setTimeout(() => {
+          speechSynthesis.speak(speech);
+        }, 400);
       } catch (err) {
-        console.error("Podcast error:", err);
+        console.error(err);
+        setStatus("No notes available 😭");
+        setLoading(false);
       }
     };
 
-    playPodcast();
+    startPodcast();
+
+    // stop audio when leaving page
+    return () => {
+      speechSynthesis.cancel();
+    };
   }, []);
 
+  /* ------------------------------------------------ */
+  /* ▶️ PLAY / PAUSE                                 */
+  /* ------------------------------------------------ */
+
+  const togglePlay = () => {
+    if (!utteranceRef.current) return;
+
+    if (playing) {
+      speechSynthesis.pause();
+      setPlaying(false);
+    } else {
+      speechSynthesis.resume();
+      setPlaying(true);
+    }
+  };
+
+  /* ------------------------------------------------ */
+  /* 📜 AUTO SCROLL                                  */
+  /* ------------------------------------------------ */
+
+  useEffect(() => {
+    if (!captionRef.current) return;
+
+    const el = captionRef.current;
+
+    const active = el.querySelector(".activeWord");
+    if (active) {
+      active.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [currentWordIndex]);
+
+  /* ------------------------------------------------ */
+  /* 🎨 UI                                           */
+  /* ------------------------------------------------ */
+
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "linear-gradient(to bottom, #fff1f6, #e0f7fa)",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
+    <div className="page">
       <TopBar />
 
-      <div
-        style={{
-          flex: 1,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "40px",
-          flexDirection: "column",
-        }}
-      >
-        {/* 🐱 Mascot */}
-        <div
-          style={{
-            width: "150px",
-            height: "150px",
-            borderRadius: "50%",
-            overflow: "hidden",
-            background: "#ffeef5",
-            border: "5px solid #ffd6e7",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            marginBottom: "35px",
-            boxShadow: "0 10px 40px rgba(255,182,193,0.35)",
-          }}
-        >
-          <img
-            src="/mascot.png"
-            alt="Mimi mascot"
-            style={{ width: "85%", height: "85%", objectFit: "contain" }}
-          />
+      <div className="container">
+        <div className="card">
+
+          {/* Mascot */}
+          <div className="mascotWrap">
+            <img src="/mascot.png" className="mascot" />
+
+            {playing && (
+              <div className="waves">
+                {[0,1,2,3,4].map(i => (
+                  <span key={i} style={{animationDelay:`${i*0.15}s`}}/>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <h2 className="status">{status}</h2>
+
+          {loading && (
+            <div className="progressBar">
+              <div
+                className="progressFill"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          )}
+
+          {!loading && (
+            <button className="playBtn" onClick={togglePlay}>
+              {playing ? "Pause ⏸️" : "Play ▶️"}
+            </button>
+          )}
+
+          {!loading && (
+            <div ref={captionRef} className="captions">
+              {words.map((word, i) => (
+                <span
+                  key={i}
+                  className={
+                    i === currentWordIndex ? "activeWord" : ""
+                  }
+                >
+                  {word}{" "}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
-
-        {/* 🌊 Sound Waves */}
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "flex-end",
-            gap: "10px",
-            height: "60px",
-            marginBottom: "25px",
-          }}
-        >
-          {[0, 1, 2, 3, 4].map((i) => (
-            <div
-              key={i}
-              style={{
-                width: "10px",
-                height: "100%",
-                background: "linear-gradient(to top, #ff9ebb, #a0e7ff)",
-                borderRadius: "10px",
-                transformOrigin: "bottom",
-
-                animationName: "bounce",
-                animationDuration: "1.2s",
-                animationTimingFunction: "ease-in-out",
-                animationIterationCount: "infinite",
-                animationDelay: `${i * 0.15}s`,
-              }}
-            />
-          ))}
-        </div>
-
-        {/* 🎧 Status */}
-        <p style={{ color: "#555", fontSize: "16px" }}>
-          {loading
-            ? "Mimi is turning your notes into a podcast..."
-            : "Now playing your AI podcast 🎧"}
-        </p>
       </div>
 
-      {/* 🎵 Hidden audio element */}
-      <audio ref={audioRef} />
+      {/* ---------------- STYLES ---------------- */}
+      <style jsx>{`
+        .page {
+          min-height: 100vh;
+          background: linear-gradient(180deg,#fdfbff,#f3f9ff);
+        }
 
-      {/* 🌊 Wave Animation */}
-      <style jsx global>{`
-        @keyframes bounce {
-          0%,
-          100% {
-            transform: scaleY(0.4);
-          }
-          50% {
-            transform: scaleY(1);
-          }
+        .container {
+          display:flex;
+          justify-content:center;
+          align-items:center;
+          padding:40px 20px;
+        }
+
+        .card {
+          width:100%;
+          max-width:820px;
+          background:white;
+          border-radius:28px;
+          padding:40px;
+          box-shadow:0 20px 60px rgba(0,0,0,0.08);
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          gap:24px;
+        }
+
+        .mascotWrap{
+          position:relative;
+          width:140px;
+        }
+
+        .mascot{
+          width:100%;
+          filter:drop-shadow(0 12px 25px rgba(0,0,0,0.15));
+        }
+
+        .status{
+          color:#333;
+          font-weight:600;
+        }
+
+        .progressBar{
+          width:320px;
+          height:10px;
+          background:#eee;
+          border-radius:999px;
+          overflow:hidden;
+        }
+
+        .progressFill{
+          height:100%;
+          background:linear-gradient(90deg,#ff9ebb,#a0e7ff);
+          transition:width .6s ease;
+        }
+
+        .playBtn{
+          border:none;
+          padding:14px 32px;
+          border-radius:999px;
+          background:linear-gradient(135deg,#ff9ebb,#ffa7c4);
+          color:white;
+          font-size:16px;
+          cursor:pointer;
+          box-shadow:0 10px 25px rgba(0,0,0,.15);
+        }
+
+        .captions{
+          width:100%;
+          max-width:640px;
+          height:260px;
+          overflow-y:auto;
+          background:#fafcff;
+          border-radius:18px;
+          padding:20px;
+          line-height:1.9;
+          color:#444;
+          border:1px solid #eef2f7;
+        }
+
+        /* ⭐ PINK WORD HIGHLIGHT */
+        .activeWord{
+          background:#ff9ebb;
+          color:white;
+          padding:3px 7px;
+          border-radius:8px;
+          transition:all .2s ease;
+        }
+
+        /* SOUND WAVES */
+        .waves{
+          position:absolute;
+          bottom:-15px;
+          left:50%;
+          transform:translateX(-50%);
+          display:flex;
+          gap:6px;
+          height:30px;
+        }
+
+        .waves span{
+          width:6px;
+          height:100%;
+          background:linear-gradient(to top,#ff9ebb,#ffc2d6);
+          border-radius:6px;
+          animation:bounce 1.2s infinite ease-in-out;
+          transform-origin:bottom;
+        }
+
+        @keyframes bounce{
+          0%,100%{transform:scaleY(.3);}
+          50%{transform:scaleY(1);}
         }
       `}</style>
     </div>
