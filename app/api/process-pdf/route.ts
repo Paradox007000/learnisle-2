@@ -51,6 +51,14 @@ export async function POST(req: NextRequest) {
     await fs.writeFile(filePath, JSON.stringify({ text }));
 
     console.log("💾 Saved to:", filePath);
+    /* ---------------------------------- */
+/* 🤖 AUTO GENERATE NOTES AFTER UPLOAD */
+/* ---------------------------------- */
+
+await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"}/api/generate-notes`, {
+  method: "POST",
+});
+
 
     return NextResponse.json({ success: true, documentId });
 
