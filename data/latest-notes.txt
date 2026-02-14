@@ -1,91 +1,69 @@
-# Study Notes: Software Testing Tools and Measurement
-
-## 1. Manual Testing
-**Short Explanation:** Manual testing is the process where a human tester checks software without automation tools to find defects, acting like an end-user to verify features step-by-step.
-
-### The Manual Testing Process (8 Steps)
-*   **Requirement Analysis:** Understanding what needs to be tested based on software requirements.
-*   **Test Planning:** Deciding the strategy, scope, resources, and timeline.
-*   **Test Case Design:** Writing test cases, scenarios, and preparing data.
-*   **Test Environment Setup:** Setting up necessary hardware and software.
-*   **Test Execution:** Manually running tests and marking them as Pass or Fail.
-*   **Defect Reporting:** Logging found bugs and assigning severity/priority.
-*   **Re-testing & Regression Testing:** Checking fixed bugs and ensuring existing features still work.
-*   **Test Closure:** Preparing summary reports and signing off.
-
-### Limitations of Manual Testing
-*   **Time-consuming:** Especially for large applications.
-*   **Repetitive tasks:** Inefficient for tests like regression testing.
-*   **Accuracy issues:** Prone to human error.
-*   **Performance limitations:** Cannot accurately measure load or stress.
-*   **High manpower:** Requires more testers, increasing project costs.
+Focusing on Chapter 5: Software Project Management, here are your study notes, bullet points, and simplified explanations based on the text provided.
 
 ---
 
-## 2. Automation Testing
-**Short Explanation:** This technique uses specialized tools (like Selenium or JUnit) and scripts to run test cases automatically, comparing actual results with expected results.
+### **1. Project Scheduling**
+**Short Explanation:** This is the process of deciding how to organize project work into separate tasks and determining when and how they will be executed. It acts as a map for tasks, deadlines, and resources.
 
-### Benefits & Importance
-*   **Speed:** Much faster than manual execution.
-*   **Reliability:** Consistent results with fewer human errors.
-*   **Reusability:** Scripts can be used multiple times and run 24/7.
-*   **Efficiency:** Increases the cycle of execution while saving long-term time and cost.
+*   **Key Components:**
+    *   **Timeline:** Start and end dates.
+    *   **Milestones:** Major points of progress.
+    *   **Resources:** People, equipment, and tools needed.
+    *   **Dependencies:** How tasks rely on each other.
 
-### The Automation Process
-1.  **Feasibility Analysis:** Decide if automation is suitable (check ROI and stability).
-2.  **Tool Selection:** Choose a tool based on technology, budget, and team skill.
-3.  **Framework Evaluation:** Select a framework (Data-driven, Keyword-driven, or Hybrid).
-4.  **Proof of Concept (POC):** Create a small sample to verify tool capability.
-5.  **Develop Framework:** Build the structure for scripts and reporting.
-6.  **Develop & Execute Scripts:** Write scripts, run them, and analyze failures.
-
----
-
-## 3. Comparison: Manual vs. Automation
-
-| Aspect | Manual Testing | Automation Testing |
-| :--- | :--- | :--- |
-| **Execution** | Performed by a human. | Executed via tools and scripts. |
-| **Speed** | Slower. | Significantly faster. |
-| **Accuracy** | Prone to human error. | Highly consistent and reliable. |
-| **Cost** | Lower initial cost; higher long-term cost. | Higher initial cost; lower long-term cost. |
-| **Programming** | No coding knowledge required. | Requires knowledge of languages (Java, Python, etc.). |
-| **Best Use Case** | UI/UX and Exploratory testing. | Regression and Performance testing. |
+**The 5-Step Scheduling Process:**
+1.  **Identify Activities:** Break the project into small, manageable tasks (e.g., coding, testing).
+2.  **Identify Activity Dependencies:** Determine the order of tasks.
+3.  **Allocate Resources:** Assign tools, software, and budget to each activity.
+4.  **Create Project Charts:** Use visual tools like Gantt or PERT/CPM charts to see the workflow.
+5.  **Allocate People:** Assign team members to tasks based on their skills without overloading them.
 
 ---
 
-## 4. Software Testing Tools Categories
-*   **Manual/Management:** JIRA, Bugzilla, TestLink.
-*   **Automation (Functional):** Selenium, UFT (QTP), Cypress.
-*   **Performance (Load/Stress):** JMeter, LoadRunner.
-*   **Mobile:** Appium, Espresso.
-*   **API:** Postman, SoapUI.
-*   **Security:** OWASP ZAP, Burp Suite.
+### **2. Task Dependencies**
+**Short Explanation:** In project management, some tasks cannot start or finish until others do.
+
+*   **Finish-to-Start (FS):** Task B starts only after Task A is finished (Most common).
+*   **Start-to-Start (SS):** Task B starts at the same time Task A starts.
+*   **Finish-to-Finish (FF):** Task B can only finish when Task A is finished.
+*   **Start-to-Finish (SF):** Task B can only finish when Task A starts (Rare).
 
 ---
 
-## 5. Selecting the Right Tool
-**Short Explanation:** Choosing a tool is critical because tools can be expensive, require specific training, or may not support all platforms.
+### **3. Work Breakdown Structure (WBS)**
+**Short Explanation:** A hierarchical "tree" structure that breaks a complex project down into smaller, independent parts. It follows a **Top-Down approach**.
 
-### Key Selection Criteria
-*   **Meeting Requirements:** Does it support the project goals and required test types?
-*   **Technology Expectations:** Is it compatible with the project's OS, browsers, and languages?
-*   **Training and Skill:** Can the team learn it easily? Is there good documentation?
-*   **Management Aspects:** What is the cost, licensing, and expected Return on Investment (ROI)?
+*   **Levels of WBS:**
+    *   **Level 1 (Goal):** The complete system (e.g., Library Management System).
+    *   **Level 2 (Major Modules):** Requirements, Design, Implementation, Testing.
+    *   **Level 3 (Activities):** Sub-tasks (e.g., Database design, Unit testing).
+    *   **Level 4 (Work Packages):** The smallest manageable task assigned to an individual.
 
 ---
 
-## 6. Selenium Deep Dive
-**Short Explanation:** An open-source suite used specifically for automating web applications across different browsers and platforms.
+### **4. Activity Networks**
+**Short Explanation:** A visual graph showing the logical sequence of tasks and their relationships.
 
-### Key Features
-*   **Open Source:** Free to use with no licensing costs.
-*   **Multi-Language:** Supports Java, Python, C#, and Ruby.
-*   **Cross-Browser:** Works on Chrome, Firefox, Edge, and Safari.
-*   **Platform Independent:** Runs on Windows, Linux, and macOS.
-*   **Parallel Execution:** Can run multiple tests at once to save time.
+*   **Activity on Nodes (AON):** Activities are shown as circles or ovals. Arrows show the sequence.
+*   **Activity on Arrows (AOA):** Activities are shown as arrows. Nodes represent the start or end of an event.
 
-### Components of Selenium
-*   **Selenium IDE:** A record-and-playback tool for beginners to create quick scripts.
-*   **Selenium WebDriver:** The core component for complex, fast, and reliable automation using code.
-*   **Selenium Grid:** Used to run tests on multiple machines and browsers simultaneously.
+---
+
+### **5. Project Tracking Tools**
+**Short Explanation:** Monitoring and controlling the project to ensure it stays on schedule, within budget, and meets quality standards.
+
+*   **Gantt Chart (Timeline Chart):**
+    *   Shows tasks as horizontal bars against a timeline.
+    *   Visualizes start dates, end dates, and overlaps.
+    *   Emphasizes the scope of individual tasks.
+
+*   **Earned Value Analysis (EVA):**
+    *   A technique to measure project health by integrating cost, schedule, and scope.
+    *   **PV (Planned Value):** Budgeted cost for work *planned* to be done.
+    *   **EV (Earned Value):** Budgeted cost for work *actually completed*.
+    *   **AC (Actual Cost):** Real money spent so far.
+
+**How to read EVA Results:**
+*   **Schedule Variance (SV = EV - PV):** If negative, you are behind schedule.
+*   **Cost Variance (CV = EV - AC):** If negative, you are over budget.
+*   **Performance Indexes (SPI & CPI):** If the value is **less than 1**, the project is behind schedule or over budget.
