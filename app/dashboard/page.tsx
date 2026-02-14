@@ -6,6 +6,8 @@ import Link from "next/link";
 import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useTheme } from "next-themes";
+import Image from "next/image";
+
 
 export default function Dashboard() {
   const router = useRouter();
@@ -146,7 +148,9 @@ export default function Dashboard() {
       )}
 
       {/* MAIN CONTENT */}
-      <div style={{ paddingTop: '80px', minHeight: '100vh', background: isDark ? '#282727ff' : '#f5f5f5' }}>
+     <div className="min-h-screen pt-20 bg-[#FFFDF7] dark:bg-[#282727]">
+
+
         {/* HEADER */}
         <header style={{
           position: 'fixed',
@@ -182,8 +186,26 @@ export default function Dashboard() {
 </div>
           {/* RIGHT SIDE: Account shortcut + Theme toggle */}
           <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: "12px" }}>
-            <Link href="/account" style={{ fontSize: "24px", textDecoration: "none" }}>👤</Link>
-            {mounted && (
+            <Link href="/account">
+  <div
+    style={{
+      width: "40px",
+      height: "40px",
+      borderRadius: "50%",
+      overflow: "hidden",
+      cursor: "pointer"
+    }}
+  >
+    <Image
+      src="/profile.png"
+      alt="Profile"
+      width={40}
+      height={40}
+      style={{ objectFit: "cover" }}
+    />
+  </div>
+</Link>
+{mounted && (
               <button
                 onClick={() => setTheme(isDark ? 'light' : 'dark')}
                 style={{
