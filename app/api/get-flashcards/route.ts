@@ -6,14 +6,14 @@ import path from "path";
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_FLASHCARD_KEY,
 });
 
 export async function GET() {
   try {
-    if (!process.env.GEMINI_API_KEY) {
+    if (!process.env.GEMINI_FLASHCARD_KEY) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY missing in .env.local" },
+        { error: "GEMINI_FLASHCARD_KEY missing in .env.local" },
         { status: 500 }
       );
     }
@@ -62,8 +62,7 @@ export async function GET() {
     }
 
     const response = await ai.models.generateContent({
-  model: "models/gemini-2.5-flash",
-
+      model: "models/gemini-2.5-flash",
       contents: `
 Generate exactly 5 study flashcards.
 
