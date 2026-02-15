@@ -99,9 +99,16 @@ export default function Dashboard() {
 
   return (
     <>
-      <div className="min-h-screen pt-24 bg-[#FFFDF7] dark:bg-[#1E1E1E] px-8 transition-colors duration-300">
+    <div
+  className="min-h-screen pt-24 px-8 transition-colors duration-300"
+  style={{
+    background: theme === "dark"
+      ? "linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 50%, #3a3a3a 100%)" // subtle dark gray gradient
+      : "linear-gradient(135deg, #ffe6f0 0%, #e0f0ff 100%)",             // faded pink → faded blue
+  }}
+>
 
-        {/* HEADER */}
+{/* HEADER */}
         <header className="fixed top-0 left-0 right-0 h-20 bg-white dark:bg-[#1E1E1E] shadow-md flex items-center px-6 z-50 transition-colors duration-300">
           <div className="w-full flex items-center justify-between">
             <div className="flex items-center gap-4">
