@@ -1,12 +1,17 @@
 "use client";
+
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface TopBarProps {
-  openMenu?: () => void; // optional so it won’t break other pages
+  openMenu?: () => void; // optional menu button
+  hideMimi?: boolean;    // ✅ NEW: hide mascot when needed
 }
 
-export default function TopBar({ openMenu }: TopBarProps) {
+export default function TopBar({
+  openMenu,
+  hideMimi = false,
+}: TopBarProps) {
   const router = useRouter();
 
   return (
@@ -21,10 +26,15 @@ export default function TopBar({ openMenu }: TopBarProps) {
         padding: "0 40px",
       }}
     >
-      {/* Left side — Menu + Logo */}
-      <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-        
-        {/* ☰ Menu Button (only works if prop passed) */}
+      {/* LEFT SIDE — MENU + LOGO */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "20px",
+        }}
+      >
+        {/* ☰ Menu Button (only if provided) */}
         {openMenu && (
           <button
             onClick={openMenu}
@@ -58,37 +68,45 @@ export default function TopBar({ openMenu }: TopBarProps) {
         </div>
       </div>
 
-      {/* Right side — Mascot + Mimi */}
-      <div style={{ display: "flex", alignItems: "center", gap: "14px" }}>
+      {/* RIGHT SIDE — Mimi (conditionally rendered) */}
+      {!hideMimi && (
         <div
           style={{
-            width: "50px",
-            height: "50px",
-            borderRadius: "50%",
-            overflow: "hidden",
-            background: "#ffeef5",
-            border: "2px solid #ffd6e7",
-            position: "relative",
+            display: "flex",
+            alignItems: "center",
+            gap: "14px",
           }}
         >
-          <Image
-            src="/mascot.png"
-            alt="Mimi mascot"
-            fill
-            style={{ objectFit: "cover" }}
-          />
-        </div>
+          <div
+            style={{
+              width: "50px",
+              height: "50px",
+              borderRadius: "50%",
+              overflow: "hidden",
+              background: "#ffeef5",
+              border: "2px solid #ffd6e7",
+              position: "relative",
+            }}
+          >
+            <Image
+              src="/mascot.png"
+              alt="Mimi mascot"
+              fill
+              style={{ objectFit: "cover" }}
+            />
+          </div>
 
-        <span
-          style={{
-            fontSize: "20px",
-            fontWeight: 600,
-            color: "#2F3E34",
-          }}
-        >
-          Mimi
-        </span>
-      </div>
+          <span
+            style={{
+              fontSize: "20px",
+              fontWeight: 600,
+              color: "#2F3E34",
+            }}
+          >
+            Mimi
+          </span>
+        </div>
+      )}
     </div>
   );
 }
