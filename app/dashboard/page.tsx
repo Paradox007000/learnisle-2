@@ -31,52 +31,47 @@ export default function Dashboard() {
   useEffect(() => setMounted(true), []);
 
   const handleFileUpload = async (
-  e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>
-) => {
-  e.preventDefault();
-  let file: File | null = null;
+    e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>
+  ) => {
+    e.preventDefault();
+    let file: File | null = null;
 
-  if ("dataTransfer" in e) {
-    file = e.dataTransfer.files[0];
-  } else {
-    file = e.target.files?.[0] || null;
-  }
-
-  if (!file) return;
-
-  setDragOver(false);
-
-  const newFile = {
-    id: Date.now(),
-    name: file.name,
-    type: file.name.split(".").pop()?.toLowerCase() || "unknown",
-    lastOpened: "Just now",
-  };
-
-  setFiles((prev) => [newFile, ...prev]);
-
-  const formData = new FormData();
-  formData.append("pdf", file);
-
-  try {
-    const res = await fetch("/api/process-pdf", {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-
-    if (data.success && data.documentId) {
-      localStorage.setItem("latestDoc", data.documentId);
-
-      // ✅ Dispatch event to refresh flashcards automatically
-      window.dispatchEvent(new Event("flashcardsUpdated"));
-      console.log("📢 Flashcards update event dispatched");
+    if ("dataTransfer" in e) {
+      file = e.dataTransfer.files[0];
+    } else {
+      file = e.target.files?.[0] || null;
     }
-  } catch (err) {
-    console.error("Upload failed:", err);
-  }
-};
 
+    if (!file) return;
+
+    setDragOver(false);
+
+    const newFile = {
+      id: Date.now(),
+      name: file.name,
+      type: file.name.split(".").pop()?.toLowerCase() || "unknown",
+      lastOpened: "Just now",
+    };
+
+    setFiles((prev) => [newFile, ...prev]);
+
+    const formData = new FormData();
+    formData.append("pdf", file);
+
+    try {
+      const res = await fetch("/api/process-pdf", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.success && data.documentId) {
+        localStorage.setItem("latestDoc", data.documentId);
+        window.dispatchEvent(new Event("flashcardsUpdated"));
+      }
+    } catch (err) {
+      console.error("Upload failed:", err);
+    }
+  };
 
   const getFileIcon = (type: string) => {
     switch (type) {
@@ -87,7 +82,6 @@ export default function Dashboard() {
     }
   };
 
-  // Menu styles
   const menuStyle: React.CSSProperties = {
     display: "block",
     padding: "12px 20px",
@@ -112,7 +106,6 @@ export default function Dashboard() {
           <div className="w-full flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button onClick={() => setIsMenuOpen(true)} className="text-2xl dark:text-white">☰</button>
-              {/* Logo enlarged */}
               <img src="/logo.png" alt="Logo" className="h-24 w-auto object-contain" />
             </div>
 
@@ -133,8 +126,7 @@ export default function Dashboard() {
           </div>
         </header>
 
-    
-        {/* 📂 MENU DRAWER */}
+        {/* MENU DRAWER */}
         {isMenuOpen && (
           <div
             style={{
@@ -165,48 +157,24 @@ export default function Dashboard() {
             </button>
 
             <div style={{ marginTop: "20px" }}>
-              <Link
-                href="/arcade"
-                onClick={() => setIsMenuOpen(false)}
-                style={{ ...menuStyle, background: "#e6f0ff" }}
-              >
+              <Link href="/arcade" onClick={() => setIsMenuOpen(false)} style={{ ...menuStyle, background: "#e6f0ff" }}>
                 🎮 Arcade
               </Link>
-              <Link
-                href="/document"
-                onClick={() => setIsMenuOpen(false)}
-                style={{ ...menuStyle, background: "#e6f0ff" }}
-              >
+              <Link href="/document" onClick={() => setIsMenuOpen(false)} style={{ ...menuStyle, background: "#e6f0ff" }}>
                 📄 Document
               </Link>
-              <Link
-                href="/podcast"
-                onClick={() => setIsMenuOpen(false)}
-                style={{ ...menuStyle, background: "#e6f0ff" }}
-              >
+              <Link href="/podcast" onClick={() => setIsMenuOpen(false)} style={{ ...menuStyle, background: "#e6f0ff" }}>
                 🎙️ Podcast
               </Link>
-              <Link
-                href="/flashcards"
-                onClick={() => setIsMenuOpen(false)}
-                style={{ ...menuStyle, background: "#e6f0ff" }}
-              >
+              <Link href="/flashcards" onClick={() => setIsMenuOpen(false)} style={{ ...menuStyle, background: "#e6f0ff" }}>
                 🃏 Flashcards
               </Link>
               <hr style={dividerStyle} />
-              <Link
-                href="/mimi"
-                onClick={() => setIsMenuOpen(false)}
-                style={{ ...menuStyle, background: "#fce4ec" }}
-              >
+              <Link href="/mimi" onClick={() => setIsMenuOpen(false)} style={{ ...menuStyle, background: "#fce4ec" }}>
                 😺 Mimi
               </Link>
               <hr style={dividerStyle} />
-              <Link
-                href="/account"
-                onClick={() => setIsMenuOpen(false)}
-                style={{ ...menuStyle, background: "#f5f5f5" }}
-              >
+              <Link href="/account" onClick={() => setIsMenuOpen(false)} style={{ ...menuStyle, background: "#f5f5f5" }}>
                 👤 Account
               </Link>
             </div>
@@ -238,8 +206,8 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* FEATURE BOXES */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        {/* FEATURE BOXES (Updated Order) */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
           <Link href="/document">
             <div className="premiumCard">
               <div className="cardIcon bg-purple-100 text-purple-600">📄</div>
@@ -265,13 +233,23 @@ export default function Dashboard() {
               <div className="cardIcon bg-blue-100 text-blue-600">🎙️</div>
               <div>
                 <h3>AI Podcast</h3>
-                <p>Turn notes into audio explanation</p>
+                <p>Turn notes into audio </p>
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/arcade">
+            <div className="premiumCard">
+              <div className="cardIcon bg-indigo-100 text-indigo-600">🎮</div>
+              <div>
+                <h3>Arcade</h3>
+                <p>Play fun mini-games</p>
               </div>
             </div>
           </Link>
         </div>
 
-        {/* UPLOAD */}
+        {/* UPLOAD BOX & FILE LIST (unchanged) */}
         <div className="flex justify-center mb-12">
           <div
             className={`uploadBox ${dragOver ? "dragActive" : ""}`}
@@ -294,11 +272,7 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* FILE LIST */}
-        <h2 className="text-lg font-semibold mb-4 dark:text-white">
-          My Files
-        </h2>
-
+        <h2 className="text-lg font-semibold mb-4 dark:text-white">My Files</h2>
         <div className="space-y-4">
           {files.map((file) => (
             <div key={file.id} className="fileRow">
@@ -306,9 +280,7 @@ export default function Dashboard() {
                 <div className="docIcon">{getFileIcon(file.type)}</div>
                 <div>
                   <h4 className="font-medium dark:text-white">{file.name}</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {file.lastOpened}
-                  </p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{file.lastOpened}</p>
                 </div>
               </div>
               <span className="text-xl text-gray-400 cursor-pointer">⋮</span>
