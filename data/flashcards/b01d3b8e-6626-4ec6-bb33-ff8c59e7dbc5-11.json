@@ -1,4 +1,0 @@
-{
-  "question": "Finish-to-Start (FS): Task B starts after Task A finishes.",
-  "answer": "Start-to-Start (SS): Task B can start when Task A starts."
-}

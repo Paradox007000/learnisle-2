@@ -1,4 +1,0 @@
-{
-  "question": "dependencies and find the critical path of a project. It contains nodes and arrows.",
-  "answer": "Nodes represent events or tasks. Arrow represents dependencies between tasks."
-}
