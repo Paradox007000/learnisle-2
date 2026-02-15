@@ -1,69 +1,63 @@
-Focusing on Chapter 5: Software Project Management, here are your study notes, bullet points, and simplified explanations based on the text provided.
+# Study Notes: Software Project Management
 
----
+## 1. Project Scheduling
+Project scheduling is the process of creating a roadmap to track tasks, deadlines, and resource allocation within a project.
 
-### **1. Project Scheduling**
-**Short Explanation:** This is the process of deciding how to organize project work into separate tasks and determining when and how they will be executed. It acts as a map for tasks, deadlines, and resources.
+*   **Purpose:** To communicate what needs to be done, who will do it, and the timeframe for completion.
+*   **Key Components:** Start/end dates, milestones, tasks, resources (people/equipment), and task dependencies.
 
-*   **Key Components:**
-    *   **Timeline:** Start and end dates.
-    *   **Milestones:** Major points of progress.
-    *   **Resources:** People, equipment, and tools needed.
-    *   **Dependencies:** How tasks rely on each other.
-
-**The 5-Step Scheduling Process:**
-1.  **Identify Activities:** Break the project into small, manageable tasks (e.g., coding, testing).
+### The Project Scheduling Process
+1.  **Identify Activities:** Break the project into small, manageable tasks with clear start and end points (e.g., coding, testing).
 2.  **Identify Activity Dependencies:** Determine the order of tasks.
-3.  **Allocate Resources:** Assign tools, software, and budget to each activity.
-4.  **Create Project Charts:** Use visual tools like Gantt or PERT/CPM charts to see the workflow.
-5.  **Allocate People:** Assign team members to tasks based on their skills without overloading them.
+    *   **Finish-to-Start (FS):** Task B starts after Task A finishes.
+    *   **Start-to-Start (SS):** Task B starts when Task A starts.
+    *   **Finish-to-Finish (FF):** Task B finishes when Task A finishes.
+    *   **Start-to-Finish (SF):** Task B finishes when Task A starts (Rare).
+3.  **Allocate Resources:** Assign tools, budget, and materials to ensure they are available when needed.
+4.  **Create Project Charts:** Use visual tools like **Gantt Charts** (timelines) or **PERT/CPM Charts** (dependencies/critical path).
+5.  **Allocate People:** Assign team members based on skills while avoiding overloading individuals.
 
 ---
 
-### **2. Task Dependencies**
-**Short Explanation:** In project management, some tasks cannot start or finish until others do.
+## 2. Work Breakdown Structure (WBS)
+WBS is a "Top-Down" hierarchical decomposition of a project into smaller, independent modules and activities.
 
-*   **Finish-to-Start (FS):** Task B starts only after Task A is finished (Most common).
-*   **Start-to-Start (SS):** Task B starts at the same time Task A starts.
-*   **Finish-to-Finish (FF):** Task B can only finish when Task A is finished.
-*   **Start-to-Finish (SF):** Task B can only finish when Task A starts (Rare).
-
----
-
-### **3. Work Breakdown Structure (WBS)**
-**Short Explanation:** A hierarchical "tree" structure that breaks a complex project down into smaller, independent parts. It follows a **Top-Down approach**.
-
-*   **Levels of WBS:**
-    *   **Level 1 (Goal):** The complete system (e.g., Library Management System).
-    *   **Level 2 (Major Modules):** Requirements, Design, Implementation, Testing.
-    *   **Level 3 (Activities):** Sub-tasks (e.g., Database design, Unit testing).
-    *   **Level 4 (Work Packages):** The smallest manageable task assigned to an individual.
+*   **Features:**
+    *   Breaks complex projects into manageable parts.
+    *   Follows a tree-like structure.
+    *   Supports scheduling, resource allocation, and cost estimation.
+*   **The Four Levels:**
+    *   **Level 1: Project Goal** (The entire system).
+    *   **Level 2: Major Modules** (e.g., Design, Implementation, Testing).
+    *   **Level 3: Sub-Modules/Activities** (e.g., Database design, Unit testing).
+    *   **Level 4: Work Packages** (Smallest tasks assigned to individuals).
 
 ---
 
-### **4. Activity Networks**
-**Short Explanation:** A visual graph showing the logical sequence of tasks and their relationships.
+## 3. Activity Networks
+An Activity Network is a graph showing how tasks relate to each other in a logical sequence.
 
-*   **Activity on Nodes (AON):** Activities are shown as circles or ovals. Arrows show the sequence.
-*   **Activity on Arrows (AOA):** Activities are shown as arrows. Nodes represent the start or end of an event.
+*   **AON (Activity on Node):** Activities are shown as circles/ovals (nodes) and sequence is shown by arrows.
+*   **AOA (Activity on Arrow):** Activities are represented by arrows, while nodes represent the start or end "events" of those activities.
 
 ---
 
-### **5. Project Tracking Tools**
-**Short Explanation:** Monitoring and controlling the project to ensure it stays on schedule, within budget, and meets quality standards.
+## 4. Project Tracking & Tools
+Project tracking monitors progress to ensure the project stays on schedule, under budget, and meets quality standards.
 
-*   **Gantt Chart (Timeline Chart):**
-    *   Shows tasks as horizontal bars against a timeline.
-    *   Visualizes start dates, end dates, and overlaps.
-    *   Emphasizes the scope of individual tasks.
+### Gantt Chart (Timeline Chart)
+*   **Definition:** A visual tool using horizontal bars to show task duration and schedule.
+*   **Goal:** To visualize overlaps, dependencies, and the sequence of events.
+*   **Output:** Often leads to the creation of "project tables" listing start/end dates for every task.
 
-*   **Earned Value Analysis (EVA):**
-    *   A technique to measure project health by integrating cost, schedule, and scope.
-    *   **PV (Planned Value):** Budgeted cost for work *planned* to be done.
-    *   **EV (Earned Value):** Budgeted cost for work *actually completed*.
-    *   **AC (Actual Cost):** Real money spent so far.
+### Earned Value Analysis (EVA)
+EVA is a technique to measure project health by integrating cost, schedule, and scope.
 
-**How to read EVA Results:**
-*   **Schedule Variance (SV = EV - PV):** If negative, you are behind schedule.
-*   **Cost Variance (CV = EV - AC):** If negative, you are over budget.
-*   **Performance Indexes (SPI & CPI):** If the value is **less than 1**, the project is behind schedule or over budget.
+*   **Core Metrics:**
+    *   **Planned Value (PV):** Budgeted cost for work *planned* to be done by a specific date.
+    *   **Earned Value (EV):** Budgeted cost for work *actually completed* by that date.
+    *   **Actual Cost (AC):** The real money spent to complete the work so far.
+*   **Performance Indicators:**
+    *   **Schedule Variance (SV):** (EV - PV). Negative means behind schedule.
+    *   **Cost Variance (CV):** (EV - AC). Negative means over budget.
+    *   **SPI/CPI:** If the performance index is less than 1, the project is behind schedule (SPI) or over budget (CPI).

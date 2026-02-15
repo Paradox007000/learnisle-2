@@ -1,0 +1,4 @@
+{
+  "question": "Finish-to-Finish (FF): Task B can finish only when Task A finishes.",
+  "answer": "Start-to-Finish (SF): Rare; Task B can finish only when Task A starts."
+}

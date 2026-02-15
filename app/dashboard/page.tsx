@@ -31,46 +31,52 @@ export default function Dashboard() {
   useEffect(() => setMounted(true), []);
 
   const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>
-  ) => {
-    e.preventDefault();
-    let file: File | null = null;
+  e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>
+) => {
+  e.preventDefault();
+  let file: File | null = null;
 
-    if ("dataTransfer" in e) {
-      file = e.dataTransfer.files[0];
-    } else {
-      file = e.target.files?.[0] || null;
-    }
+  if ("dataTransfer" in e) {
+    file = e.dataTransfer.files[0];
+  } else {
+    file = e.target.files?.[0] || null;
+  }
 
-    if (!file) return;
+  if (!file) return;
 
-    setDragOver(false);
+  setDragOver(false);
 
-    const newFile = {
-      id: Date.now(),
-      name: file.name,
-      type: file.name.split(".").pop()?.toLowerCase() || "unknown",
-      lastOpened: "Just now",
-    };
-
-    setFiles((prev) => [newFile, ...prev]);
-
-    const formData = new FormData();
-    formData.append("pdf", file);
-
-    try {
-      const res = await fetch("/api/process-pdf", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.success && data.documentId) {
-        localStorage.setItem("latestDoc", data.documentId);
-      }
-    } catch (err) {
-      console.error("Upload failed:", err);
-    }
+  const newFile = {
+    id: Date.now(),
+    name: file.name,
+    type: file.name.split(".").pop()?.toLowerCase() || "unknown",
+    lastOpened: "Just now",
   };
+
+  setFiles((prev) => [newFile, ...prev]);
+
+  const formData = new FormData();
+  formData.append("pdf", file);
+
+  try {
+    const res = await fetch("/api/process-pdf", {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+
+    if (data.success && data.documentId) {
+      localStorage.setItem("latestDoc", data.documentId);
+
+      // ✅ Dispatch event to refresh flashcards automatically
+      window.dispatchEvent(new Event("flashcardsUpdated"));
+      console.log("📢 Flashcards update event dispatched");
+    }
+  } catch (err) {
+    console.error("Upload failed:", err);
+  }
+};
+
 
   const getFileIcon = (type: string) => {
     switch (type) {
