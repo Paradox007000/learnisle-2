@@ -257,4 +257,3 @@ const progress = (xp % 200) / 2; // progress %
 }
 
 
-
