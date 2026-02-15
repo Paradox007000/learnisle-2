@@ -4,8 +4,13 @@ import { NextResponse } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { mimiSystemPrompt } from "@/lib/mimiContext";
 
-// Gemini client (uses GEMINI_API_KEY automatically)
-const ai = new GoogleGenAI({});
+/* -------------------------------- */
+/* ✅ USE MIMI-SPECIFIC API KEY     */
+/* -------------------------------- */
+
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_MIMI_KEY, // 👈 NEW KEY
+});
 
 export async function POST(req: Request) {
   try {
