@@ -1,5 +1,6 @@
 Here are your study notes based on the provided text:
 
+<<<<<<< HEAD
 ### **Easy Study Notes**
 *   **Document Purpose:** This is a "Sample PDF" specifically created for testing a tool called **PDFObject**.
 *   **Document Structure:** The document consists of three pages.
@@ -19,3 +20,68 @@ Here are your study notes based on the provided text:
 *   **Perception vs. Reality:** The text asks the reader to consider if a page can be "long" even if its physical size is the same as others. It uses the analogy of "three long minutes" to show that while the actual measurement (duration or size) is the same, our perception of it can change.
 *   **Placeholder Text:** The document uses "Lorem ipsum" to fill space. This text includes standard sections such as *Class aptent taciti sociosqu ad litora torquent* and *Vestibulum ante ipsum primis in faucibus*. 
 *   **Document Testing:** This text serves as a technical sample. It is used to verify how a PDF viewer or software (like PDFObject) handles a three-page document filled with standard text blocks.
+=======
+## 1. Project Scheduling
+Project scheduling is the process of creating a roadmap to track tasks, deadlines, and resources within a project. It serves as a communication tool to show what needs to be done, who will do it, and the timeframe for completion.
+
+**Key Components:**
+*   **Tasks and Milestones:** Specific activities and major progress points.
+*   **Resources:** People, equipment, and software tools required.
+*   **Dependencies:** How tasks rely on one another.
+*   **Timeframes:** Start and end dates for every activity.
+
+---
+
+## 2. The Project Scheduling Process
+This process organizes work into separate, manageable tasks through five main steps:
+
+1.  **Identify Activities:** Break the project down into smaller tasks (e.g., requirements gathering, coding, testing).
+2.  **Identify Activity Dependencies:** Determine the order of tasks.
+    *   **Finish-to-Start (FS):** Task B starts only after Task A finishes.
+    *   **Start-to-Start (SS):** Task B starts when Task A starts.
+    *   **Finish-to-Finish (FF):** Task B finishes when Task A finishes.
+    *   **Start-to-Finish (SF):** Task B finishes when Task A starts (rare).
+3.  **Allocate Resources:** Assign equipment, tools, and budget to each activity.
+4.  **Create Project Charts:** Use visual tools like **Gantt Charts** (timelines) or **PERT/CPM Charts** (dependencies and critical paths).
+5.  **Allocate People:** Assign team members to tasks based on their skills without overloading them.
+
+---
+
+## 3. Work Breakdown Structure (WBS)
+A WBS is a hierarchical, "Top-Down" decomposition of a project into smaller, more manageable pieces. It starts with the project name at the root and breaks down into "leaf" levels that are independent and undividable.
+
+**The Four Levels of WBS:**
+*   **Level 1 – Project Goal:** The entire software system (e.g., Library Management System).
+*   **Level 2 – Major Modules:** High-level deliverables like Design, Implementation, or Testing.
+*   **Level 3 – Sub-Modules:** Specific activities like "Database Design" or "Unit Testing."
+*   **Level 4 – Work Packages:** The smallest manageable tasks assigned to specific individuals.
+
+---
+
+## 4. Activity Networks
+An activity network is a graph showing the logical sequence of tasks and their dependencies. There are two primary methods:
+*   **Activity on Nodes (AON):** Activities are represented by circles (nodes), and arrows show the sequence.
+*   **Activity on Arrows (AOA):** Activities are represented by arrows, while nodes represent the start or end "events" of those activities.
+
+---
+
+## 5. Project Tracking and Tools
+Tracking involves monitoring progress to ensure the project stays on schedule, within budget, and meets quality standards.
+
+### Timeline/Gantt Charts
+*   **Definition:** A visual chart using horizontal bars to show the start and end dates of tasks against a timeline.
+*   **Purpose:** To emphasize the scope of individual tasks, identify overlaps, and track progress over time.
+
+### Earned Value Analysis (EVA)
+EVA is a technique used to measure a project’s health by integrating cost, schedule, and scope. 
+
+**Core Metrics:**
+*   **Planned Value (PV):** Budgeted cost of work that *should* have been done by now.
+*   **Earned Value (EV):** Budgeted cost of work *actually* completed.
+*   **Actual Cost (AC):** Real money spent to complete the work so far.
+
+**Performance Indicators:**
+*   **Schedule Variance (SV = EV - PV):** A negative number means the project is behind schedule.
+*   **Cost Variance (CV = EV - AC):** A negative number means the project is over budget.
+*   **Performance Indexes (SPI & CPI):** A value less than 1.0 indicates the project is behind schedule or over budget.
+>>>>>>> fd2e06c74d85da92c66fed1bdc8fc3b59e996c18

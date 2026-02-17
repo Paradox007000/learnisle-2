@@ -22,7 +22,7 @@ export default function SpeedRecallPage() {
   useEffect(() => {
     async function loadQuestions() {
       try {
-        const res = await fetch("/api/speed");
+        const res = await fetch("api/arcade/speed");
         const data = await res.json();
 
         setQuestions(data.questions || []);
@@ -85,7 +85,7 @@ export default function SpeedRecallPage() {
   async function finishGame() {
     setFinished(true);
 
-    await fetch("api/", {
+    await fetch("api/arcade/result", {
       method: "POST",
       body: JSON.stringify({
         game: "speed",
