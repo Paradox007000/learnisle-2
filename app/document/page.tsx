@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import TopBar from "@/components/ui/TopBar";
+import { Home, Gamepad2, FileText, Mic, CreditCard, User } from "lucide-react";
 
 export default function DocumentPage() {
   const [notes, setNotes] = useState("Loading notes...");
@@ -12,7 +13,6 @@ export default function DocumentPage() {
   >([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // ✅ LOAD SAVED NOTES (DO NOT GENERATE AGAIN)
   useEffect(() => {
     const fetchNotes = async () => {
       try {
@@ -34,7 +34,6 @@ export default function DocumentPage() {
     fetchNotes();
   }, []);
 
-  // 🤖 Ask AI about document
   const askQuestion = async () => {
     if (!question.trim()) return;
 
@@ -56,10 +55,9 @@ export default function DocumentPage() {
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
-      {/* 🌸 TOP BAR */}
       <TopBar openMenu={() => setIsMenuOpen(true)} />
 
-      {/* 📂 MENU DRAWER */}
+      {/* UPDATED MENU DRAWER */}
       {isMenuOpen && (
         <div
           style={{
@@ -70,8 +68,8 @@ export default function DocumentPage() {
             height: "100vh",
             background: "white",
             zIndex: 999999,
-            boxShadow: "5px 0 20px rgba(0,0,0,0.3)",
-            padding: "40px 20px",
+            boxShadow: "5px 0 20px rgba(0,0,0,0.15)",
+            padding: "30px 20px",
           }}
         >
           <button
@@ -80,7 +78,7 @@ export default function DocumentPage() {
               position: "absolute",
               top: "20px",
               right: "20px",
-              fontSize: "30px",
+              fontSize: "28px",
               background: "none",
               border: "none",
               cursor: "pointer",
@@ -89,15 +87,79 @@ export default function DocumentPage() {
             ×
           </button>
 
-          <div style={{ marginTop: "20px" }}>
-            <Link href="/arcade" onClick={() => setIsMenuOpen(false)} style={menuStyle}>🎮 Arcade</Link>
-            <Link href="/document" onClick={() => setIsMenuOpen(false)} style={menuStyle}>📄 Document</Link>
-            <Link href="/podcast" onClick={() => setIsMenuOpen(false)} style={menuStyle}>🎙️ Podcast</Link>
-            <Link href="/flashcards" onClick={() => setIsMenuOpen(false)} style={menuStyle}>🃏 Flashcards</Link>
-            <hr style={dividerStyle} />
-            <Link href="/mimi" onClick={() => setIsMenuOpen(false)} style={{ ...menuStyle, background: "#fce4ec" }}>😺 Mimi</Link>
-            <hr style={dividerStyle} />
-            <Link href="/account" onClick={() => setIsMenuOpen(false)} style={{ ...menuStyle, background: "#f5f5f5" }}>👤 Account</Link>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "6px",
+              marginTop: "40px",
+            }}
+          >
+            {[
+              { href: "/", label: "Home", icon: <Home size={24} strokeWidth={2.5} color="#ec4899" /> },
+              { href: "/arcade", label: "Arcade", icon: <Gamepad2 size={24} strokeWidth={2.5} color="#ec4899" /> },
+              { href: "/document", label: "Document", icon: <FileText size={24} strokeWidth={2.5} color="#ec4899" /> },
+              { href: "/podcast", label: "Podcast", icon: <Mic size={24} strokeWidth={2.5} color="#ec4899" /> },
+              { href: "/flashcards", label: "Flashcards", icon: <CreditCard size={24} strokeWidth={2.5} color="#ec4899" /> },
+            ].map((item, index) => (
+              <Link
+                key={index}
+                href={item.href}
+                onClick={() => setIsMenuOpen(false)}
+                style={menuStyle}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "rgba(128,128,128,0.08)";
+                  e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "transparent";
+                  e.currentTarget.style.boxShadow = "none";
+                }}
+              >
+                {item.icon} {item.label}
+              </Link>
+            ))}
+
+            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+
+            <Link
+              href="/mimi"
+              onClick={() => setIsMenuOpen(false)}
+              style={{ ...menuStyle, gap: "12px", display: "flex", alignItems: "center" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(128,128,128,0.08)";
+                e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              <img
+                src="/mascot.png"
+                alt="Mascot"
+                style={{ width: "28px", height: "28px", objectFit: "contain" }}
+              />
+              Mimi
+            </Link>
+
+            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+
+            <Link
+              href="/account"
+              onClick={() => setIsMenuOpen(false)}
+              style={menuStyle}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(128,128,128,0.08)";
+                e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.boxShadow = "none";
+              }}
+            >
+              <User size={24} strokeWidth={2.5} color="#ec4899" /> Account
+            </Link>
           </div>
         </div>
       )}
@@ -117,17 +179,10 @@ export default function DocumentPage() {
         />
       )}
 
-      {/* MAIN CONTENT */}
+      {/* MAIN CONTENT (UNCHANGED) */}
       <div style={{ display: "flex", flex: 1, background: "#FFFDF7" }}>
         
-        {/* 📄 NOTES */}
-        <div
-          style={{
-            flex: 2,
-            padding: "40px",
-            overflowY: "auto",
-          }}
-        >
+        <div style={{ flex: 2, padding: "40px", overflowY: "auto" }}>
           <div
             style={{
               background: "#FFFFFF",
@@ -152,7 +207,6 @@ export default function DocumentPage() {
           </div>
         </div>
 
-        {/* 🤖 MIMI CHAT */}
         <div
           style={{
             flex: 1,
@@ -229,20 +283,15 @@ export default function DocumentPage() {
   );
 }
 
-const menuStyle = {
-  display: "block",
-  padding: "15px",
-  marginBottom: "10px",
-  borderRadius: "10px",
-  background: "#e3f2fd",
+const menuStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "14px",
+  padding: "16px 18px",
+  borderRadius: "14px",
   textDecoration: "none",
-  color: "black",
-  fontWeight: "bold",
-};
-
-const dividerStyle = {
-  margin: "20px 0",
-  border: "none",
-  height: "1px",
-  background: "#ddd",
+  color: "#111",
+  fontWeight: 600,
+  fontSize: "16px",
+  transition: "all 0.2s ease",
 };
