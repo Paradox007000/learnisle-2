@@ -1,65 +1,35 @@
-# Study Notes: Software Project Management
+### Easy Study Notes
 
-## 1. Project Scheduling
-Project scheduling is the process of creating a roadmap to track tasks, deadlines, and resources within a project. It communicates what needs to be done, who will do it, and the timeframe for completion.
-
-### The Scheduling Process:
-1.  **Identify Activities:** Break the project into smaller, manageable tasks (e.g., coding, testing).
-2.  **Identify Activity Dependencies:** Determine the order of tasks. 
-    *   **Finish-to-Start (FS):** Task B starts after Task A finishes.
-    *   **Start-to-Start (SS):** Task B starts when Task A starts.
-    *   **Finish-to-Finish (FF):** Task B finishes when Task A finishes.
-    *   **Start-to-Finish (SF):** Task B finishes only when Task A starts (rare).
-3.  **Allocate Resources:** Assign tools, equipment, and budget to each activity.
-4.  **Create Project Charts:** Use visual tools like **Gantt Charts** (timelines) or **PERT/CPM Charts** (dependencies).
-5.  **Allocate People:** Assign team members to tasks based on their skills without overloading them.
+*   **Document Purpose:** This is a sample PDF specifically created for testing **PDFObject**.
+*   **Document Length:** The PDF consists of **three pages**.
+*   **Key Concept:** The text poses a philosophical question about length, comparing pages to minutes. It asks if pages of the same size can be "longer" than one another, just as people describe "long minutes" despite minutes having a fixed duration.
+*   **Content Type:** Beyond the introduction, the document primarily consists of **Latin filler text** (Lorem ipsum).
 
 ---
 
-## 2. Work Breakdown Structure (WBS)
-A WBS is a hierarchical "tree" that breaks a project down from a large goal into tiny, manageable pieces. It uses a **Top-Down approach**.
+### Bullet Points
 
-### Levels of WBS:
-*   **Level 1 – Project Goal:** The entire system (e.g., Library Management System).
-*   **Level 2 – Major Modules:** Large deliverables like Design, Implementation, or Testing.
-*   **Level 3 – Sub-Modules:** Specific activities (e.g., Testing → Unit Testing, System Testing).
-*   **Level 4 – Work Packages:** The smallest manageable tasks assigned to individuals.
-
----
-
-## 3. Activity Networks
-These are graphical maps showing the logical sequence of project tasks.
-*   **AON (Activity on Nodes):** Activities are shown as circles/ovals, and arrows show the sequence.
-*   **AOA (Activity on Arrows):** Activities are represented by arrows. Nodes represent the start or end points (events) of those activities.
+*   **Testing Tool:** Created for PDFObject.
+*   **Page Count:** Three pages total.
+*   **Rhetorical Questions:** 
+    *   Can one page be longer than another if they are the same size?
+    *   Is it similar to the phrase "three long minutes"?
+*   **Latin Vocabulary Included:**
+    *   *Lorem ipsum dolor sit amet*
+    *   *Integer nec odio*
+    *   *Praesent libero*
+    *   *Curabitur sodales ligula in libero*
+    *   *Vestibulum lacinia arcu eget nulla*
 
 ---
 
-## 4. Project Tracking Tools
-Project tracking involves monitoring progress to ensure the project stays on schedule and budget.
+### Short Explanations for Learning
 
-*   **Timeline Chart:** A visual schedule showing the sequence and duration of activities. It helps identify overlaps and deadlines.
-*   **Gantt Chart:** Also known as a timeline chart. It uses horizontal bars to show how much work was planned versus how much has actually been completed over a specific period.
+**PDFObject Testing**
+This document serves as a functional sample to ensure that the PDFObject software is displaying pages and content correctly across a three-page format.
 
----
+**Perception of Length**
+The author digresses to discuss the relativity of length. Even though minutes and page sizes are technically constant, the text explores how they can be perceived as "long" or "short" (optimism vs. reality).
 
-## 5. Earned Value Analysis (EVA)
-EVA is a technique used to measure a project’s health by integrating cost, schedule, and scope.
-
-### Key Concepts:
-*   **Planned Value (PV):** The budget for work that *should* have been done by now.
-*   **Earned Value (EV):** The budget for work *actually* completed.
-*   **Actual Cost (AC):** The real money spent so far.
-
-### Performance Metrics:
-*   **Schedule Variance (SV = EV - PV):** If negative, you are behind schedule.
-*   **Cost Variance (CV = EV - AC):** If negative, you are over budget.
-*   **SPI (Schedule Performance Index = EV / PV):** If less than 1, you are behind schedule.
-*   **CPI (Cost Performance Index = EV / AC):** If less than 1, you are over budget.
-
----
-
-## Key Terms for Learning
-*   **Dependencies:** How tasks rely on one another.
-*   **Hierarchical Decomposition:** Breaking a complex project into simpler parts level-by-level.
-*   **Root:** The top node of a WBS, representing the project name.
-*   **Leaf Level:** The bottom of a WBS where tasks cannot be divided further.
+**Placeholder Text (Lorem Ipsum)**
+The majority of the document uses Latin sequences to fill space. This allows testers to see how blocks of text—such as "Class aptent taciti sociosqu ad litora torquent"—layout on the page without needing specific English content.

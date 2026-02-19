@@ -11,7 +11,7 @@ const ai = new GoogleGenAI({
 
 export async function GET() {
   try {
-    console.log("⚡ Speed API called");
+    console.log("🧠 Memory API called");
 
     if (!process.env.GEMINI_ARCADE_KEY) {
       return NextResponse.json(
@@ -21,7 +21,7 @@ export async function GET() {
     }
 
     // -----------------------------
-    // 1️⃣ Read latest-notes.txt
+    // 1️⃣ Read notes
     // -----------------------------
     const notesPath = path.join(
       process.cwd(),
@@ -37,32 +37,30 @@ export async function GET() {
       console.log("❌ latest-notes.txt not found");
 
       return NextResponse.json(
-        { error: "No study notes found. Generate notes first." },
+        { error: "Generate notes first." },
         { status: 404 }
       );
     }
 
     if (!documentText.trim()) {
       return NextResponse.json(
-        { error: "Notes file empty." },
+        { error: "Notes empty." },
         { status: 400 }
       );
     }
 
-    console.log("📏 Notes length:", documentText.length);
-
     // -----------------------------
-    // 2️⃣ Generate questions (Gemini)
+    // 2️⃣ Gemini generate pairs
     // -----------------------------
     const response = await ai.models.generateContent({
       model: "models/gemini-2.5-flash",
       contents: `
-Create EXACTLY 5 SPEED RECALL questions.
+Create EXACTLY 3 study flashcard pairs.
 
 Rules:
-- answers must be VERY SHORT (1–3 words)
+- short questions
+- short answers (1–4 words)
 - no explanations
-- fast recall questions only
 
 FORMAT STRICTLY:
 
@@ -79,14 +77,12 @@ ${documentText.slice(0, 8000)}
         ?.map((p: any) => p.text)
         .join("") || "";
 
-    if (!aiText) {
-      throw new Error("Empty AI response");
-    }
+    if (!aiText) throw new Error("Empty AI response");
 
     // -----------------------------
-    // 3️⃣ Parse output
+    // 3️⃣ Parse output safely
     // -----------------------------
-    const questions = aiText
+    const pairs = aiText
       .split("Q:")
       .slice(1)
       .map((block) => {
@@ -97,20 +93,20 @@ ${documentText.slice(0, 8000)}
           answer: a?.trim(),
         };
       })
-      .filter((q) => q.question && q.answer);
+      .filter((p) => p.question && p.answer);
 
-    if (!questions.length) {
-      throw new Error("No questions parsed");
+    if (!pairs.length) {
+      throw new Error("No pairs parsed");
     }
 
-    console.log("✅ Speed questions generated");
+    console.log("✅ Memory pairs generated");
 
-    return NextResponse.json({ questions });
+    return NextResponse.json({ pairs });
   } catch (error) {
-    console.error("SPEED ERROR:", error);
+    console.error("MEMORY ERROR:", error);
 
     return NextResponse.json(
-      { error: "Failed to generate speed questions." },
+      { error: "Failed to generate memory game." },
       { status: 500 }
     );
   }

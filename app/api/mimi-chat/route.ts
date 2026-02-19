@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
     if (!message) {
       return NextResponse.json(
-        { reply: "Please say something 😊" },
+        { reply: "Please say something " },
         { status: 400 }
       );
     }
@@ -38,14 +38,14 @@ ${message}
     });
 
     const reply =
-      response.text || "I'm here to help! ✨";
+      response.text || "I'm here to help!";
 
     return NextResponse.json({ reply });
   } catch (error) {
     console.error("Mimi Chat Error:", error);
 
     return NextResponse.json(
-      { reply: "Mimi is having trouble right now 😭" },
+      { reply: "Mimi is having trouble right now " },
       { status: 500 }
     );
   }
