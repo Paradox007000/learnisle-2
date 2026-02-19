@@ -59,8 +59,9 @@ export default function FillGame() {
     }, 1200);
   }
 
-  if (loading)
-    return <p style={{ padding: 40 }}>Generating blanks...</p>;
+ if (loading)
+  return <ProgressLoader label="Generating..." />;
+
 
   if (finished)
     return (

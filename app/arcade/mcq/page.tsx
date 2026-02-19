@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ProgressLoader from "@/components/ui/ProgressLoader";
+
 
 export default function MCQGame() {
   const [loading, setLoading] = useState(true);
@@ -51,7 +53,9 @@ export default function MCQGame() {
     setResult(correct ? "✅ Correct!" : "❌ Wrong");
   }
 
-  if (loading) return <p style={{ padding: 40 }}>Loading question...</p>;
+  if (loading)
+  return <ProgressLoader label="⚡ Generating..." />;
+
 
   return (
     <div

@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import ProgressLoader from "@/components/ui/ProgressLoader";
 
-
 type Card = {
   id: string;
   text: string;
@@ -17,13 +16,15 @@ type Card = {
 export default function MemoryGame() {
   const [cards, setCards] = useState<Card[]>([]);
   const [gameState, setGameState] =
-    useState<"loading" | "preview" | "playing" | "finished">(
+    useState<"loading" | "preview" | "playing" | "finished" | "error">(
       "loading"
     );
 
   const [selected, setSelected] = useState<Card[]>([]);
 
-  // ✅ shuffle helper
+  // -----------------------------
+  // shuffle helper
+  // -----------------------------
   function shuffle<T>(array: T[]): T[] {
     return [...array].sort(() => Math.random() - 0.5);
   }
@@ -32,55 +33,67 @@ export default function MemoryGame() {
   // Load Game
   // -----------------------------
   async function loadGame() {
-    setGameState("loading");
+    try {
+      setGameState("loading");
 
-    const res = await fetch("/api/arcade/memory");
-    const data = await res.json();
+      // allow loader to render first
+      await new Promise((r) => setTimeout(r, 60));
 
-    if (!data?.pairs) return;
+      const res = await fetch("/api/arcade/memory");
 
-    const generated: Card[] = [];
+      if (!res.ok) throw new Error("API failed");
 
-    data.pairs.forEach((pair: any, index: number) => {
-      const id = String(index);
+      const data = await res.json();
 
-      generated.push({
-        id: id + "q",
-        text: pair.question,
-        pairId: id,
-        type: "question",
-        flipped: true,
-        matched: false,
+      if (!data?.pairs) throw new Error("No pairs returned");
+
+      const generated: Card[] = [];
+
+      data.pairs.forEach((pair: any, index: number) => {
+        const id = String(index);
+
+        generated.push({
+          id: id + "q",
+          text: pair.question,
+          pairId: id,
+          type: "question",
+          flipped: true,
+          matched: false,
+        });
+
+        generated.push({
+          id: id + "a",
+          text: pair.answer,
+          pairId: id,
+          type: "answer",
+          flipped: true,
+          matched: false,
+        });
       });
 
-      generated.push({
-        id: id + "a",
-        text: pair.answer,
-        pairId: id,
-        type: "answer",
-        flipped: true,
-        matched: false,
-      });
-    });
-
-    const questions = shuffle(
-      generated.filter((c) => c.type === "question")
-    );
-
-    const answers = shuffle(
-      generated.filter((c) => c.type === "answer")
-    );
-
-    setCards([...questions, ...answers]);
-    setGameState("preview");
-
-    // 👀 preview
-    setTimeout(() => {
-      setCards((prev) =>
-        prev.map((c) => ({ ...c, flipped: false }))
+      const questions = shuffle(
+        generated.filter((c) => c.type === "question")
       );
-      setGameState("playing");
-    }, 3000);
+
+      const answers = shuffle(
+        generated.filter((c) => c.type === "answer")
+      );
+
+      setCards([...questions, ...answers]);
+
+      setGameState("preview");
+
+      // preview phase
+      setTimeout(() => {
+        setCards((prev) =>
+          prev.map((c) => ({ ...c, flipped: false }))
+        );
+        setGameState("playing");
+      }, 3000);
+    } catch (err) {
+      console.error(err);
+      setGameState("error");
+    }
   }
 
   useEffect(() => {
@@ -118,14 +131,10 @@ export default function MemoryGame() {
     const isMatch =
       a.pairId === b.pairId && a.type !== b.type;
 
-    // show colors
     setCards((prev) =>
       prev.map((c) =>
         c.id === a.id || c.id === b.id
-          ? {
-              ...c,
-              status: isMatch ? "correct" : "wrong",
-            }
+          ? { ...c, status: isMatch ? "correct" : "wrong" }
           : c
       )
     );
@@ -134,19 +143,14 @@ export default function MemoryGame() {
       setCards((prev) =>
         prev.map((c) => {
           if (c.id === a.id || c.id === b.id) {
-            if (isMatch) {
-              return {
-                ...c,
-                matched: true,
-                status: undefined,
-              };
-            } else {
-              return {
-                ...c,
-                flipped: false,
-                status: undefined,
-              };
-            }
+            if (isMatch)
+              return { ...c, matched: true, status: undefined };
+
+            return {
+              ...c,
+              flipped: false,
+              status: undefined,
+            };
           }
           return c;
         })
@@ -160,15 +164,31 @@ export default function MemoryGame() {
   // Win Check
   // -----------------------------
   useEffect(() => {
-    if (
-      cards.length > 0 &&
-      cards.every((c) => c.matched)
-    ) {
+    if (cards.length && cards.every((c) => c.matched)) {
       setGameState("finished");
     }
   }, [cards]);
 
-  // split layout
+  // -----------------------------
+  // UI STATES
+  // -----------------------------
+
+  if (gameState === "loading") {
+    return (
+      <ProgressLoader label="Preparing memory game..." />
+    );
+  }
+
+  if (gameState === "error") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-gray-600">
+          Unable to generate game. Please create notes first.
+        </p>
+      </div>
+    );
+  }
+
   const questions = cards.filter(
     (c) => c.type === "question"
   );
@@ -176,88 +196,86 @@ export default function MemoryGame() {
     (c) => c.type === "answer"
   );
 
-  // -----------------------------
-  // Card Styling
-  // -----------------------------
   function cardStyle(card: Card) {
     if (card.status === "correct")
-      return "bg-green-400 text-white";
+      return "bg-green-500 text-white";
 
     if (card.status === "wrong")
-      return "bg-red-400 text-white";
+      return "bg-red-500 text-white";
 
     if (card.flipped || card.matched)
-      return "bg-white text-black";
+      return "bg-white text-gray-800";
 
-    // 🌸 pink back
-    return "bg-pink-300 text-transparent";
+    return "bg-pink-200 text-transparent";
   }
 
   // -----------------------------
-  // UI
+  // MAIN UI
   // -----------------------------
   return (
-    <div className="min-h-screen flex flex-col items-center p-8">
-      <h1 className="text-4xl font-bold mb-8">
-        🧠 Memory Match
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-6">
+      <h1 className="text-3xl font-semibold mb-10 text-gray-800">
+        Memory Match
       </h1>
 
       {gameState === "preview" && (
-        <p className="mb-6">👀 Memorize...</p>
-      )}
-
-      {gameState === "finished" && (
-        <p className="mb-6 text-green-600 text-xl">
-          🎉 Perfect Match!
+        <p className="mb-8 text-gray-500">
+          Memorize the pairs
         </p>
       )}
 
-      <div className="flex gap-16">
+      {gameState === "finished" && (
+        <p className="mb-8 text-green-600 font-medium">
+          All pairs matched
+        </p>
+      )}
+
+      <div className="flex gap-20">
         {/* QUESTIONS */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4 text-center">
+        <section>
+          <h2 className="text-lg font-medium mb-6 text-center text-gray-600">
             Questions
           </h2>
 
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-6">
             {questions.map((card) => (
               <button
                 key={card.id}
                 onClick={() => handleClick(card)}
-                className={`w-72 h-32 rounded-2xl shadow-lg text-lg font-medium flex items-center justify-center text-center p-4 transition-all duration-300 ${cardStyle(
+                className={`w-80 h-36 rounded-2xl shadow-md flex items-center justify-center text-center p-6 transition-all duration-300 ${cardStyle(
                   card
                 )}`}
               >
                 {card.flipped || card.matched
                   ? card.text
-                  : "?"}
+                  : " "}
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* ANSWERS */}
-        <div>
-          <h2 className="text-xl font-semibold mb-4 text-center">
+        <section>
+          <h2 className="text-lg font-medium mb-6 text-center text-gray-600">
             Answers
           </h2>
 
-          <div className="flex flex-col gap-5">
+          <div className="flex flex-col gap-6">
             {answers.map((card) => (
               <button
                 key={card.id}
                 onClick={() => handleClick(card)}
-                className={`w-72 h-32 rounded-2xl shadow-lg text-lg font-medium flex items-center justify-center text-center p-4 transition-all duration-300 ${cardStyle(
+                className={`w-80 h-36 rounded-2xl shadow-md flex items-center justify-center text-center p-6 transition-all duration-300 ${cardStyle(
                   card
                 )}`}
               >
                 {card.flipped || card.matched
                   ? card.text
-                  : "?"}
+                  : " "}
               </button>
             ))}
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
