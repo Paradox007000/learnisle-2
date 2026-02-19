@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ProgressLoader from "@/components/ui/ProgressLoader";
+
 
 type Card = {
   id: string;

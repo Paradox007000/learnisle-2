@@ -1,96 +1,91 @@
-### Easy Study Notes
+# Study Notes: Software Testing Tools and Measurement
 
-*   **Document Purpose:** This is a sample PDF specifically created for testing **PDFObject**.
-*   **Document Length:** The PDF consists of **three pages**.
-*   **Key Concept:** The text poses a philosophical question about length, comparing pages to minutes. It asks if pages of the same size can be "longer" than one another, just as people describe "long minutes" despite minutes having a fixed duration.
-*   **Content Type:** Beyond the introduction, the document primarily consists of **Latin filler text** (Lorem ipsum).
+## 1. Manual Testing
+**Short Explanation:** A process where a human tester checks the software without automation tools. The tester acts as an end-user to verify features and find defects by following test cases step-by-step.
 
----
+### Limitations of Manual Testing
+*   **Time & Speed:** Very time-consuming and slow compared to automation.
+*   **Repetition:** Inefficient for repetitive tasks like regression testing.
+*   **Accuracy:** Prone to human errors.
+*   **Coverage:** Hard to test every possible input and scenario.
+*   **Resources:** Requires more manpower, increasing project costs.
+*   **Performance:** Not reliable for measuring load or stress.
 
-### Bullet Points
-
-*   **Testing Tool:** Created for PDFObject.
-*   **Page Count:** Three pages total.
-*   **Rhetorical Questions:** 
-    *   Can one page be longer than another if they are the same size?
-    *   Is it similar to the phrase "three long minutes"?
-*   **Latin Vocabulary Included:**
-    *   *Lorem ipsum dolor sit amet*
-    *   *Integer nec odio*
-    *   *Praesent libero*
-    *   *Curabitur sodales ligula in libero*
-    *   *Vestibulum lacinia arcu eget nulla*
-## 1. Project Scheduling
-Project scheduling is the process of organizing project work into separate tasks and deciding when and how they will be executed. It acts as a communication mechanism for tasks, resources, and timeframes.
-
-**Key Elements of a Schedule:**
-*   Start and end dates.
-*   Milestones and specific tasks.
-*   Required resources (people, equipment, etc.).
-*   Task dependencies.
-
-### The Project Scheduling Process
-1.  **Identify Activities:** Break the project into small, manageable tasks with clear start and end points (e.g., coding, testing).
-2.  **Identify Activity Dependencies:** Determine the order of tasks.
-    *   **Finish-to-Start (FS):** Task B starts after Task A finishes.
-    *   **Start-to-Start (SS):** Task B starts when Task A starts.
-    *   **Finish-to-Finish (FF):** Task B finishes only when Task A finishes.
-    *   **Start-to-Finish (SF):** Task B finishes only when Task A starts (Rare).
-3.  **Allocate Resources:** Assign tools, budget, and materials to tasks.
-4.  **Create Project Charts:** Use tools like **Gantt Charts** (timelines) or **PERT/CPM Charts** (critical paths) to visualize the workflow.
-5.  **Allocate People:** Assign team members based on skills while avoiding overloading individuals.
+### The Manual Testing Process (8 Steps)
+1.  **Requirement Analysis:** Understand what to test by looking at user stories or SRS.
+2.  **Test Planning:** Decide strategy, scope, timeline, and resources.
+3.  **Test Case Design:** Write specific test cases and prepare test data.
+4.  **Test Environment Setup:** Prepare the hardware and software for testing.
+5.  **Test Execution:** Run tests manually and mark them as Pass/Fail.
+6.  **Defect Reporting:** Log bugs in a tracking tool with severity and priority.
+7.  **Re-testing & Regression:** Test fixed bugs and ensure existing features still work.
+8.  **Test Closure:** Prepare summary reports and sign off.
 
 ---
 
-## 2. Work Breakdown Structure (WBS)
-WBS is a "Top-Down" hierarchical decomposition of a project into smaller, manageable parts (modules, tasks, and activities).
+## 2. Automation Testing
+**Short Explanation:** Using software tools (like Selenium or JUnit) to run test scripts automatically. It compares actual results with expected results to improve speed and reliability.
 
-**Hierarchy Levels:**
-*   **Level 1 – Project Goal:** The complete system (e.g., Library Management System).
-*   **Level 2 – Major Modules:** Large deliverables like Design, Implementation, or Testing.
-*   **Level 3 – Sub-Modules:** Specific activities (e.g., Database design, Unit testing).
-*   **Level 4 – Work Packages:** The smallest manageable tasks assigned to individuals.
+### Benefits and Importance
+*   **Efficiency:** Faster execution and saves time/cost in the long run.
+*   **Reliability:** Highly accurate and can run 24/7.
+*   **Reusability:** Scripts can be used multiple times for regression testing.
+*   **Human Resources:** Requires fewer people for execution.
 
-**Core Features:**
-*   Uses a tree structure.
-*   The "root" is the project name.
-*   Leaf nodes are independent and undividable activities.
+### The Automation Testing Process (6 Steps)
+1.  **Feasibility Analysis:** Decide if automation is suitable based on cost and stability.
+2.  **Tool Selection:** Choose a tool based on technology, budget, and team skill.
+3.  **Evaluate Framework:** Select a structure (Data-driven, Keyword-driven, or Hybrid).
+4.  **Proof of Concept (POC):** Create a small sample to verify the tool's capability.
+5.  **Develop Framework:** Build the structure for scripts, reporting, and error handling.
+6.  **Develop & Execute Scripts:** Write the code, run tests, and analyze failures.
 
 ---
 
-### Short Explanations for Learning
-## 3. Activity Networks
-A graphical representation showing the logical sequence and dependencies of project tasks.
+## 3. Comparison: Manual vs. Automation
 
-**Two Ways to Show Relationships:**
-*   **Activity on Nodes (AON):** Activities are represented by circles/ovals (labeled A, B, C) and arrows show the sequence.
-*   **Activity on Arrows (AOA):** Activities are represented by arrows. The nodes (circles) represent the start or end events of those activities.
+| Aspect | Manual Testing | Automation Testing |
+| :--- | :--- | :--- |
+| **Execution** | By humans (simulating users) | By tools (using scripts) |
+| **Speed** | Slower | Faster |
+| **Accuracy** | Prone to human error | Highly consistent |
+| **Cost** | High long-term cost | High initial cost; cheap long-term |
+| **Programming** | Not required | Programming knowledge required |
+| **Best Use** | UI/UX, Exploratory testing | Regression, Load testing |
 
-**PDFObject Testing**
-This document serves as a functional sample to ensure that the PDFObject software is displaying pages and content correctly across a three-page format.
+---
 
-**Perception of Length**
-The author digresses to discuss the relativity of length. Even though minutes and page sizes are technically constant, the text explores how they can be perceived as "long" or "short" (optimism vs. reality).
+## 4. Software Testing Tool Categories
+*   **Manual/Defect Tracking:** JIRA, Bugzilla, Mantis.
+*   **Automation (Functional):** Selenium, UFT (QTP), Cypress.
+*   **Performance:** JMeter, LoadRunner.
+*   **Mobile:** Appium, Espresso.
+*   **API:** Postman, SoapUI.
+*   **Security:** OWASP ZAP, Burp Suite.
 
-**Placeholder Text (Lorem Ipsum)**
-The majority of the document uses Latin sequences to fill space. This allows testers to see how blocks of text—such as "Class aptent taciti sociosqu ad litora torquent"—layout on the page without needing specific English content.
-## 4. Project Tracking Tools
-Tracking involves monitoring progress to ensure the project stays on schedule, within budget, and meets quality standards.
+---
 
-### Timeline & Gantt Charts
-*   **Timeline Chart:** A graph showing when tasks start and end. It helps identify overlaps and monitor deadlines.
-*   **Gantt Chart:** A type of timeline chart using horizontal bars to show work completed in relation to work planned. It emphasizes the scope of individual tasks.
+## 5. Selecting a Testing Tool
+**Short Explanation:** Choosing the right tool is critical because tools can be expensive, require specific training, or may not support all platforms.
 
-### Earned Value Analysis (EVA)
-EVA is a technique used to measure project health by integrating cost, schedule, and scope.
+### Selection Criteria
+*   **Meeting Requirements:** Does it support the project goals and types of testing?
+*   **Technology Expectations:** Is it compatible with the project’s language, OS, and browsers?
+*   **Training and Skill:** Can the current team learn and use the tool effectively?
+*   **Management Aspects:** What is the cost, license type, and Return on Investment (ROI)?
 
-**Key Concepts:**
-*   **Planned Value (PV):** Budgeted cost of work that *should* have been done by now.
-*   **Earned Value (EV):** Budgeted cost of work *actually* completed.
-*   **Actual Cost (AC):** The real money spent so far.
+---
 
-**Performance Metrics:**
-*   **Schedule Variance (SV):** $EV - PV$ (Negative means behind schedule).
-*   **Cost Variance (CV):** $EV - AC$ (Negative means over budget).
-*   **Schedule Performance Index (SPI):** $EV / PV$ (Less than 1 means behind schedule).
-*   **Cost Performance Index (CPI):** $EV / AC$ (Less than 1 means over budget).
+## 6. Selenium
+**Short Explanation:** A free, open-source tool used specifically for automating web applications. It is platform-independent and supports multiple languages.
+
+### Key Features
+*   **Cross-Browser:** Works on Chrome, Firefox, Edge, and Safari.
+*   **Multi-Language:** Supports Java, Python, C#, and Ruby.
+*   **Parallel Execution:** Can run multiple tests at once to save time.
+*   **Open Source:** No licensing costs.
+
+### Selenium Components
+*   **Selenium IDE:** A "record-and-playback" tool for beginners to create quick scripts.
+*   **Selenium WebDriver:** The core component for complex testing; communicates directly with browsers.
+*   **Selenium Grid:** Used to run tests on multiple machines and operating systems simultaneously.

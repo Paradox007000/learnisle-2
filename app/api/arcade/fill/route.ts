@@ -11,11 +11,8 @@ const ai = new GoogleGenAI({
 
 export async function GET() {
   try {
-    console.log("🧠 MCQ API called");
+    console.log("✏️ Fill Blank API called");
 
-    // -----------------------------
-    // 1️⃣ Check API key
-    // -----------------------------
     if (!process.env.GEMINI_QUIZ_KEY) {
       return NextResponse.json(
         { error: "GEMINI_QUIZ_KEY missing" },
@@ -24,7 +21,7 @@ export async function GET() {
     }
 
     // -----------------------------
-    // 2️⃣ Read notes
+    // Read notes
     // -----------------------------
     const notesPath = path.join(
       process.cwd(),
@@ -45,39 +42,25 @@ export async function GET() {
       );
     }
 
-    if (!notes.trim()) {
-      return NextResponse.json(
-        { error: "Notes file empty." },
-        { status: 400 }
-      );
-    }
-
-    console.log("📏 Notes length:", notes.length);
-
     // -----------------------------
-    // 3️⃣ Gemini Generate MCQ
+    // Generate blanks
     // -----------------------------
     const response = await ai.models.generateContent({
       model: "models/gemini-2.5-flash",
       contents: `
-Create EXACTLY ONE multiple choice question.
+Create EXACTLY 5 fill-in-the-blank questions.
 
-RULES:
-- 4 options only
-- Only ONE correct answer
-- Options must be short
+Rules:
+- Replace ONE keyword with _____
+- Answers must be SHORT (1–3 words)
 - No explanations
-- Based strictly on notes
 
-RETURN STRICT JSON ONLY:
+FORMAT STRICTLY:
 
-{
- "question": "string",
- "options": ["A","B","C","D"],
- "answer": "exact correct option text"
-}
+Q: sentence with _____
+A: answer
 
-NOTES:
+TEXT:
 ${notes.slice(0, 8000)}
 `,
     });
@@ -87,38 +70,35 @@ ${notes.slice(0, 8000)}
         ?.map((p: any) => p.text)
         .join("") || "";
 
-    if (!aiText) {
-      throw new Error("Empty AI response");
-    }
+    if (!aiText) throw new Error("Empty AI response");
 
     // -----------------------------
-    // 4️⃣ Safe JSON extraction
+    // Parse
     // -----------------------------
-    const start = aiText.indexOf("{");
-    const end = aiText.lastIndexOf("}") + 1;
+    const questions = aiText
+      .split("Q:")
+      .slice(1)
+      .map((block) => {
+        const [q, a] = block.split("A:");
 
-    const cleanJSON = aiText.slice(start, end);
+        return {
+          question: q?.trim(),
+          answer: a?.trim(),
+        };
+      })
+      .filter((q) => q.question && q.answer);
 
-    const parsed = JSON.parse(cleanJSON);
+    if (!questions.length)
+      throw new Error("No questions parsed");
 
-    // validation (VERY IMPORTANT)
-    if (
-      !parsed.question ||
-      !Array.isArray(parsed.options) ||
-      parsed.options.length !== 4 ||
-      !parsed.answer
-    ) {
-      throw new Error("Invalid MCQ format");
-    }
+    console.log("✅ Fill blanks generated");
 
-    console.log("✅ MCQ generated");
-
-    return NextResponse.json(parsed);
+    return NextResponse.json({ questions });
   } catch (error) {
-    console.error("MCQ ERROR:", error);
+    console.error("FILL ERROR:", error);
 
     return NextResponse.json(
-      { error: "Failed to generate MCQ." },
+      { error: "Failed to generate blanks." },
       { status: 500 }
     );
   }

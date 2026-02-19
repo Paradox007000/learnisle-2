@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ProgressLoader from "@/components/ui/ProgressLoader";
+
 
 type Question = {
   question: string;
@@ -93,15 +95,9 @@ export default function SpeedRecallPage() {
   // -----------------------------
   // UI STATES
   // -----------------------------
-  if (loading)
-    return (
-      <div className="center">
-        <div className="card">
-          <h2>⚡ Preparing Speed Recall...</h2>
-          <p>Generating AI questions from your notes</p>
-        </div>
-      </div>
-    );
+ if (loading)
+  return <ProgressLoader label="⚡ Generating questions..." />;
+
 
   if (finished)
     return (
