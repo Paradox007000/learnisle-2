@@ -2,7 +2,8 @@
 
 import TopBar from "@/components/ui/TopBar";
 import { useEffect, useRef, useState } from "react";
-import { Play, Pause } from "lucide-react";
+import Link from "next/link";
+import { Play, Pause, Home, Gamepad2, FileText, Mic, CreditCard, User } from "lucide-react";
 
 /* ---------------- CLEAN MARKDOWN ---------------- */
 function cleanForSpeech(text: string) {
@@ -26,6 +27,7 @@ export default function PodcastPage() {
   const [playing, setPlaying] = useState(false);
   const [words, setWords] = useState<string[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const loadPodcast = async () => {
@@ -119,13 +121,110 @@ export default function PodcastPage() {
 
   return (
     <div className="page">
-      <TopBar openMenu={() => {}} />
+      <TopBar openMenu={() => setIsMenuOpen(true)} />
+
+      {/* MENU DRAWER */}
+      {isMenuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "300px",
+            height: "100vh",
+            background: "white",
+            zIndex: 999999,
+            boxShadow: "5px 0 20px rgba(0,0,0,0.15)",
+            padding: "30px 20px",
+          }}
+        >
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            style={{
+              position: "absolute",
+              top: "20px",
+              right: "20px",
+              fontSize: "28px",
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            ×
+          </button>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "6px",
+              marginTop: "40px",
+            }}
+          >
+            {[
+              { href: "/", label: "Home", icon: <Home size={24} strokeWidth={2.5} color="#ec4899" /> },
+              { href: "/arcade", label: "Arcade", icon: <Gamepad2 size={24} strokeWidth={2.5} color="#ec4899" /> },
+              { href: "/document", label: "Document", icon: <FileText size={24} strokeWidth={2.5} color="#ec4899" /> },
+              { href: "/podcast", label: "Podcast", icon: <Mic size={24} strokeWidth={2.5} color="#ec4899" /> },
+              { href: "/flashcards", label: "Flashcards", icon: <CreditCard size={24} strokeWidth={2.5} color="#ec4899" /> },
+            ].map((item, index) => (
+              <Link
+                key={index}
+                href={item.href}
+                onClick={() => setIsMenuOpen(false)}
+                style={menuStyle}
+              >
+                {item.icon} {item.label}
+              </Link>
+            ))}
+
+            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+
+            <Link
+              href="/mimi"
+              onClick={() => setIsMenuOpen(false)}
+              style={{ ...menuStyle, gap: "12px" }}
+            >
+              <img
+                src="/mascot.png"
+                alt="Mascot"
+                style={{ width: "28px", height: "28px", objectFit: "contain" }}
+              />
+              Mimi
+            </Link>
+
+            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+
+            <Link
+              href="/account"
+              onClick={() => setIsMenuOpen(false)}
+              style={menuStyle}
+            >
+              <User size={24} strokeWidth={2.5} color="#ec4899" /> Account
+            </Link>
+          </div>
+        </div>
+      )}
+
+      {/* OVERLAY */}
+      {isMenuOpen && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            background: "rgba(0,0,0,0.5)",
+            zIndex: 99999,
+          }}
+          onClick={() => setIsMenuOpen(false)}
+        />
+      )}
 
       <div className="centerWrap">
         <div className="card">
-
           <img src="/mascot.png" className="mascot" />
-
           <h2 className="status">{status}</h2>
 
           {!loading && (
@@ -145,16 +244,12 @@ export default function PodcastPage() {
           {!loading && (
             <div ref={captionRef} className="captions">
               {words.map((word, i) => (
-                <span
-                  key={i}
-                  className={i === currentWordIndex ? "activeWord" : ""}
-                >
+                <span key={i} className={i === currentWordIndex ? "activeWord" : ""}>
                   {word}{" "}
                 </span>
               ))}
             </div>
           )}
-
         </div>
       </div>
 
@@ -188,7 +283,6 @@ export default function PodcastPage() {
 
         .mascot {
           width: 150px;
-          filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15));
         }
 
         .status {
@@ -197,7 +291,6 @@ export default function PodcastPage() {
           color: #333;
         }
 
-        /* ✅ Smaller Play Button */
         .playButton {
           width: 65px;
           height: 65px;
@@ -209,32 +302,6 @@ export default function PodcastPage() {
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          box-shadow: 0 15px 30px rgba(255, 79, 145, 0.3);
-          transition: 0.3s ease;
-        }
-
-        .playButton:hover {
-          transform: scale(1.08);
-        }
-
-        .waveWrap {
-          display: flex;
-          gap: 6px;
-          height: 30px;
-        }
-
-        .waveWrap span {
-          width: 6px;
-          height: 100%;
-          background: linear-gradient(to top, #ff9ebb, #ffc2d6);
-          border-radius: 6px;
-          animation: bounce 1.2s infinite ease-in-out;
-          transform-origin: bottom;
-        }
-
-        @keyframes bounce {
-          0%, 100% { transform: scaleY(0.3); }
-          50% { transform: scaleY(1); }
         }
 
         .captions {
@@ -259,3 +326,16 @@ export default function PodcastPage() {
     </div>
   );
 }
+
+const menuStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: "14px",
+  padding: "16px 18px",
+  borderRadius: "14px",
+  textDecoration: "none",
+  color: "#111",
+  fontWeight: 600,
+  fontSize: "16px",
+  transition: "all 0.2s ease",
+};
