@@ -2,12 +2,9 @@
 
 import TopBar from "@/components/ui/TopBar";
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { Home, Gamepad2, FileText, Mic, CreditCard, User } from "lucide-react";
+import { Play, Pause } from "lucide-react";
 
-/* ------------------------------------------------ */
-/* 🧹 CLEAN MARKDOWN FOR SPEECH                     */
-/* ------------------------------------------------ */
+/* ---------------- CLEAN MARKDOWN ---------------- */
 function cleanForSpeech(text: string) {
   return text
     .replace(/\*\*/g, "")
@@ -24,103 +21,76 @@ export default function PodcastPage() {
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState("Preparing podcast...");
   const [captions, setCaptions] = useState("");
   const [playing, setPlaying] = useState(false);
   const [words, setWords] = useState<string[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
 
-  // ✅ MENU STATE
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
-  /* ------------------------------------------------ */
-  /* 🎙️ PODCAST + SPEECH                             */
-  /* ------------------------------------------------ */
-
   useEffect(() => {
-    if (speechSynthesis.speaking || speechSynthesis.pending) {
-      setLoading(false);
-      setPlaying(true);
-      setStatus("Now playing 🎧");
-      return;
-    }
-
-    const startPodcast = async () => {
+    const loadPodcast = async () => {
       try {
-        setStatus("Fetching your notes...");
-        setProgress(30);
-
         const res = await fetch("/api/get-notes");
         if (!res.ok) throw new Error("No notes");
 
         const { notes } = await res.json();
-
         setCaptions(notes);
 
         const cleanText = cleanForSpeech(notes);
         const wordArray = cleanText.split(/\s+/);
         setWords(wordArray);
 
-        setStatus("Preparing Mimi's voice...");
-        setProgress(70);
-
         const speech = new SpeechSynthesisUtterance(cleanText);
 
-        const voices = speechSynthesis.getVoices();
-        const bestVoice =
-          voices.find(v => v.name.toLowerCase().includes("female")) ||
-          voices.find(v => v.lang.includes("en")) ||
-          voices[0];
+        const loadVoices = () => {
+          const voices = speechSynthesis.getVoices();
+          const best =
+            voices.find((v) => v.name.toLowerCase().includes("female")) ||
+            voices.find((v) => v.lang.includes("en")) ||
+            voices[0];
 
-        if (bestVoice) speech.voice = bestVoice;
+          if (best) speech.voice = best;
+        };
+
+        loadVoices();
+        speechSynthesis.onvoiceschanged = loadVoices;
 
         speech.rate = 0.95;
-        speech.pitch = 1.15;
+        speech.pitch = 1.1;
 
         speech.onstart = () => {
           setLoading(false);
           setPlaying(true);
-          setStatus("Now playing 🎧");
-          setProgress(100);
+          setStatus("Now Playing");
         };
 
         speech.onboundary = (event) => {
           if (event.name === "word") {
-            const spokenText = cleanText.substring(0, event.charIndex);
-            const index = spokenText.split(/\s+/).length - 1;
+            const spoken = cleanText.substring(0, event.charIndex);
+            const index = spoken.split(/\s+/).length - 1;
             setCurrentWordIndex(index);
           }
         };
 
         speech.onend = () => {
           setPlaying(false);
-          setStatus("Podcast finished ✨");
+          setStatus("Podcast Finished");
         };
 
         utteranceRef.current = speech;
-
-        setTimeout(() => {
-          speechSynthesis.speak(speech);
-        }, 400);
-
+        setTimeout(() => speechSynthesis.speak(speech), 400);
       } catch (err) {
-        console.error(err);
-        setStatus("No notes available 😭");
+        setStatus("No notes available");
         setLoading(false);
       }
     };
 
-    startPodcast();
+    loadPodcast();
 
     return () => {
       speechSynthesis.cancel();
     };
   }, []);
-
-  /* ------------------------------------------------ */
-  /* ▶️ PLAY / PAUSE                                 */
-  /* ------------------------------------------------ */
 
   const togglePlay = () => {
     if (!utteranceRef.current) return;
@@ -134,16 +104,11 @@ export default function PodcastPage() {
     }
   };
 
-  /* ------------------------------------------------ */
-  /* 📜 AUTO SCROLL                                  */
-  /* ------------------------------------------------ */
-
   useEffect(() => {
-    if (!captionRef.current) return;
-
     const el = captionRef.current;
-    const active = el.querySelector(".activeWord");
+    if (!el) return;
 
+    const active = el.querySelector(".activeWord");
     if (active) {
       active.scrollIntoView({
         behavior: "smooth",
@@ -152,194 +117,145 @@ export default function PodcastPage() {
     }
   }, [currentWordIndex]);
 
-  /* ------------------------------------------------ */
-  /* 🎨 UI                                           */
-  /* ------------------------------------------------ */
-
   return (
     <div className="page">
+      <TopBar openMenu={() => {}} />
 
-      {/* ✅ TOPBAR WITH MENU BUTTON */}
-      <TopBar openMenu={() => setIsMenuOpen(true)} />
-
-      {/* ✅ SIDEBAR MENU */}
-      {isMenuOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "300px",
-            height: "100vh",
-            background: "white",
-            zIndex: 999999,
-            boxShadow: "5px 0 20px rgba(0,0,0,0.15)",
-            padding: "30px 20px",
-          }}
-        >
-          <button
-            onClick={() => setIsMenuOpen(false)}
-            style={{
-              position: "absolute",
-              top: "20px",
-              right: "20px",
-              fontSize: "28px",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-            }}
-          >
-            ×
-          </button>
-
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "6px",
-              marginTop: "40px",
-            }}
-          >
-            {[
-              { href: "/", label: "Home", icon: <Home size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/arcade", label: "Arcade", icon: <Gamepad2 size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/document", label: "Document", icon: <FileText size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/podcast", label: "Podcast", icon: <Mic size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/flashcards", label: "Flashcards", icon: <CreditCard size={24} strokeWidth={2.5} color="#ec4899" /> },
-            ].map((item, index) => (
-              <Link
-                key={index}
-                href={item.href}
-                onClick={() => setIsMenuOpen(false)}
-                style={menuStyle}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(128,128,128,0.08)";
-                  e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
-                {item.icon} {item.label}
-              </Link>
-            ))}
-
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
-
-            <Link
-              href="/mimi"
-              onClick={() => setIsMenuOpen(false)}
-              style={{ ...menuStyle, display: "flex", alignItems: "center" }}
-            >
-              <img
-                src="/mascot.png"
-                alt="Mascot"
-                style={{ width: "28px", height: "28px", objectFit: "contain" }}
-              />
-              Mimi
-            </Link>
-
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
-
-            <Link
-              href="/account"
-              onClick={() => setIsMenuOpen(false)}
-              style={menuStyle}
-            >
-              <User size={24} strokeWidth={2.5} color="#ec4899" /> Account
-            </Link>
-          </div>
-        </div>
-      )}
-
-      {/* ✅ OVERLAY */}
-      {isMenuOpen && (
-        <div
-          onClick={() => setIsMenuOpen(false)}
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            background: "rgba(0,0,0,0.5)",
-            zIndex: 99999,
-          }}
-        />
-      )}
-
-      {/* 🔥 YOUR ORIGINAL CONTENT BELOW (UNCHANGED) */}
-      <div className="container">
+      <div className="centerWrap">
         <div className="card">
 
-          <div className="mascotWrap">
-            <img src="/mascot.png" className="mascot" />
-            {playing && (
-              <div className="waves">
-                {[0,1,2,3,4].map(i => (
-                  <span key={i} style={{animationDelay:`${i*0.15}s`}}/>
-                ))}
-              </div>
-            )}
-          </div>
+          <img src="/mascot.png" className="mascot" />
 
           <h2 className="status">{status}</h2>
 
-          {loading && (
-            <div className="progressBar">
-              <div className="progressFill" style={{ width: `${progress}%` }} />
-            </div>
+          {!loading && (
+            <button className="playButton" onClick={togglePlay}>
+              {playing ? <Pause size={22} /> : <Play size={22} />}
+            </button>
           )}
 
-          {!loading && (
-            <button className="playBtn" onClick={togglePlay}>
-              {playing ? "Pause ⏸️" : "Play ▶️"}
-            </button>
+          {playing && (
+            <div className="waveWrap">
+              {[0, 1, 2, 3, 4].map((i) => (
+                <span key={i} style={{ animationDelay: `${i * 0.15}s` }} />
+              ))}
+            </div>
           )}
 
           {!loading && (
             <div ref={captionRef} className="captions">
               {words.map((word, i) => (
-                <span key={i} className={i === currentWordIndex ? "activeWord" : ""}>
+                <span
+                  key={i}
+                  className={i === currentWordIndex ? "activeWord" : ""}
+                >
                   {word}{" "}
                 </span>
               ))}
             </div>
           )}
+
         </div>
       </div>
 
-      {/* KEEPING YOUR ORIGINAL STYLES UNTOUCHED */}
       <style jsx>{`
-        .page { min-height:100vh; background:linear-gradient(180deg,#fdfbff,#f3f9ff); }
-        .container { display:flex; justify-content:center; align-items:center; padding:40px 20px; }
-        .card { width:100%; max-width:820px; background:white; border-radius:28px; padding:40px; box-shadow:0 20px 60px rgba(0,0,0,0.08); display:flex; flex-direction:column; align-items:center; gap:24px; }
-        .mascotWrap{ position:relative; width:140px; }
-        .mascot{ width:100%; filter:drop-shadow(0 12px 25px rgba(0,0,0,0.15)); }
-        .status{ color:#333; font-weight:600; }
-        .progressBar{ width:320px; height:10px; background:#eee; border-radius:999px; overflow:hidden; }
-        .progressFill{ height:100%; background:linear-gradient(90deg,#ff9ebb,#a0e7ff); transition:width .6s ease; }
-        .playBtn{ border:none; padding:14px 32px; border-radius:999px; background:linear-gradient(135deg,#ff9ebb,#ffa7c4); color:white; font-size:16px; cursor:pointer; box-shadow:0 10px 25px rgba(0,0,0,.15); }
-        .captions{ width:100%; max-width:640px; height:260px; overflow-y:auto; background:#fafcff; border-radius:18px; padding:20px; line-height:1.9; color:#444; border:1px solid #eef2f7; }
-        .activeWord{ background:#ff9ebb; color:white; padding:3px 7px; border-radius:8px; transition:all .2s ease; }
-        .waves{ position:absolute; bottom:-15px; left:50%; transform:translateX(-50%); display:flex; gap:6px; height:30px; }
-        .waves span{ width:6px; height:100%; background:linear-gradient(to top,#ff9ebb,#ffc2d6); border-radius:6px; animation:bounce 1.2s infinite ease-in-out; transform-origin:bottom; }
-        @keyframes bounce{ 0%,100%{transform:scaleY(.3);} 50%{transform:scaleY(1);} }
+        .page {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #fff5fa, #eef9ff);
+        }
+
+        .centerWrap {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          min-height: calc(100vh - 80px);
+          padding: 40px 20px;
+        }
+
+        .card {
+          width: 100%;
+          max-width: 1000px;
+          background: white;
+          border-radius: 40px;
+          padding: 70px 90px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 28px;
+          box-shadow: 0 40px 100px rgba(255, 94, 149, 0.12);
+          text-align: center;
+        }
+
+        .mascot {
+          width: 150px;
+          filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.15));
+        }
+
+        .status {
+          font-size: 22px;
+          font-weight: 600;
+          color: #333;
+        }
+
+        /* ✅ Smaller Play Button */
+        .playButton {
+          width: 65px;
+          height: 65px;
+          border-radius: 50%;
+          border: none;
+          background: linear-gradient(135deg, #ff7aa8, #ff4f91);
+          color: white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          box-shadow: 0 15px 30px rgba(255, 79, 145, 0.3);
+          transition: 0.3s ease;
+        }
+
+        .playButton:hover {
+          transform: scale(1.08);
+        }
+
+        .waveWrap {
+          display: flex;
+          gap: 6px;
+          height: 30px;
+        }
+
+        .waveWrap span {
+          width: 6px;
+          height: 100%;
+          background: linear-gradient(to top, #ff9ebb, #ffc2d6);
+          border-radius: 6px;
+          animation: bounce 1.2s infinite ease-in-out;
+          transform-origin: bottom;
+        }
+
+        @keyframes bounce {
+          0%, 100% { transform: scaleY(0.3); }
+          50% { transform: scaleY(1); }
+        }
+
+        .captions {
+          width: 100%;
+          height: 260px;
+          overflow-y: auto;
+          background: #f8fbff;
+          padding: 28px;
+          border-radius: 20px;
+          line-height: 1.9;
+          font-size: 15px;
+          border: 1px solid #eef2f7;
+        }
+
+        .activeWord {
+          background: #ff7aa8;
+          color: white;
+          padding: 4px 8px;
+          border-radius: 8px;
+        }
       `}</style>
     </div>
   );
 }
-
-const menuStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "14px",
-  padding: "16px 18px",
-  borderRadius: "14px",
-  textDecoration: "none",
-  color: "#111",
-  fontWeight: 600,
-  fontSize: "16px",
-  transition: "all 0.2s ease",
-};

@@ -1,11 +1,12 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface TopBarProps {
-  openMenu?: () => void; // optional menu button
-  hideMimi?: boolean;    // ✅ NEW: hide mascot when needed
+  openMenu?: () => void;
+  hideMimi?: boolean;
 }
 
 export default function TopBar({
@@ -34,7 +35,6 @@ export default function TopBar({
           gap: "20px",
         }}
       >
-        {/* ☰ Menu Button (only if provided) */}
         {openMenu && (
           <button
             onClick={openMenu}
@@ -68,13 +68,16 @@ export default function TopBar({
         </div>
       </div>
 
-      {/* RIGHT SIDE — Mimi (conditionally rendered) */}
+      {/* RIGHT SIDE — Mimi */}
       {!hideMimi && (
-        <div
+        <Link
+          href="/mimi"
           style={{
             display: "flex",
             alignItems: "center",
             gap: "14px",
+            cursor: "pointer",
+            textDecoration: "none",
           }}
         >
           <div
@@ -105,8 +108,9 @@ export default function TopBar({
           >
             Mimi
           </span>
-        </div>
+        </Link>
       )}
     </div>
   );
 }
+
