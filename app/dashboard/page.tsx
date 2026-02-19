@@ -7,7 +7,8 @@ import { auth } from "@/lib/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { useTheme } from "next-themes";
 import Image from "next/image";
-import { Home, Gamepad2, FileText, Mic, CreditCard, User } from "lucide-react";
+import { Home, Gamepad2, FileText, Mic, CreditCard, User, Sun, Moon } from "lucide-react";
+
 
 
 export default function Dashboard() {
@@ -128,14 +129,45 @@ export default function Dashboard() {
                 <Image src="/profile.png" alt="Profile" width={40} height={40} />
               </Link>
 
-              {mounted && (
-                <button
-                  onClick={() => setTheme(isDark ? "light" : "dark")}
-                  className="text-xl dark:text-white"
-                >
-                  {theme === "dark" ? "☀️" : "🌙"}
-                </button>
-              )}
+  {mounted && (
+  <div
+    onClick={() => setTheme(isDark ? "light" : "dark")}
+    style={{
+      width: "62px",
+      height: "32px",
+      backgroundColor: isDark ? "#1f2937" : "#fce7f3",
+      borderRadius: "999px",
+      display: "flex",
+      alignItems: "center",
+      padding: "4px",
+      cursor: "pointer",
+      transition: "all 0.3s ease",
+    }}
+  >
+    <div
+      style={{
+        width: "24px",
+        height: "24px",
+        backgroundColor: "#ffffff",
+        borderRadius: "50%",
+        transform: isDark ? "translateX(30px)" : "translateX(0px)",
+        transition: "transform 0.3s ease",
+        boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {isDark ? (
+        <Moon size={14} color="#111827" />
+      ) : (
+        <Sun size={14} color="#ec4899" />
+      )}
+    </div>
+  </div>
+)}
+
+
             </div>
           </div>
         </header>
@@ -150,10 +182,14 @@ export default function Dashboard() {
       left: 0,
       width: "300px",
       height: "100vh",
-      background: "white",
+      background: isDark
+        ? "linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 50%, #3a3a3a 100%)"
+        : "white",
+      color: isDark ? "#ffffff" : "#111111",
       zIndex: 999999,
       boxShadow: "5px 0 20px rgba(0,0,0,0.15)",
       padding: "30px 20px",
+      transition: "background 0.3s ease, color 0.3s ease",
     }}
   >
     {/* CLOSE BUTTON */}
@@ -167,6 +203,7 @@ export default function Dashboard() {
         background: "none",
         border: "none",
         cursor: "pointer",
+        color: isDark ? "#ffffff" : "#111111",
       }}
     >
       ×
@@ -191,9 +228,14 @@ export default function Dashboard() {
           key={index}
           href={item.href}
           onClick={() => setIsMenuOpen(false)}
-          style={menuStyle}
+          style={{
+            ...menuStyle,
+            color: isDark ? "#ffffff" : "#111111",
+          }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = "rgba(128,128,128,0.08)";
+            e.currentTarget.style.background = isDark
+              ? "rgba(255,255,255,0.08)"
+              : "rgba(128,128,128,0.08)";
             e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
           }}
           onMouseLeave={(e) => {
@@ -205,38 +247,60 @@ export default function Dashboard() {
         </Link>
       ))}
 
-      <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+      <hr
+        style={{
+          margin: "12px 0",
+          borderColor: isDark ? "#374151" : "#eee",
+        }}
+      />
 
-     <Link
-  href="/mimi"
-  onClick={() => setIsMenuOpen(false)}
-  style={{ ...menuStyle, gap: "12px", display: "flex", alignItems: "center" }}
-  onMouseEnter={(e) => {
-    e.currentTarget.style.background = "rgba(128,128,128,0.08)";
-    e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-  }}
-  onMouseLeave={(e) => {
-    e.currentTarget.style.background = "transparent";
-    e.currentTarget.style.boxShadow = "none";
-  }}
->
-  <img
-    src="/mascot.png"
-    alt="Mascot"
-    style={{ width: "28px", height: "28px", objectFit: "contain" }}
-  />
-  Mimi
-</Link>
+      <Link
+        href="/mimi"
+        onClick={() => setIsMenuOpen(false)}
+        style={{
+          ...menuStyle,
+          gap: "12px",
+          display: "flex",
+          alignItems: "center",
+          color: isDark ? "#ffffff" : "#111111",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.background = isDark
+            ? "rgba(255,255,255,0.08)"
+            : "rgba(128,128,128,0.08)";
+          e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = "transparent";
+          e.currentTarget.style.boxShadow = "none";
+        }}
+      >
+        <img
+          src="/mascot.png"
+          alt="Mascot"
+          style={{ width: "28px", height: "28px", objectFit: "contain" }}
+        />
+        Mimi
+      </Link>
 
-
-      <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+      <hr
+        style={{
+          margin: "12px 0",
+          borderColor: isDark ? "#374151" : "#eee",
+        }}
+      />
 
       <Link
         href="/account"
         onClick={() => setIsMenuOpen(false)}
-        style={menuStyle}
+        style={{
+          ...menuStyle,
+          color: isDark ? "#ffffff" : "#111111",
+        }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = "rgba(128,128,128,0.08)";
+          e.currentTarget.style.background = isDark
+            ? "rgba(255,255,255,0.08)"
+            : "rgba(128,128,128,0.08)";
           e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
         }}
         onMouseLeave={(e) => {
@@ -249,6 +313,7 @@ export default function Dashboard() {
     </div>
   </div>
 )}
+
 
 {/* OVERLAY */}
 {isMenuOpen && (

@@ -20,10 +20,51 @@
     *   *Praesent libero*
     *   *Curabitur sodales ligula in libero*
     *   *Vestibulum lacinia arcu eget nulla*
+## 1. Project Scheduling
+Project scheduling is the process of organizing project work into separate tasks and deciding when and how they will be executed. It acts as a communication mechanism for tasks, resources, and timeframes.
+
+**Key Elements of a Schedule:**
+*   Start and end dates.
+*   Milestones and specific tasks.
+*   Required resources (people, equipment, etc.).
+*   Task dependencies.
+
+### The Project Scheduling Process
+1.  **Identify Activities:** Break the project into small, manageable tasks with clear start and end points (e.g., coding, testing).
+2.  **Identify Activity Dependencies:** Determine the order of tasks.
+    *   **Finish-to-Start (FS):** Task B starts after Task A finishes.
+    *   **Start-to-Start (SS):** Task B starts when Task A starts.
+    *   **Finish-to-Finish (FF):** Task B finishes only when Task A finishes.
+    *   **Start-to-Finish (SF):** Task B finishes only when Task A starts (Rare).
+3.  **Allocate Resources:** Assign tools, budget, and materials to tasks.
+4.  **Create Project Charts:** Use tools like **Gantt Charts** (timelines) or **PERT/CPM Charts** (critical paths) to visualize the workflow.
+5.  **Allocate People:** Assign team members based on skills while avoiding overloading individuals.
+
+---
+
+## 2. Work Breakdown Structure (WBS)
+WBS is a "Top-Down" hierarchical decomposition of a project into smaller, manageable parts (modules, tasks, and activities).
+
+**Hierarchy Levels:**
+*   **Level 1 – Project Goal:** The complete system (e.g., Library Management System).
+*   **Level 2 – Major Modules:** Large deliverables like Design, Implementation, or Testing.
+*   **Level 3 – Sub-Modules:** Specific activities (e.g., Database design, Unit testing).
+*   **Level 4 – Work Packages:** The smallest manageable tasks assigned to individuals.
+
+**Core Features:**
+*   Uses a tree structure.
+*   The "root" is the project name.
+*   Leaf nodes are independent and undividable activities.
 
 ---
 
 ### Short Explanations for Learning
+## 3. Activity Networks
+A graphical representation showing the logical sequence and dependencies of project tasks.
+
+**Two Ways to Show Relationships:**
+*   **Activity on Nodes (AON):** Activities are represented by circles/ovals (labeled A, B, C) and arrows show the sequence.
+*   **Activity on Arrows (AOA):** Activities are represented by arrows. The nodes (circles) represent the start or end events of those activities.
 
 **PDFObject Testing**
 This document serves as a functional sample to ensure that the PDFObject software is displaying pages and content correctly across a three-page format.
@@ -33,3 +74,23 @@ The author digresses to discuss the relativity of length. Even though minutes an
 
 **Placeholder Text (Lorem Ipsum)**
 The majority of the document uses Latin sequences to fill space. This allows testers to see how blocks of text—such as "Class aptent taciti sociosqu ad litora torquent"—layout on the page without needing specific English content.
+## 4. Project Tracking Tools
+Tracking involves monitoring progress to ensure the project stays on schedule, within budget, and meets quality standards.
+
+### Timeline & Gantt Charts
+*   **Timeline Chart:** A graph showing when tasks start and end. It helps identify overlaps and monitor deadlines.
+*   **Gantt Chart:** A type of timeline chart using horizontal bars to show work completed in relation to work planned. It emphasizes the scope of individual tasks.
+
+### Earned Value Analysis (EVA)
+EVA is a technique used to measure project health by integrating cost, schedule, and scope.
+
+**Key Concepts:**
+*   **Planned Value (PV):** Budgeted cost of work that *should* have been done by now.
+*   **Earned Value (EV):** Budgeted cost of work *actually* completed.
+*   **Actual Cost (AC):** The real money spent so far.
+
+**Performance Metrics:**
+*   **Schedule Variance (SV):** $EV - PV$ (Negative means behind schedule).
+*   **Cost Variance (CV):** $EV - AC$ (Negative means over budget).
+*   **Schedule Performance Index (SPI):** $EV / PV$ (Less than 1 means behind schedule).
+*   **Cost Performance Index (CPI):** $EV / AC$ (Less than 1 means over budget).

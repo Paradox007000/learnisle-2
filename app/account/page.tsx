@@ -79,14 +79,7 @@ const progress = (xp % 200) / 2; // progress %
           </div>
 
           <div className="flex items-center gap-4">
-            {mounted && (
-              <button
-                onClick={() => setTheme(isDark ? "light" : "dark")}
-                className="text-xl dark:text-white"
-              >
-                {theme === "dark" ? "☀️" : "🌙"}
-              </button>
-            )}
+            
 
             <button
               onClick={logout}
