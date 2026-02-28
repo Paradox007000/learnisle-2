@@ -3,10 +3,16 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLanguage } from "@/context/LanguageContext";
+import { translations } from "@/translations";
 
 export default function HomePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
+  // ✅ ADDED
+  const { language, setLanguage } = useLanguage();
+  const t = translations[language];
 
   const handleStart = () => {
     setLoading(true);
@@ -46,6 +52,8 @@ export default function HomePage() {
         {/* Right Side */}
         <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
           <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value as "en" | "hi")}
             style={{
               padding: "6px 12px",
               borderRadius: "20px",
@@ -54,8 +62,8 @@ export default function HomePage() {
               cursor: "pointer",
             }}
           >
-            <option>English</option>
-            <option>Hindi</option>
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
           </select>
 
           <button
@@ -72,7 +80,7 @@ export default function HomePage() {
               boxShadow: "0 5px 15px rgba(0,0,0,0.1)",
             }}
           >
-            Sign Up
+            {t.signup}
           </button>
         </div>
       </div>
@@ -101,7 +109,7 @@ export default function HomePage() {
             marginBottom: "20px",
           }}
         >
-          Your Personalized Learning Island
+          {t.title}
         </h1>
 
         {/* Subtitle */}
@@ -113,8 +121,7 @@ export default function HomePage() {
             marginBottom: "40px",
           }}
         >
-          Discover AI-powered notes, flashcards, quizzes, and fun interactive
-          learning tools designed just for you.
+          {t.subtitle}
         </p>
 
         {/* Mascot */}
@@ -150,11 +157,11 @@ export default function HomePage() {
               (e.currentTarget.style.transform = "scale(1)")
             }
           >
-            Start Your Journey →
+            {t.start}
           </button>
         ) : (
           <p style={{ marginTop: "20px" }}>
-            Loading your island...
+            {t.loading}
           </p>
         )}
       </div>

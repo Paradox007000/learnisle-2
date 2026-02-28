@@ -8,11 +8,15 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import { Home, Gamepad2, FileText, Mic, CreditCard, User, Sun, Moon } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
+import { translations } from "@/translations";
 
 
 
 export default function Dashboard() {
   const router = useRouter();
+  const { language } = useLanguage();
+  const t = translations[language];
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [files, setFiles] = useState([
     { id: 1, name: "UML, Data Modeling, and V-Model Testing", type: "pdf", lastOpened: "1 day ago" },
@@ -218,11 +222,11 @@ export default function Dashboard() {
       }}
     >
       {[
-        { href: "/", label: "Home", icon: <Home size={24} strokeWidth={2.5} color="#ec4899" /> },
-        { href: "/arcade", label: "Arcade", icon: <Gamepad2 size={24} strokeWidth={2.5} color="#ec4899" /> },
-        { href: "/document", label: "Document", icon: <FileText size={24} strokeWidth={2.5} color="#ec4899" /> },
-        { href: "/podcast", label: "Podcast", icon: <Mic size={24} strokeWidth={2.5} color="#ec4899" /> },
-        { href: "/flashcards", label: "Flashcards", icon: <CreditCard size={24} strokeWidth={2.5} color="#ec4899" /> },
+        { href: "/", label: t.home, icon: <Home size={24} strokeWidth={2.5} color="#ec4899" /> },
+        { href: "/arcade", label: t.arcade, icon: <Gamepad2 size={24} strokeWidth={2.5} color="#ec4899" /> },
+        { href: "/document", label: t.document, icon: <FileText size={24} strokeWidth={2.5} color="#ec4899" /> },
+        { href: "/podcast", label: t.podcast, icon: <Mic size={24} strokeWidth={2.5} color="#ec4899" /> },
+        { href: "/flashcards", label: t.flashcards, icon: <CreditCard size={24} strokeWidth={2.5} color="#ec4899" /> },
       ].map((item, index) => (
         <Link
           key={index}
@@ -280,7 +284,7 @@ export default function Dashboard() {
           alt="Mascot"
           style={{ width: "28px", height: "28px", objectFit: "contain" }}
         />
-        Mimi
+        mimi
       </Link>
 
       <hr
@@ -308,7 +312,7 @@ export default function Dashboard() {
           e.currentTarget.style.boxShadow = "none";
         }}
       >
-        <User size={24} strokeWidth={2.5} color="#ec4899" /> Account
+        <User size={24} strokeWidth={2.5} color="#ec4899" /> {t.account}
       </Link>
     </div>
   </div>
@@ -335,10 +339,10 @@ export default function Dashboard() {
         {/* TITLE */}
         <div className="mb-10">
           <h1 className="text-3xl font-semibold text-gray-800 dark:text-white">
-            Dashboard
+            {t.dashboardTitle}
           </h1>
           <p className="text-gray-500 dark:text-gray-400 mt-1">
-            Create and manage your AI study tools
+            {t.dashboardSubtitle}
           </p>
         </div>
 
@@ -348,8 +352,8 @@ export default function Dashboard() {
             <div className="premiumCard">
               <div className="cardIcon bg-purple-100 text-purple-600">📄</div>
               <div>
-                <h3>Summarize Document</h3>
-                <p>Upload PDF & get smart notes</p>
+                <h3>{t.summarize}</h3>
+                <p>{t.uploadSmart}</p>
               </div>
             </div>
           </Link>
@@ -358,8 +362,8 @@ export default function Dashboard() {
             <div className="premiumCard">
               <div className="cardIcon bg-pink-100 text-pink-600">🃏</div>
               <div>
-                <h3>Generate Flashcards</h3>
-                <p>Auto-create exam revision cards</p>
+                <h3>{t.generateFlashcards}</h3>
+                <p>{t.revisionCards}</p>
               </div>
             </div>
           </Link>
@@ -368,8 +372,8 @@ export default function Dashboard() {
             <div className="premiumCard">
               <div className="cardIcon bg-blue-100 text-blue-600">🎙️</div>
               <div>
-                <h3>AI Podcast</h3>
-                <p>Turn notes into audio </p>
+                <h3>{t.aiPodcast}</h3>
+                <p>{t.turnNotes}</p>
               </div>
             </div>
           </Link>
@@ -378,8 +382,8 @@ export default function Dashboard() {
             <div className="premiumCard">
               <div className="cardIcon bg-indigo-100 text-indigo-600">🎮</div>
               <div>
-                <h3>Arcade</h3>
-                <p>Play fun mini-games</p>
+                <h3>{t.arcade}</h3>
+                <p>{t.playGames}</p>
               </div>
             </div>
           </Link>
@@ -403,12 +407,12 @@ export default function Dashboard() {
             />
             <div className="text-4xl mb-3">📄</div>
             <p className="text-lg font-semibold">
-              Drop your PDF here or click to upload
+              {t.dropYourPDFFHere}
             </p>
           </div>
         </div>
 
-        <h2 className="text-lg font-semibold mb-4 dark:text-white">My Files</h2>
+        <h2 className="text-lg font-semibold mb-4 dark:text-white">{t.myFiles}</h2>
         <div className="space-y-4">
           {files.map((file) => (
             <div key={file.id} className="fileRow">
