@@ -20,6 +20,7 @@ export async function GET() {
 
     const dir = path.join(process.cwd(), "data");
 
+    // ✅ ensure folder exists
     try {
       await fs.access(dir);
     } catch {
@@ -31,15 +32,21 @@ export async function GET() {
 
     const files = await fs.readdir(dir);
 
-    if (!files.length) {
+    // ✅ ONLY JSON FILES
+    const jsonFiles = files.filter((file) =>
+      file.endsWith(".json")
+    );
+
+    if (!jsonFiles.length) {
       return NextResponse.json(
-        { error: "Please upload PDF first." },
+        { error: "No processed notes found." },
         { status: 400 }
       );
     }
 
+    // ✅ get latest JSON file
     const sorted = await Promise.all(
-      files.map(async (file) => {
+      jsonFiles.map(async (file) => {
         const stats = await fs.stat(path.join(dir, file));
         return { file, time: stats.mtime.getTime() };
       })
@@ -48,9 +55,23 @@ export async function GET() {
     sorted.sort((a, b) => b.time - a.time);
     const latestFile = sorted[0].file;
 
-    const fileData = JSON.parse(
-      await fs.readFile(path.join(dir, latestFile), "utf-8")
+    // ✅ SAFE FILE READ
+    const rawData = await fs.readFile(
+      path.join(dir, latestFile),
+      "utf-8"
     );
+
+    let fileData;
+
+    try {
+      fileData = JSON.parse(rawData);
+    } catch (err) {
+      console.error("Invalid JSON:", latestFile);
+      return NextResponse.json(
+        { error: "Study notes file corrupted." },
+        { status: 500 }
+      );
+    }
 
     const documentText = fileData.text?.slice(0, 8000);
 
@@ -61,6 +82,7 @@ export async function GET() {
       );
     }
 
+    // ✅ GEMINI CALL
     const response = await ai.models.generateContent({
       model: "models/gemini-2.5-flash",
       contents: `
@@ -73,7 +95,7 @@ A: Answer
 
 TEXT:
 ${documentText}
-      `,
+`,
     });
 
     const aiText =
@@ -88,6 +110,7 @@ ${documentText}
       );
     }
 
+    // ✅ parse flashcards
     const cards = aiText
       .split("Q:")
       .slice(1)
@@ -111,6 +134,7 @@ ${documentText}
 
   } catch (error) {
     console.error("FLASHCARD ERROR:", error);
+
     return NextResponse.json(
       { error: "Failed to generate flashcards." },
       { status: 500 }

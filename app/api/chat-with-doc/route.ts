@@ -5,7 +5,9 @@ import fs from "fs/promises";
 import path from "path";
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY!,
+});
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,13 +16,20 @@ export async function POST(req: NextRequest) {
     const dir = path.join(process.cwd(), "data");
     const files = await fs.readdir(dir);
 
-    if (!files.length) {
-      return NextResponse.json({ answer: "No document found." });
+    // ✅ ONLY allow JSON files
+    const jsonFiles = files.filter((file) =>
+      file.endsWith(".json")
+    );
+
+    if (!jsonFiles.length) {
+      return NextResponse.json({
+        answer: "No study notes found.",
+      });
     }
 
-    // Get latest uploaded document
+    // ✅ find latest JSON file
     const sorted = await Promise.all(
-      files.map(async (file) => {
+      jsonFiles.map(async (file) => {
         const stats = await fs.stat(path.join(dir, file));
         return { file, time: stats.mtime.getTime() };
       })
@@ -29,16 +38,37 @@ export async function POST(req: NextRequest) {
     sorted.sort((a, b) => b.time - a.time);
     const latestFile = sorted[0].file;
 
-    const fileData = JSON.parse(
-      await fs.readFile(path.join(dir, latestFile), "utf-8")
+    // ✅ read safely
+    const rawData = await fs.readFile(
+      path.join(dir, latestFile),
+      "utf-8"
     );
 
-    const limitedText = fileData.text.slice(0, 10000);
+    let fileData;
 
+    try {
+      fileData = JSON.parse(rawData);
+    } catch (err) {
+      console.error("Invalid JSON file:", latestFile);
+      return NextResponse.json({
+        answer: "Study notes file is corrupted.",
+      });
+    }
+
+    const limitedText = fileData.text?.slice(0, 10000) || "";
+
+    if (!limitedText) {
+      return NextResponse.json({
+        answer: "No study notes content found.",
+      });
+    }
+
+    // ✅ Gemini request (UNCHANGED LOGIC)
     const response = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
       contents: `
-You are a helpful study assistant. Only answer using the document content below.
+You are a helpful study assistant.
+Only answer using the document content below.
 
 DOCUMENT:
 ${limitedText}
@@ -48,9 +78,14 @@ ${question}
 `,
     });
 
-    return NextResponse.json({ answer: response.text });
+    return NextResponse.json({
+      answer: response.text,
+    });
   } catch (error) {
     console.error("CHAT ERROR:", error);
-    return NextResponse.json({ answer: "AI failed to respond." });
+
+    return NextResponse.json({
+      answer: "AI failed to respond.",
+    });
   }
 }

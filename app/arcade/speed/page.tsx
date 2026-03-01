@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ProgressLoader from "@/components/ui/ProgressLoader";
-
+import { useLives } from "@/context/LivesContext";
 
 type Question = {
   question: string;
@@ -17,6 +17,9 @@ export default function SpeedRecallPage() {
   const [time, setTime] = useState(5);
   const [loading, setLoading] = useState(true);
   const [finished, setFinished] = useState(false);
+
+  // ❤️ GLOBAL LIVES
+  const { loseLife, lives } = useLives();
 
   // -----------------------------
   // Fetch questions
@@ -48,7 +51,7 @@ export default function SpeedRecallPage() {
     const timer = setInterval(() => {
       setTime((prev) => {
         if (prev === 1) {
-          nextQuestion();
+          handleAnswer(false); // ⏰ timeout = wrong
           return 5;
         }
         return prev - 1;
@@ -59,19 +62,18 @@ export default function SpeedRecallPage() {
   }, [index, finished, loading]);
 
   // -----------------------------
-  function nextQuestion() {
-    const current = questions[index];
-
-    if (
-      input.trim().toLowerCase() ===
-      current.answer.toLowerCase()
-    ) {
+  // CORE ANSWER HANDLER
+  // -----------------------------
+  function handleAnswer(correct: boolean) {
+    if (correct) {
       setScore((s) => s + 1);
+    } else {
+      loseLife(); // ❤️ remove life globally
     }
 
     setInput("");
 
-    if (index + 1 >= questions.length) {
+    if (index + 1 >= questions.length || lives <= 1) {
       finishGame();
     } else {
       setIndex((i) => i + 1);
@@ -79,6 +81,18 @@ export default function SpeedRecallPage() {
     }
   }
 
+  // -----------------------------
+  function nextQuestion() {
+    const current = questions[index];
+
+    const correct =
+      input.trim().toLowerCase() ===
+      current.answer.toLowerCase();
+
+    handleAnswer(correct);
+  }
+
+  // -----------------------------
   async function finishGame() {
     setFinished(true);
 
@@ -95,9 +109,8 @@ export default function SpeedRecallPage() {
   // -----------------------------
   // UI STATES
   // -----------------------------
- if (loading)
-  return <ProgressLoader label="⚡ Generating questions..." />;
-
+  if (loading)
+    return <ProgressLoader label="⚡ Generating questions..." />;
 
   if (finished)
     return (
@@ -106,6 +119,23 @@ export default function SpeedRecallPage() {
           <h1>🎉 Finished!</h1>
           <h2>Your Score: {score}</h2>
         </div>
+
+        <style jsx>{`
+          .center {
+            min-height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+          }
+
+          .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+          }
+        `}</style>
       </div>
     );
 
@@ -126,7 +156,7 @@ export default function SpeedRecallPage() {
           </div>
         </div>
 
-        {/* Progress Bar */}
+        {/* Progress */}
         <div className="progress">
           <div
             className="progressFill"
@@ -135,9 +165,7 @@ export default function SpeedRecallPage() {
         </div>
 
         {/* Question */}
-        <h2 className="question">
-          {current.question}
-        </h2>
+        <h2 className="question">{current.question}</h2>
 
         {/* Input */}
         <input
@@ -184,14 +212,6 @@ export default function SpeedRecallPage() {
           box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
         }
 
-        .card {
-          background: white;
-          padding: 40px;
-          border-radius: 20px;
-          text-align: center;
-          box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
-        }
-
         .header {
           display: flex;
           justify-content: space-between;
@@ -236,12 +256,6 @@ export default function SpeedRecallPage() {
           border: 1px solid #ddd;
           font-size: 16px;
           outline: none;
-          transition: 0.2s;
-        }
-
-        .input:focus {
-          border-color: #9edbff;
-          box-shadow: 0 0 0 3px rgba(158, 219, 255, 0.2);
         }
 
         .submitBtn {
@@ -259,12 +273,6 @@ export default function SpeedRecallPage() {
             #ff9ebb,
             #9edbff
           );
-          transition: 0.2s;
-        }
-
-        .submitBtn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
         }
 
         .counter {
