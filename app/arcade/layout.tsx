@@ -1,9 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
+import { usePathname } from "next/navigation";
 import TopBar from "@/components/ui/TopBar";
-import { Home, Gamepad2, FileText, Mic, CreditCard, User } from "lucide-react";
+import { soundManager } from "@/utils/soundManager";
+import {
+  Home,
+  Gamepad2,
+  FileText,
+  Mic,
+  CreditCard,
+  User,
+} from "lucide-react";
 
 export default function ArcadeLayout({
   children,
@@ -11,6 +21,42 @@ export default function ArcadeLayout({
   children: React.ReactNode;
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [muted, setMuted] = useState(
+    soundManager.getMuted()
+  );
+
+  const pathname = usePathname();
+
+  /* ===============================
+     BACKGROUND MUSIC CONTROL
+     (USER INTERACTION SAFE)
+  =============================== */
+  useEffect(() => {
+    if (pathname !== "/arcade") {
+      soundManager.stopBackground();
+      return;
+    }
+
+    const startMusic = () => {
+      soundManager.playBackground();
+      document.removeEventListener("click", startMusic);
+    };
+
+    document.addEventListener("click", startMusic);
+
+    return () => {
+      document.removeEventListener("click", startMusic);
+      soundManager.stopBackground();
+    };
+  }, [pathname]);
+
+  /* ===============================
+     MUTE TOGGLE
+  =============================== */
+  const toggleMute = () => {
+    soundManager.toggleMute();
+    setMuted(soundManager.getMuted());
+  };
 
   return (
     <div
@@ -20,9 +66,37 @@ export default function ArcadeLayout({
           "linear-gradient(180deg,#fff7fb 0%,#f3f9ff 100%)",
         display: "flex",
         flexDirection: "column",
+        position: "relative",
       }}
     >
       <TopBar openMenu={() => setIsMenuOpen(true)} />
+
+      {/* MUSIC BUTTON */}
+      <div
+        style={{
+          position: "fixed",
+          bottom: "20px",
+          right: "20px",
+          zIndex: 999999,
+        }}
+      >
+        <Image
+          src={
+            muted
+              ? "/images/mute.png"
+              : "/images/volume.png"
+          }
+          alt="volume toggle"
+          width={44}
+          height={44}
+          onClick={toggleMute}
+          style={{
+            cursor: "pointer",
+            filter:
+              "drop-shadow(0 6px 12px rgba(0,0,0,0.15))",
+          }}
+        />
+      </div>
 
       {/* MENU DRAWER */}
       {isMenuOpen && (
@@ -63,27 +137,20 @@ export default function ArcadeLayout({
             }}
           >
             {[
-              { href: "/dashboard", label: "Home", icon: <Home size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/arcade", label: "Arcade", icon: <Gamepad2 size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/document", label: "Document", icon: <FileText size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/podcast", label: "Podcast", icon: <Mic size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/flashcards", label: "Flashcards", icon: <CreditCard size={24} strokeWidth={2.5} color="#ec4899" /> },
+              { href: "/dashboard", label: "Home", icon: <Home size={24} color="#ec4899" /> },
+              { href: "/arcade", label: "Arcade", icon: <Gamepad2 size={24} color="#ec4899" /> },
+              { href: "/document", label: "Document", icon: <FileText size={24} color="#ec4899" /> },
+              { href: "/podcast", label: "Podcast", icon: <Mic size={24} color="#ec4899" /> },
+              { href: "/flashcards", label: "Flashcards", icon: <CreditCard size={24} color="#ec4899" /> },
             ].map((item, index) => (
               <Link
                 key={index}
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
                 style={menuStyle}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(128,128,128,0.08)";
-                  e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
               >
-                {item.icon} {item.label}
+                {item.icon}
+                {item.label}
               </Link>
             ))}
 
@@ -92,20 +159,12 @@ export default function ArcadeLayout({
             <Link
               href="/mimi"
               onClick={() => setIsMenuOpen(false)}
-              style={{ ...menuStyle, gap: "12px", display: "flex", alignItems: "center" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(128,128,128,0.08)";
-                e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.boxShadow = "none";
-              }}
+              style={menuStyle}
             >
               <img
                 src="/mascot.png"
                 alt="Mascot"
-                style={{ width: "28px", height: "28px", objectFit: "contain" }}
+                style={{ width: "28px", height: "28px" }}
               />
               Mimi
             </Link>
@@ -116,22 +175,14 @@ export default function ArcadeLayout({
               href="/account"
               onClick={() => setIsMenuOpen(false)}
               style={menuStyle}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(128,128,128,0.08)";
-                e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.boxShadow = "none";
-              }}
             >
-              <User size={24} strokeWidth={2.5} color="#ec4899" /> Account
+              <User size={24} color="#ec4899" />
+              Account
             </Link>
           </div>
         </div>
       )}
 
-      {/* BACKDROP */}
       {isMenuOpen && (
         <div
           style={{
@@ -147,7 +198,6 @@ export default function ArcadeLayout({
         />
       )}
 
-      {/* MAIN CONTENT */}
       <div
         style={{
           flex: 1,
@@ -172,5 +222,4 @@ const menuStyle: React.CSSProperties = {
   color: "#111",
   fontWeight: 600,
   fontSize: "16px",
-  transition: "all 0.2s ease",
 };

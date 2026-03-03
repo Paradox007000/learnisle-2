@@ -1,6 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useLives } from "@/context/LivesContext";
+import { soundManager } from "@/utils/soundManager";
 
 const games = [
   {
@@ -31,25 +33,18 @@ const games = [
 
 export default function ArcadePage() {
   const router = useRouter();
+  const { lives } = useLives();
+
+  const noLives = lives === 0;
 
   return (
     <div
       style={{
         width: "100%",
         maxWidth: "900px",
+        margin: "0 auto",
       }}
     >
-      <h1
-        style={{
-          fontSize: "32px",
-          fontWeight: 700,
-          marginBottom: "30px",
-          textAlign: "center",
-        }}
-      >
-        🎮 Arcade
-      </h1>
-
       <div
         style={{
           display: "grid",
@@ -61,20 +56,27 @@ export default function ArcadePage() {
         {games.map((game) => (
           <div
             key={game.title}
-            onClick={() => router.push(game.path)}
+            onClick={() => {
+              if (!noLives) {
+                soundManager.playClick();
+                router.push(game.path);
+              }
+            }}
             style={{
-              cursor: "pointer",
+              cursor: noLives ? "not-allowed" : "pointer",
               background: "white",
               borderRadius: "22px",
               padding: "24px",
               boxShadow:
                 "0 12px 30px rgba(0,0,0,0.08)",
               transition: "0.2s",
+              opacity: noLives ? 0.5 : 1,
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.transform =
-                "translateY(-4px)")
-            }
+            onMouseEnter={(e) => {
+              if (!noLives)
+                e.currentTarget.style.transform =
+                  "translateY(-4px)";
+            }}
             onMouseLeave={(e) =>
               (e.currentTarget.style.transform =
                 "translateY(0)")
@@ -96,6 +98,18 @@ export default function ArcadePage() {
             >
               {game.desc}
             </p>
+
+            {noLives && (
+              <p
+                style={{
+                  marginTop: "10px",
+                  color: "red",
+                  fontSize: "13px",
+                }}
+              >
+                🔒 No lives remaining
+              </p>
+            )}
           </div>
         ))}
       </div>

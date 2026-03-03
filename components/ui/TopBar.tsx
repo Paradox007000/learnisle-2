@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import Hearts from "@/components/ui/Hearts";
+import LifeTimer from "@/components/ui/LifeTimer";
 
 interface TopBarProps {
   openMenu?: () => void;
@@ -14,6 +16,21 @@ export default function TopBar({
   hideMimi = false,
 }: TopBarProps) {
   const router = useRouter();
+  const pathname = usePathname();
+
+  /* -----------------------------
+     PAGE DETECTION
+  ----------------------------- */
+
+  // ❤️ Arcade pages
+  const showLives = pathname.includes("/arcade");
+
+  // ⏰ Learning pages (works with nested routes)
+  const learningRoutes = ["/document", "/podcast", "/flashcards"];
+
+  const showLearningTimer = learningRoutes.some((route) =>
+    pathname.includes(route)
+  );
 
   return (
     <div
@@ -27,7 +44,9 @@ export default function TopBar({
         padding: "0 40px",
       }}
     >
-      {/* LEFT SIDE — MENU + LOGO */}
+      {/* =========================
+         LEFT SIDE — MENU + LOGO
+      ========================= */}
       <div
         style={{
           display: "flex",
@@ -68,49 +87,65 @@ export default function TopBar({
         </div>
       </div>
 
-      {/* RIGHT SIDE — Mimi */}
-      {!hideMimi && (
-        <Link
-          href="/mimi"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "14px",
-            cursor: "pointer",
-            textDecoration: "none",
-          }}
-        >
-          <div
-            style={{
-              width: "50px",
-              height: "50px",
-              borderRadius: "50%",
-              overflow: "hidden",
-              background: "#ffeef5",
-              border: "2px solid #ffd6e7",
-              position: "relative",
-            }}
-          >
-            <Image
-              src="/mascot.png"
-              alt="Mimi mascot"
-              fill
-              style={{ objectFit: "cover" }}
-            />
-          </div>
+      {/* =========================
+         RIGHT SIDE
+      ========================= */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: "24px",
+        }}
+      >
+        {/* ❤️ Arcade Lives */}
+        {showLives && <Hearts />}
 
-          <span
+        {/* ⏰ Study Timer */}
+        {showLearningTimer && <LifeTimer />}
+
+        {/* Mimi */}
+        {!hideMimi && (
+          <Link
+            href="/mimi"
             style={{
-              fontSize: "20px",
-              fontWeight: 600,
-              color: "#2F3E34",
+              display: "flex",
+              alignItems: "center",
+              gap: "14px",
+              cursor: "pointer",
+              textDecoration: "none",
             }}
           >
-            Mimi
-          </span>
-        </Link>
-      )}
+            <div
+              style={{
+                width: "50px",
+                height: "50px",
+                borderRadius: "50%",
+                overflow: "hidden",
+                background: "#ffeef5",
+                border: "2px solid #ffd6e7",
+                position: "relative",
+              }}
+            >
+              <Image
+                src="/mascot.png"
+                alt="Mimi mascot"
+                fill
+                style={{ objectFit: "cover" }}
+              />
+            </div>
+
+            <span
+              style={{
+                fontSize: "20px",
+                fontWeight: 600,
+                color: "#2F3E34",
+              }}
+            >
+              Mimi
+            </span>
+          </Link>
+        )}
+      </div>
     </div>
   );
 }
-

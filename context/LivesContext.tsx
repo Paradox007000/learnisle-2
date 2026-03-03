@@ -1,51 +1,96 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { usePathname } from "next/navigation";
 
 type LivesContextType = {
   lives: number;
-  maxLives: number;
-  addLife: () => void;
+  nextLifeIn: number;
   loseLife: () => void;
+  gainLife: () => void;
   resetLives: () => void;
+  isArcadePage: boolean; // 👈 added
 };
 
-const LivesContext = createContext<LivesContextType | null>(null);
+const MAX_LIVES = 5;
+
+/* Demo: 30 seconds */
+const REFILL_TIME = 30 * 1000;
+
+const LivesContext =
+  createContext<LivesContextType | null>(null);
 
 export function LivesProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const maxLives = 3;
-  const [lives, setLives] = useState(3);
+  const pathname = usePathname();
+  const isArcadePage = pathname.startsWith("/arcade");
 
-  // load from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem("learnisle_lives");
-    if (saved) setLives(Number(saved));
-  }, []);
+  const [lives, setLives] = useState(MAX_LIVES);
+  const [nextLifeIn, setNextLifeIn] =
+    useState(REFILL_TIME / 1000);
 
-  // save automatically
+  /* -------------------------
+     LIFE REFILL TIMER
+  ------------------------- */
   useEffect(() => {
-    localStorage.setItem("learnisle_lives", String(lives));
+    if (lives >= MAX_LIVES) return;
+
+    const interval = setInterval(() => {
+      setNextLifeIn((prev) => {
+        if (prev <= 1) {
+          setLives((l) =>
+            Math.min(MAX_LIVES, l + 1)
+          );
+          return REFILL_TIME / 1000;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
   }, [lives]);
 
-  function addLife() {
-    setLives((l) => Math.min(maxLives, l + 1));
-  }
+  /* -------------------------
+     ACTIONS
+  ------------------------- */
 
   function loseLife() {
-    setLives((l) => Math.max(0, l - 1));
+    setLives((prev) => {
+      if (prev === MAX_LIVES) {
+        setNextLifeIn(REFILL_TIME / 1000);
+      }
+      return Math.max(0, prev - 1);
+    });
+  }
+
+  function gainLife() {
+    setLives((prev) =>
+      Math.min(MAX_LIVES, prev + 1)
+    );
   }
 
   function resetLives() {
-    setLives(maxLives);
+    setLives(MAX_LIVES);
   }
 
   return (
     <LivesContext.Provider
-      value={{ lives, maxLives, addLife, loseLife, resetLives }}
+      value={{
+        lives,
+        nextLifeIn,
+        loseLife,
+        gainLife,
+        resetLives,
+        isArcadePage, // 👈 exposed
+      }}
     >
       {children}
     </LivesContext.Provider>
@@ -53,7 +98,12 @@ export function LivesProvider({
 }
 
 export function useLives() {
-  const ctx = useContext(LivesContext);
-  if (!ctx) throw new Error("useLives must be inside LivesProvider");
-  return ctx;
-}
+  const context = useContext(LivesContext);
+
+  if (!context)
+    throw new Error(
+      "useLives must be inside LivesProvider"
+    );
+
+  return context;
+} 

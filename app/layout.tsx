@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
-
 import { LanguageProvider } from "@/context/LanguageContext";
 import { LivesProvider } from "@/context/LivesContext";
+import { StudyProvider } from "@/context/StudyContext";
 
 export const metadata: Metadata = {
   title: "Learnisle",
@@ -12,23 +12,24 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
         <LanguageProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem={false}
-          >
-            {/* ❤️ GLOBAL LIVES SYSTEM */}
-            <LivesProvider>
-              {children}
-            </LivesProvider>
-          </ThemeProvider>
+          <LivesProvider>
+            <StudyProvider>
+              <ThemeProvider
+                attribute="class"
+                defaultTheme="light"
+                enableSystem={false}
+              >
+                {children}
+              </ThemeProvider>
+            </StudyProvider>
+          </LivesProvider>
         </LanguageProvider>
       </body>
     </html>

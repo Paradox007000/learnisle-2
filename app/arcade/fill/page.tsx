@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import ProgressLoader from "@/components/ui/ProgressLoader";
-
+import {
+  DEFAULT_STATE,
+  processGameResult,
+  ArcadeState,
+} from "@/lib/arcade/arcadeEngine";
+import { useLives } from "@/context/LivesContext";
+import { soundManager } from "@/utils/soundManager";
 
 type Question = {
   question: string;
@@ -13,27 +19,37 @@ export default function FillGame() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
   const [input, setInput] = useState("");
-  const [score, setScore] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [finished, setFinished] = useState(false);
   const [feedback, setFeedback] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // -----------------------------
-  // Load questions
-  // -----------------------------
+  const [arcadeState, setArcadeState] =
+    useState<ArcadeState>(DEFAULT_STATE);
+
+  const { loseLife } = useLives();
+
   useEffect(() => {
     async function load() {
       const res = await fetch("/api/arcade/fill");
       const data = await res.json();
-
       setQuestions(data.questions || []);
       setLoading(false);
     }
-
     load();
   }, []);
 
+  function applyResult(correct: boolean) {
+    setArcadeState((prev) => {
+      const updated = processGameResult(prev, { correct });
+
+      if (!correct) loseLife();
+
+      return updated;
+    });
+  }
+
   function submit() {
+    soundManager.playClick();
+
     const current = questions[index];
 
     const correct =
@@ -41,90 +57,62 @@ export default function FillGame() {
       current.answer.toLowerCase();
 
     if (correct) {
-      setScore((s) => s + 1);
-      setFeedback("✅ Correct!");
+      soundManager.playCorrect();
     } else {
-      setFeedback(`❌ Correct: ${current.answer}`);
+      soundManager.playWrong();
     }
 
-    setTimeout(() => {
-      setFeedback("");
-      setInput("");
+    applyResult(correct);
 
-      if (index + 1 >= questions.length) {
-        setFinished(true);
-      } else {
-        setIndex((i) => i + 1);
-      }
+    setFeedback(
+      correct
+        ? "✅ Correct!"
+        : `❌ Correct answer: ${current.answer}`
+    );
+
+    setTimeout(() => {
+      setInput("");
+      setFeedback("");
+      setIndex((i) => i + 1);
     }, 1200);
   }
 
- if (loading)
-  return <ProgressLoader label="Generating..." />;
-
-
-  if (finished)
-    return (
-      <div style={{ textAlign: "center", marginTop: 80 }}>
-        <h1>✏️ Game Complete</h1>
-        <h2>Score: {score}</h2>
-      </div>
-    );
+  if (loading)
+    return <ProgressLoader label="Generating Fill Game..." />;
 
   const current = questions[index];
 
+  if (!current)
+    return (
+      <div className="text-center mt-20 text-xl">
+        🎉 Level Complete!
+      </div>
+    );
+
   return (
-    <div
-      style={{
-        maxWidth: 700,
-        margin: "60px auto",
-        background: "white",
-        padding: 30,
-        borderRadius: 20,
-        boxShadow: "0 15px 40px rgba(0,0,0,0.08)",
-      }}
-    >
-      <h2>{current.question}</h2>
+    <div className="max-w-xl mx-auto mt-16 px-6">
+      <h2 className="text-2xl font-semibold mb-6">
+        {current.question}
+      </h2>
 
       <input
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="Type missing word..."
-        style={{
-          marginTop: 20,
-          width: "100%",
-          padding: 14,
-          borderRadius: 12,
-          border: "1px solid #eee",
-        }}
+        className="w-full p-4 border rounded-xl mb-4"
       />
 
       <button
         onClick={submit}
-        style={{
-          marginTop: 20,
-          padding: "12px 24px",
-          borderRadius: 999,
-          border: "none",
-          background:
-            "linear-gradient(135deg,#ff9ebb,#9edbff)",
-          color: "white",
-          cursor: "pointer",
-        }}
+        className="px-6 py-3 rounded-xl bg-black text-white"
       >
         Submit
       </button>
 
-      {feedback && (
-        <h3 style={{ marginTop: 20 }}>{feedback}</h3>
-      )}
+      <p className="mt-4 text-lg">{feedback}</p>
 
-      <p style={{ marginTop: 20 }}>
-        Question {index + 1} / {questions.length}
+      <p className="mt-8 text-lg">
+        ⭐ XP: {arcadeState.score} | 🔥 Streak: {arcadeState.streak}
       </p>
-
-      <p>⭐ Score: {score}</p>
     </div>
   );
 }
-

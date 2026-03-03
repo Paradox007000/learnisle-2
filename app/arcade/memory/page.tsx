@@ -2,280 +2,198 @@
 
 import { useEffect, useState } from "react";
 import ProgressLoader from "@/components/ui/ProgressLoader";
+import {
+  DEFAULT_STATE,
+  processGameResult,
+  ArcadeState,
+} from "@/lib/arcade/arcadeEngine";
+import { useLives } from "@/context/LivesContext";
+import { soundManager } from "@/utils/soundManager";
 
-type Card = {
-  id: string;
-  text: string;
-  pairId: string;
-  type: "question" | "answer";
-  flipped: boolean;
-  matched: boolean;
-  status?: "correct" | "wrong";
+// ✅ Import your reusable Card
+import { Card, CardContent } from "@/components/ui/card";
+
+/* ======================================
+   TYPES
+====================================== */
+
+type MCQ = {
+  question: string;
+  options: string[];
+  answer: string;
 };
 
-export default function MemoryGame() {
-  const [cards, setCards] = useState<Card[]>([]);
-  const [gameState, setGameState] =
-    useState<"loading" | "preview" | "playing" | "finished" | "error">(
-      "loading"
-    );
+/* ======================================
+   COMPONENT
+====================================== */
 
-  const [selected, setSelected] = useState<Card[]>([]);
+export default function MCQGame() {
+  const [questions, setQuestions] = useState<MCQ[]>([]);
+  const [index, setIndex] = useState(0);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [finished, setFinished] = useState(false);
 
-  // -----------------------------
-  // shuffle helper
-  // -----------------------------
-  function shuffle<T>(array: T[]): T[] {
-    return [...array].sort(() => Math.random() - 0.5);
-  }
+  const [arcadeState, setArcadeState] =
+    useState<ArcadeState>(DEFAULT_STATE);
 
-  // -----------------------------
-  // Load Game
-  // -----------------------------
-  async function loadGame() {
-    try {
-      setGameState("loading");
+  const { loseLife, lives } = useLives();
 
-      // allow loader to render first
-      await new Promise((r) => setTimeout(r, 60));
-
-      const res = await fetch("/api/arcade/memory");
-
-      if (!res.ok) throw new Error("API failed");
-
-      const data = await res.json();
-
-      if (!data?.pairs) throw new Error("No pairs returned");
-
-      const generated: Card[] = [];
-
-      data.pairs.forEach((pair: any, index: number) => {
-        const id = String(index);
-
-        generated.push({
-          id: id + "q",
-          text: pair.question,
-          pairId: id,
-          type: "question",
-          flipped: true,
-          matched: false,
-        });
-
-        generated.push({
-          id: id + "a",
-          text: pair.answer,
-          pairId: id,
-          type: "answer",
-          flipped: true,
-          matched: false,
-        });
-      });
-
-      const questions = shuffle(
-        generated.filter((c) => c.type === "question")
-      );
-
-      const answers = shuffle(
-        generated.filter((c) => c.type === "answer")
-      );
-
-      setCards([...questions, ...answers]);
-
-      setGameState("preview");
-
-      // preview phase
-      setTimeout(() => {
-        setCards((prev) =>
-          prev.map((c) => ({ ...c, flipped: false }))
-        );
-        setGameState("playing");
-      }, 3000);
-    } catch (err) {
-      console.error(err);
-      setGameState("error");
-    }
-  }
+  /* ======================================
+     LOAD QUESTIONS
+  ====================================== */
 
   useEffect(() => {
-    loadGame();
+    async function load() {
+      try {
+        const res = await fetch("/api/arcade/mcq");
+        const data = await res.json();
+        setQuestions(data.questions || []);
+        setLoading(false);
+      } catch {
+        setLoading(false);
+      }
+    }
+
+    load();
   }, []);
 
-  // -----------------------------
-  // Card Click
-  // -----------------------------
-  function handleClick(card: Card) {
-    if (gameState !== "playing") return;
-    if (card.flipped || card.matched) return;
-    if (selected.length === 2) return;
+  /* ======================================
+     RESULT SYSTEM
+  ====================================== */
 
-    setCards((prev) =>
-      prev.map((c) =>
-        c.id === card.id ? { ...c, flipped: true } : c
-      )
-    );
+  function applyResult(correct: boolean) {
+    setArcadeState((prev) => {
+      const updated = processGameResult(prev, { correct });
 
-    const newSelected = [...selected, card];
-    setSelected(newSelected);
+      if (correct) {
+        soundManager.playCorrect();
+      } else {
+        soundManager.playWrong();
+        loseLife();
+      }
 
-    if (newSelected.length === 2) {
-      checkMatch(newSelected);
-    }
+      return updated;
+    });
   }
 
-  // -----------------------------
-  // Match Logic
-  // -----------------------------
-  function checkMatch(sel: Card[]) {
-    const [a, b] = sel;
+  /* ======================================
+     OPTION CLICK
+  ====================================== */
 
-    const isMatch =
-      a.pairId === b.pairId && a.type !== b.type;
+  function handleOptionClick(option: string) {
+    if (selectedOption || finished || lives === 0) return;
 
-    setCards((prev) =>
-      prev.map((c) =>
-        c.id === a.id || c.id === b.id
-          ? { ...c, status: isMatch ? "correct" : "wrong" }
-          : c
-      )
-    );
+    soundManager.playClick();
+
+    setSelectedOption(option);
+
+    const current = questions[index];
+    const correct = option === current.answer;
+
+    applyResult(correct);
 
     setTimeout(() => {
-      setCards((prev) =>
-        prev.map((c) => {
-          if (c.id === a.id || c.id === b.id) {
-            if (isMatch)
-              return { ...c, matched: true, status: undefined };
+      setSelectedOption(null);
 
-            return {
-              ...c,
-              flipped: false,
-              status: undefined,
-            };
-          }
-          return c;
-        })
-      );
-
-      setSelected([]);
-    }, 900);
+      if (index + 1 >= questions.length || lives <= 1) {
+        setFinished(true);
+      } else {
+        setIndex((prev) => prev + 1);
+      }
+    }, 1000);
   }
 
-  // -----------------------------
-  // Win Check
-  // -----------------------------
-  useEffect(() => {
-    if (cards.length && cards.every((c) => c.matched)) {
-      setGameState("finished");
-    }
-  }, [cards]);
+  /* ======================================
+     STATES
+  ====================================== */
 
-  // -----------------------------
-  // UI STATES
-  // -----------------------------
+  if (loading)
+    return <ProgressLoader label="Generating MCQs..." />;
 
-  if (gameState === "loading") {
+  if (finished)
     return (
-      <ProgressLoader label="Preparing memory game..." />
-    );
-  }
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <h1 className="text-3xl font-semibold mb-6">
+          🎉 Level Complete!
+        </h1>
 
-  if (gameState === "error") {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">
-          Unable to generate game. Please create notes first.
+        <p className="text-lg">
+          ⭐ Final XP: {arcadeState.score}
+        </p>
+
+        <p className="text-lg">
+          🔥 Final Streak: {arcadeState.streak}
         </p>
       </div>
     );
-  }
 
-  const questions = cards.filter(
-    (c) => c.type === "question"
-  );
-  const answers = cards.filter(
-    (c) => c.type === "answer"
-  );
+  const current = questions[index];
 
-  function cardStyle(card: Card) {
-    if (card.status === "correct")
-      return "bg-green-500 text-white";
+  if (!current)
+    return (
+      <p className="p-10 text-center">
+        Create notes first.
+      </p>
+    );
 
-    if (card.status === "wrong")
-      return "bg-red-500 text-white";
+  /* ======================================
+     UI
+  ====================================== */
 
-    if (card.flipped || card.matched)
-      return "bg-white text-gray-800";
-
-    return "bg-pink-200 text-transparent";
-  }
-
-  // -----------------------------
-  // MAIN UI
-  // -----------------------------
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center py-12 px-6">
-      <h1 className="text-3xl font-semibold mb-10 text-gray-800">
-        Memory Match
+    <div className="min-h-screen flex flex-col items-center py-16 px-6">
+      <h1 className="text-3xl font-semibold mb-8">
+        🎯 MCQ Challenge
       </h1>
 
-      {gameState === "preview" && (
-        <p className="mb-8 text-gray-500">
-          Memorize the pairs
-        </p>
-      )}
+      <p className="mb-4 text-lg">
+        ❤️ Lives: {lives}
+      </p>
 
-      {gameState === "finished" && (
-        <p className="mb-8 text-green-600 font-medium">
-          All pairs matched
-        </p>
-      )}
+      <p className="mb-8 text-lg">
+        ⭐ XP: {arcadeState.score} | 🔥 Streak: {arcadeState.streak}
+      </p>
 
-      <div className="flex gap-20">
-        {/* QUESTIONS */}
-        <section>
-          <h2 className="text-lg font-medium mb-6 text-center text-gray-600">
-            Questions
-          </h2>
+      <div className="max-w-2xl w-full">
+        <h2 className="text-xl font-medium mb-8">
+          {current.question}
+        </h2>
 
-          <div className="flex flex-col gap-6">
-            {questions.map((card) => (
-              <button
-                key={card.id}
-                onClick={() => handleClick(card)}
-                className={`w-80 h-36 rounded-2xl shadow-md flex items-center justify-center text-center p-6 transition-all duration-300 ${cardStyle(
-                  card
-                )}`}
+        <div className="flex flex-col gap-4">
+          {current.options.map((option, i) => {
+            const isSelected = selectedOption === option;
+            const isCorrect = option === current.answer;
+
+            let bgClass = "";
+
+            if (selectedOption) {
+              if (isCorrect)
+                bgClass = "bg-green-200";
+              else if (isSelected)
+                bgClass = "bg-red-200";
+              else
+                bgClass = "opacity-70";
+            }
+
+            return (
+              <Card
+                key={i}
+                onClick={() => handleOptionClick(option)}
+                className={`
+                  cursor-pointer
+                  transition-all duration-300
+                  hover:scale-105
+                  ${bgClass}
+                `}
               >
-                {card.flipped || card.matched
-                  ? card.text
-                  : " "}
-              </button>
-            ))}
-          </div>
-        </section>
-
-        {/* ANSWERS */}
-        <section>
-          <h2 className="text-lg font-medium mb-6 text-center text-gray-600">
-            Answers
-          </h2>
-
-          <div className="flex flex-col gap-6">
-            {answers.map((card) => (
-              <button
-                key={card.id}
-                onClick={() => handleClick(card)}
-                className={`w-80 h-36 rounded-2xl shadow-md flex items-center justify-center text-center p-6 transition-all duration-300 ${cardStyle(
-                  card
-                )}`}
-              >
-                {card.flipped || card.matched
-                  ? card.text
-                  : " "}
-              </button>
-            ))}
-          </div>
-        </section>
+                <CardContent className="p-4 text-left">
+                  {option}
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

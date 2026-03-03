@@ -2,129 +2,193 @@
 
 import { useEffect, useState } from "react";
 import ProgressLoader from "@/components/ui/ProgressLoader";
+import {
+  DEFAULT_STATE,
+  processGameResult,
+  ArcadeState,
+} from "@/lib/arcade/arcadeEngine";
+import { useLives } from "@/context/LivesContext";
+import { soundManager } from "@/utils/soundManager";
 
+/* ======================================
+   TYPES
+====================================== */
+
+type MCQ = {
+  question: string;
+  options: string[];
+  answer: string;
+};
+
+/* ======================================
+   COMPONENT
+====================================== */
 
 export default function MCQGame() {
+  const [questions, setQuestions] = useState<MCQ[]>([]);
+  const [index, setIndex] = useState(0);
+  const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [question, setQuestion] = useState("");
-  const [options, setOptions] = useState<string[]>([]);
-  const [answer, setAnswer] = useState("");
-  const [selected, setSelected] = useState<string | null>(null);
-  const [result, setResult] = useState("");
-  const [stats, setStats] = useState<any>(null);
+  const [finished, setFinished] = useState(false);
 
-  async function loadQuestion() {
-    setLoading(true);
+  const [arcadeState, setArcadeState] =
+    useState<ArcadeState>(DEFAULT_STATE);
 
-    const res = await fetch("/api/arcade/mcq");
-    const data = await res.json();
+  const { loseLife, lives } = useLives();
 
-    setQuestion(data.question);
-    setOptions(data.options);
-    setAnswer(data.answer);
-
-    setSelected(null);
-    setResult("");
-    setLoading(false);
-  }
+  /* ======================================
+     LOAD QUESTIONS
+  ====================================== */
 
   useEffect(() => {
-    loadQuestion();
+    async function load() {
+      try {
+        const res = await fetch("/api/arcade/mcq");
+        const data = await res.json();
+        setQuestions(data.questions || []);
+        setLoading(false);
+      } catch {
+        setLoading(false);
+      }
+    }
+
+    load();
   }, []);
 
-  async function choose(option: string) {
-    if (selected) return;
+  /* ======================================
+     RESULT SYSTEM
+  ====================================== */
 
-    setSelected(option);
+  function applyResult(correct: boolean) {
+    setArcadeState((prev) => {
+      const updated = processGameResult(prev, { correct });
 
-    const correct = option === answer;
+      if (correct) {
+        soundManager.playCorrect();
+      } else {
+        soundManager.playWrong();
+        loseLife();
+      }
 
-    const res = await fetch("/api/arcade/result", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ correct }),
+      return updated;
     });
-
-    const data = await res.json();
-    setStats(data.state);
-
-    setResult(correct ? "✅ Correct!" : "❌ Wrong");
   }
 
-  if (loading)
-  return <ProgressLoader label="⚡ Generating..." />;
+  /* ======================================
+     OPTION CLICK
+  ====================================== */
 
+  function handleOptionClick(option: string) {
+    if (selectedOption) return;
+    if (finished) return;
+    if (lives === 0) return;
+
+    soundManager.playClick();
+
+    setSelectedOption(option);
+
+    const current = questions[index];
+    const correct = option === current.answer;
+
+    applyResult(correct);
+
+    setTimeout(() => {
+      setSelectedOption(null);
+
+      if (index + 1 >= questions.length || lives <= 1) {
+        setFinished(true);
+      } else {
+        setIndex((prev) => prev + 1);
+      }
+    }, 1000);
+  }
+
+  /* ======================================
+     STATES
+  ====================================== */
+
+  if (loading)
+    return <ProgressLoader label="Generating MCQs..." />;
+
+  if (finished)
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center">
+        <h1 className="text-3xl font-semibold mb-6">
+          🎉 Level Complete!
+        </h1>
+
+        <p className="text-lg">
+          ⭐ Final XP: {arcadeState.score}
+        </p>
+
+        <p className="text-lg">
+          🔥 Final Streak: {arcadeState.streak}
+        </p>
+      </div>
+    );
+
+  const current = questions[index];
+
+  if (!current)
+    return (
+      <p className="p-10 text-center">
+        Create notes first.
+      </p>
+    );
+
+  /* ======================================
+     UI
+  ====================================== */
 
   return (
-    <div
-      style={{
-        maxWidth: 700,
-        margin: "60px auto",
-        background: "white",
-        padding: 30,
-        borderRadius: 20,
-        boxShadow: "0 15px 40px rgba(0,0,0,0.08)",
-      }}
-    >
-      <h2>{question}</h2>
+    <div className="min-h-screen flex flex-col items-center py-16 px-6">
+      <h1 className="text-3xl font-semibold mb-8">
+        🎯 MCQ Challenge
+      </h1>
 
-      <div style={{ marginTop: 20 }}>
-        {options.map((opt) => (
-          <button
-            key={opt}
-            onClick={() => choose(opt)}
-            style={{
-              display: "block",
-              width: "100%",
-              marginBottom: 12,
-              padding: 14,
-              borderRadius: 12,
-              border: "1px solid #eee",
-              cursor: "pointer",
-              background:
-                selected === opt
-                  ? opt === answer
-                    ? "#d4ffd9"
-                    : "#ffd6d6"
-                  : "white",
-            }}
-          >
-            {opt}
-          </button>
-        ))}
+      <p className="mb-4 text-lg">
+        ❤️ Lives: {lives}
+      </p>
+
+      <p className="mb-8 text-lg">
+        ⭐ XP: {arcadeState.score} | 🔥 Streak: {arcadeState.streak}
+      </p>
+
+      <div className="max-w-2xl w-full">
+        <h2 className="text-xl font-medium mb-8">
+          {current.question}
+        </h2>
+
+        <div className="flex flex-col gap-4">
+          {current.options.map((option, i) => {
+            const isSelected = selectedOption === option;
+            const isCorrect = option === current.answer;
+
+            let bgClass = "bg-white hover:scale-105";
+
+            if (selectedOption) {
+              if (isCorrect) bgClass = "bg-green-200";
+              else if (isSelected) bgClass = "bg-red-200";
+              else bgClass = "bg-white opacity-70";
+            }
+
+            return (
+              <button
+                key={i}
+                onClick={() => handleOptionClick(option)}
+                className={`
+                  p-4 rounded-xl shadow
+                  transition-all duration-300
+                  text-left
+                  ${bgClass}
+                `}
+              >
+                {option}
+              </button>
+            );
+          })}
+        </div>
       </div>
-
-      {result && (
-        <div style={{ marginTop: 20 }}>
-          <h3>{result}</h3>
-
-          <button
-            onClick={loadQuestion}
-            style={{
-              marginTop: 10,
-              padding: "10px 20px",
-              borderRadius: 999,
-              border: "none",
-              background:
-                "linear-gradient(135deg,#ff9ebb,#9edbff)",
-              color: "white",
-              cursor: "pointer",
-            }}
-          >
-            Next Question →
-          </button>
-        </div>
-      )}
-
-      {stats && (
-        <div style={{ marginTop: 25 }}>
-          <p>⭐ Score: {stats.score}</p>
-          <p>❤️ Lives: {stats.lives}</p>
-          <p>🔥 Streak: {stats.streak}</p>
-        </div>
-      )}
     </div>
   );
 }

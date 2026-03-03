@@ -3,18 +3,18 @@
 // Shared logic for ALL arcade games
 // ======================================
 
-/* -----------------------------
+/* =====================================================
    GAME RESULT TYPES
------------------------------ */
+===================================================== */
 
 export type GameResult = {
   correct: boolean;
-  timeTaken?: number;
+  timeTaken?: number; // optional for speed games
 };
 
-/* -----------------------------
+/* =====================================================
    GLOBAL ARCADE STATE
------------------------------ */
+===================================================== */
 
 export type ArcadeState = {
   score: number;
@@ -22,34 +22,51 @@ export type ArcadeState = {
   streak: number;
 };
 
+export const MAX_LIVES = 5;
+
 export const DEFAULT_STATE: ArcadeState = {
   score: 0,
-  lives: 5,
+  lives: MAX_LIVES,
   streak: 0,
 };
 
-/* -----------------------------
+/* =====================================================
    CORE SCORING ENGINE
------------------------------ */
+===================================================== */
 
 export function processGameResult(
   state: ArcadeState,
   result: GameResult
 ): ArcadeState {
-  const newState = { ...state };
+  const newState: ArcadeState = { ...state };
 
+  // ============================
+  // ✅ CORRECT ANSWER
+  // ============================
   if (result.correct) {
-    // base points
-    newState.score += 10;
+    let points = 10;
 
-    // streak increase
+    // ⚡ Speed bonus (for recall games)
+    if (result.timeTaken !== undefined) {
+      if (result.timeTaken < 2) points += 10;
+      else if (result.timeTaken < 4) points += 5;
+    }
+
+    newState.score += points;
+
+    // increase streak
     newState.streak += 1;
 
-    // streak bonus every 5 correct
+    // 🔥 streak bonus every 5
     if (newState.streak % 5 === 0) {
       newState.score += 20;
     }
-  } else {
+  }
+
+  // ============================
+  // ❌ WRONG ANSWER
+  // ============================
+  else {
     newState.lives = Math.max(0, newState.lives - 1);
     newState.streak = 0;
   }
@@ -57,9 +74,40 @@ export function processGameResult(
   return newState;
 }
 
-/* -----------------------------
-   QUESTION TYPES (SHARED)
------------------------------ */
+/* =====================================================
+   LIFE RECOVERY SYSTEM
+===================================================== */
+
+export function recoverLives(
+  state: ArcadeState,
+  amount: number = 1
+): ArcadeState {
+  return {
+    ...state,
+    lives: Math.min(MAX_LIVES, state.lives + amount),
+  };
+}
+
+/* =====================================================
+   RESET HELPERS
+===================================================== */
+
+export function resetArcade(): ArcadeState {
+  return { ...DEFAULT_STATE };
+}
+
+export function resetStreak(
+  state: ArcadeState
+): ArcadeState {
+  return {
+    ...state,
+    streak: 0,
+  };
+}
+
+/* =====================================================
+   QUESTION TYPES (SHARED ACROSS GAMES)
+===================================================== */
 
 export type SpeedQuestion = {
   question: string;
@@ -82,9 +130,9 @@ export type MemoryPair = {
   meaning: string;
 };
 
-/* -----------------------------
+/* =====================================================
    UTILITY HELPERS
------------------------------ */
+===================================================== */
 
 export function normalizeAnswer(text: string) {
   return text.trim().toLowerCase();
