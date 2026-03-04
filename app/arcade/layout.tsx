@@ -35,7 +35,7 @@ export default function ArcadeLayout({
   const isDark = theme === "dark";
 
   /* ===============================
-     BACKGROUND MUSIC CONTROL
+     BACKGROUND MUSIC
   =============================== */
   useEffect(() => {
     if (pathname !== "/arcade") {
@@ -56,9 +56,6 @@ export default function ArcadeLayout({
     };
   }, [pathname]);
 
-  /* ===============================
-     MUTE TOGGLE
-  =============================== */
   const toggleMute = () => {
     soundManager.toggleMute();
     setMuted(soundManager.getMuted());
@@ -70,18 +67,17 @@ export default function ArcadeLayout({
     <div
       style={{
         minHeight: "100vh",
-        background: isDark
-          ? "#121212"
-          : "linear-gradient(180deg,#fff7fb 0%,#f3f9ff 100%)",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         position: "relative",
-        transition: "background 0.3s ease",
+        overflowX: "hidden",
+        background: "transparent", // IMPORTANT
       }}
     >
       <TopBar openMenu={() => setIsMenuOpen(true)} />
 
-      {/* MUSIC BUTTON */}
+      {/* Floating Music Button */}
       <div
         style={{
           position: "fixed",
@@ -98,143 +94,113 @@ export default function ArcadeLayout({
           onClick={toggleMute}
           style={{
             cursor: "pointer",
-            filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.15))",
+            filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.25))",
           }}
         />
       </div>
 
-      {/* MENU DRAWER */}
+      {/* Side Menu */}
       {isMenuOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "300px",
-            height: "100vh",
-            background: isDark ? "#1E1E1E" : "white",
-            color: isDark ? "#ffffff" : "#111",
-            zIndex: 999999,
-            boxShadow: "5px 0 20px rgba(0,0,0,0.25)",
-            padding: "30px 20px",
-            transition: "background 0.3s ease",
-          }}
-        >
-          <button
-            onClick={() => setIsMenuOpen(false)}
-            style={{
-              position: "absolute",
-              top: "20px",
-              right: "20px",
-              fontSize: "28px",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: isDark ? "#ffffff" : "#000",
-            }}
-          >
-            ×
-          </button>
-
+        <>
           <div
             style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "6px",
-              marginTop: "40px",
+              position: "fixed",
+              top: 0,
+              left: 0,
+              width: "300px",
+              height: "100vh",
+              background: isDark ? "#1E1E1E" : "white",
+              color: isDark ? "#fff" : "#111",
+              zIndex: 999999,
+              boxShadow: "5px 0 20px rgba(0,0,0,0.25)",
+              padding: "30px 20px",
+              transition: "background 0.3s ease",
             }}
           >
-            {[
-              { href: "/dashboard", label: "Home", icon: <Home size={24} color="#ec4899" /> },
-              { href: "/arcade", label: "Arcade", icon: <Gamepad2 size={24} color="#ec4899" /> },
-              { href: "/document", label: "Document", icon: <FileText size={24} color="#ec4899" /> },
-              { href: "/podcast", label: "Podcast", icon: <Mic size={24} color="#ec4899" /> },
-              { href: "/flashcards", label: "Flashcards", icon: <CreditCard size={24} color="#ec4899" /> },
-            ].map((item, index) => (
+            <button
+              onClick={() => setIsMenuOpen(false)}
+              style={{
+                position: "absolute",
+                top: "20px",
+                right: "20px",
+                fontSize: "28px",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: isDark ? "#fff" : "#000",
+              }}
+            >
+              ×
+            </button>
+
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                gap: "6px",
+                marginTop: "40px",
+              }}
+            >
+              {[
+                { href: "/dashboard", label: "Home", icon: <Home size={24} color="#ec4899" /> },
+                { href: "/arcade", label: "Arcade", icon: <Gamepad2 size={24} color="#ec4899" /> },
+                { href: "/document", label: "Document", icon: <FileText size={24} color="#ec4899" /> },
+                { href: "/podcast", label: "Podcast", icon: <Mic size={24} color="#ec4899" /> },
+                { href: "/flashcards", label: "Flashcards", icon: <CreditCard size={24} color="#ec4899" /> },
+              ].map((item, index) => (
+                <Link
+                  key={index}
+                  href={item.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  style={{
+                    ...menuStyle,
+                    color: isDark ? "#fff" : "#111",
+                  }}
+                >
+                  {item.icon}
+                  {item.label}
+                </Link>
+              ))}
+
+              <hr style={{ margin: "12px 0", borderColor: isDark ? "#333" : "#eee" }} />
+
               <Link
-                key={index}
-                href={item.href}
+                href="/mimi"
                 onClick={() => setIsMenuOpen(false)}
-                style={{
-                  ...menuStyle,
-                  color: isDark ? "#ffffff" : "#111",
-                }}
+                style={{ ...menuStyle, color: isDark ? "#fff" : "#111" }}
               >
-                {item.icon}
-                {item.label}
+                <img src="/mascot.png" style={{ width: "28px", height: "28px" }} />
+                Mimi
               </Link>
-            ))}
 
-            <hr
-              style={{
-                margin: "12px 0",
-                borderColor: isDark ? "#2A2A2A" : "#eee",
-              }}
-            />
+              <hr style={{ margin: "12px 0", borderColor: isDark ? "#333" : "#eee" }} />
 
-            <Link
-              href="/mimi"
-              onClick={() => setIsMenuOpen(false)}
-              style={{
-                ...menuStyle,
-                color: isDark ? "#ffffff" : "#111",
-              }}
-            >
-              <img
-                src="/mascot.png"
-                alt="Mascot"
-                style={{ width: "28px", height: "28px" }}
-              />
-              Mimi
-            </Link>
-
-            <hr
-              style={{
-                margin: "12px 0",
-                borderColor: isDark ? "#2A2A2A" : "#eee",
-              }}
-            />
-
-            <Link
-              href="/account"
-              onClick={() => setIsMenuOpen(false)}
-              style={{
-                ...menuStyle,
-                color: isDark ? "#ffffff" : "#111",
-              }}
-            >
-              <User size={24} color="#ec4899" />
-              Account
-            </Link>
+              <Link
+                href="/account"
+                onClick={() => setIsMenuOpen(false)}
+                style={{ ...menuStyle, color: isDark ? "#fff" : "#111" }}
+              >
+                <User size={24} color="#ec4899" />
+                Account
+              </Link>
+            </div>
           </div>
-        </div>
+
+          <div
+            onClick={() => setIsMenuOpen(false)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,0,0,0.5)",
+              zIndex: 99999,
+            }}
+          />
+        </>
       )}
 
-      {isMenuOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100vw",
-            height: "100vh",
-            background: "rgba(0,0,0,0.5)",
-            zIndex: 99999,
-          }}
-          onClick={() => setIsMenuOpen(false)}
-        />
-      )}
-
-      <div
-        style={{
-          flex: 1,
-          padding: "40px 20px",
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
+      <main style={{ flex: 1, width: "100%" }}>
         {children}
-      </div>
+      </main>
     </div>
   );
 }
