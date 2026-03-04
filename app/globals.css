@@ -163,4 +163,24 @@
   animation: bounce 1s infinite ease-in-out;
   animation-play-state: paused;
 }
+body {
+  @apply transition-colors duration-300;
+}
 
+html:not(.dark) body {
+  background: linear-gradient(
+    to bottom right,
+    #fff8fb,
+    #fff0f5,
+    #eef6ff
+  );
+}
+
+html.dark body {
+  background: linear-gradient(
+    to bottom right,
+    #1E1E1E,
+    #181818,
+    #000000
+  );
+}

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useTheme } from "next-themes";
 import TopBar from "@/components/ui/TopBar";
 import { soundManager } from "@/utils/soundManager";
 import {
@@ -21,15 +22,20 @@ export default function ArcadeLayout({
   children: React.ReactNode;
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [muted, setMuted] = useState(
-    soundManager.getMuted()
-  );
+  const [muted, setMuted] = useState(soundManager.getMuted());
+  const [mounted, setMounted] = useState(false);
 
+  const { theme } = useTheme();
   const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = theme === "dark";
 
   /* ===============================
      BACKGROUND MUSIC CONTROL
-     (USER INTERACTION SAFE)
   =============================== */
   useEffect(() => {
     if (pathname !== "/arcade") {
@@ -58,15 +64,19 @@ export default function ArcadeLayout({
     setMuted(soundManager.getMuted());
   };
 
+  if (!mounted) return null;
+
   return (
     <div
       style={{
         minHeight: "100vh",
-        background:
-          "linear-gradient(180deg,#fff7fb 0%,#f3f9ff 100%)",
+        background: isDark
+          ? "#121212"
+          : "linear-gradient(180deg,#fff7fb 0%,#f3f9ff 100%)",
         display: "flex",
         flexDirection: "column",
         position: "relative",
+        transition: "background 0.3s ease",
       }}
     >
       <TopBar openMenu={() => setIsMenuOpen(true)} />
@@ -81,19 +91,14 @@ export default function ArcadeLayout({
         }}
       >
         <Image
-          src={
-            muted
-              ? "/images/mute.png"
-              : "/images/volume.png"
-          }
+          src={muted ? "/images/mute.png" : "/images/volume.png"}
           alt="volume toggle"
           width={44}
           height={44}
           onClick={toggleMute}
           style={{
             cursor: "pointer",
-            filter:
-              "drop-shadow(0 6px 12px rgba(0,0,0,0.15))",
+            filter: "drop-shadow(0 6px 12px rgba(0,0,0,0.15))",
           }}
         />
       </div>
@@ -107,10 +112,12 @@ export default function ArcadeLayout({
             left: 0,
             width: "300px",
             height: "100vh",
-            background: "white",
+            background: isDark ? "#1E1E1E" : "white",
+            color: isDark ? "#ffffff" : "#111",
             zIndex: 999999,
-            boxShadow: "5px 0 20px rgba(0,0,0,0.15)",
+            boxShadow: "5px 0 20px rgba(0,0,0,0.25)",
             padding: "30px 20px",
+            transition: "background 0.3s ease",
           }}
         >
           <button
@@ -123,6 +130,7 @@ export default function ArcadeLayout({
               background: "none",
               border: "none",
               cursor: "pointer",
+              color: isDark ? "#ffffff" : "#000",
             }}
           >
             ×
@@ -147,19 +155,30 @@ export default function ArcadeLayout({
                 key={index}
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
-                style={menuStyle}
+                style={{
+                  ...menuStyle,
+                  color: isDark ? "#ffffff" : "#111",
+                }}
               >
                 {item.icon}
                 {item.label}
               </Link>
             ))}
 
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+            <hr
+              style={{
+                margin: "12px 0",
+                borderColor: isDark ? "#2A2A2A" : "#eee",
+              }}
+            />
 
             <Link
               href="/mimi"
               onClick={() => setIsMenuOpen(false)}
-              style={menuStyle}
+              style={{
+                ...menuStyle,
+                color: isDark ? "#ffffff" : "#111",
+              }}
             >
               <img
                 src="/mascot.png"
@@ -169,12 +188,20 @@ export default function ArcadeLayout({
               Mimi
             </Link>
 
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+            <hr
+              style={{
+                margin: "12px 0",
+                borderColor: isDark ? "#2A2A2A" : "#eee",
+              }}
+            />
 
             <Link
               href="/account"
               onClick={() => setIsMenuOpen(false)}
-              style={menuStyle}
+              style={{
+                ...menuStyle,
+                color: isDark ? "#ffffff" : "#111",
+              }}
             >
               <User size={24} color="#ec4899" />
               Account
@@ -219,7 +246,6 @@ const menuStyle: React.CSSProperties = {
   padding: "16px 18px",
   borderRadius: "14px",
   textDecoration: "none",
-  color: "#111",
   fontWeight: 600,
   fontSize: "16px",
 };

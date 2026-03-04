@@ -55,7 +55,7 @@ export default function SignupPage() {
     >
       <div className="w-full max-w-md bg-white p-6 rounded-2xl shadow-xl">
         <h1 className="text-2xl font-bold text-center mb-6 text-black">
-          {t.createAccount}
+          {t.signup}
         </h1>
 
         <form className="space-y-4" onSubmit={handleSignup}>
@@ -108,12 +108,12 @@ export default function SignupPage() {
         </Button>
 
         <p className="text-sm text-center text-black mt-4">
-          {t.alreadyAccount}{" "}
+          {t.haveAccount}{" "}
           <Link
             href="/login"
             className="text-[#FFB7D5] font-semibold hover:opacity-80 transition"
           >
-            {t.loginButton}
+            {t.signin}
           </Link>
         </p>
       </div>

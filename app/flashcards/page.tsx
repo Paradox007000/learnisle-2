@@ -61,8 +61,8 @@ export default function FlashcardsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFFDF7]">
-        <h2 className="text-2xl font-semibold text-black animate-pulse">
+      <div className="min-h-screen flex items-center justify-center bg-muted text-foreground dark:bg-[#1E1E1E]">
+        <h2 className="text-2xl font-semibold animate-pulse">
           Generating Flashcards...
         </h2>
       </div>
@@ -71,7 +71,7 @@ export default function FlashcardsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#FFFDF7]">
+      <div className="min-h-screen flex items-center justify-center bg-muted text-foreground dark:bg-[#1E1E1E]">
         <h2 className="text-xl font-semibold text-red-500">{error}</h2>
       </div>
     );
@@ -79,12 +79,18 @@ export default function FlashcardsPage() {
 
   const card = flashcards[currentIndex];
 
+  const isDark =
+    typeof window !== "undefined" &&
+    document.documentElement.classList.contains("dark");
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFDF7]">
+    <div className="min-h-screen flex flex-col bg-muted text-foreground dark:bg-[#1E1E1E]">
 
-      <TopBar openMenu={() => setIsMenuOpen(true)} />
+<div className="bg-white/80 dark:bg-[#1E1E1E]/90 backdrop-blur-md">
+  <TopBar openMenu={() => setIsMenuOpen(true)} />
+</div>
 
-      {/* UPDATED MENU DRAWER */}
+      {/* MENU DRAWER */}
       {isMenuOpen && (
         <div
           style={{
@@ -93,7 +99,7 @@ export default function FlashcardsPage() {
             left: 0,
             width: "300px",
             height: "100vh",
-            background: "white",
+            background: isDark ? "#1E1E1E" : "white",
             zIndex: 999999,
             boxShadow: "5px 0 20px rgba(0,0,0,0.15)",
             padding: "30px 20px",
@@ -109,6 +115,7 @@ export default function FlashcardsPage() {
               background: "none",
               border: "none",
               cursor: "pointer",
+              color: isDark ? "#ffffff" : "#111",
             }}
           >
             ×
@@ -133,7 +140,10 @@ export default function FlashcardsPage() {
                 key={index}
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
-                style={menuStyle}
+                style={{
+                  ...menuStyle,
+                  color: isDark ? "#ffffff" : "#111",
+                }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "rgba(128,128,128,0.08)";
                   e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
@@ -147,12 +157,18 @@ export default function FlashcardsPage() {
               </Link>
             ))}
 
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+            <hr style={{ margin: "12px 0", borderColor: isDark ? "#333" : "#eee" }} />
 
             <Link
               href="/mimi"
               onClick={() => setIsMenuOpen(false)}
-              style={{ ...menuStyle, gap: "12px", display: "flex", alignItems: "center" }}
+              style={{
+                ...menuStyle,
+                gap: "12px",
+                display: "flex",
+                alignItems: "center",
+                color: isDark ? "#ffffff" : "#111",
+              }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "rgba(128,128,128,0.08)";
                 e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
@@ -170,12 +186,15 @@ export default function FlashcardsPage() {
               Mimi
             </Link>
 
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+            <hr style={{ margin: "12px 0", borderColor: isDark ? "#333" : "#eee" }} />
 
             <Link
               href="/account"
               onClick={() => setIsMenuOpen(false)}
-              style={menuStyle}
+              style={{
+                ...menuStyle,
+                color: isDark ? "#ffffff" : "#111",
+              }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = "rgba(128,128,128,0.08)";
                 e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
@@ -206,12 +225,10 @@ export default function FlashcardsPage() {
         />
       )}
 
-      {/* MAIN CONTENT (UNCHANGED) */}
       <div className="flex flex-col items-center justify-center flex-1 px-6">
-
         <div className="text-center mb-10">
-          <h2 className="text-4xl font-bold text-black">Flashcards</h2>
-          <p className="text-gray-500 mt-2">
+          <h2 className="text-4xl font-bold">Flashcards</h2>
+          <p className="text-muted-foreground mt-2">
             {currentIndex + 1} / {flashcards.length}
           </p>
         </div>
@@ -225,13 +242,13 @@ export default function FlashcardsPage() {
               flipped ? "rotate-y-180" : ""
             }`}
           >
-            <div className="absolute w-full h-full backface-hidden bg-white rounded-3xl shadow-xl flex items-center justify-center p-10 text-center">
-              <p className="text-xl font-medium text-black leading-relaxed">
+            <div className="absolute w-full h-full backface-hidden bg-white dark:bg-[#2A2A2A] rounded-3xl shadow-xl flex items-center justify-center p-10 text-center">
+              <p className="text-xl font-medium leading-relaxed">
                 {card.question}
               </p>
             </div>
 
-            <div className="absolute w-full h-full backface-hidden rotate-y-180 bg-pink-100 text-black rounded-3xl shadow-xl flex items-center justify-center p-10 text-center">
+            <div className="absolute w-full h-full backface-hidden rotate-y-180 bg-pink-100 dark:bg-pink-900 text-black dark:text-white rounded-3xl shadow-xl flex items-center justify-center p-10 text-center">
               <p className="text-xl font-medium leading-relaxed">
                 {card.answer}
               </p>
@@ -242,19 +259,18 @@ export default function FlashcardsPage() {
         <div className="flex gap-6 mt-10">
           <button
             onClick={prevCard}
-            className="px-6 py-3 rounded-xl bg-pink-100 text-black shadow-md hover:bg-pink-200 transition font-medium"
+            className="px-6 py-3 rounded-xl bg-pink-100 dark:bg-pink-900 text-black dark:text-white shadow-md hover:bg-pink-200 dark:hover:bg-pink-800 transition font-medium"
           >
             Previous
           </button>
 
           <button
             onClick={nextCard}
-            className="px-6 py-3 rounded-xl bg-pink-100 text-black shadow-md hover:bg-pink-200 transition font-medium"
+            className="px-6 py-3 rounded-xl bg-pink-100 dark:bg-pink-900 text-black dark:text-white shadow-md hover:bg-pink-200 dark:hover:bg-pink-800 transition font-medium"
           >
             Next
           </button>
         </div>
-
       </div>
     </div>
   );
@@ -267,7 +283,6 @@ const menuStyle: React.CSSProperties = {
   padding: "16px 18px",
   borderRadius: "14px",
   textDecoration: "none",
-  color: "#111",
   fontWeight: 600,
   fontSize: "16px",
   transition: "all 0.2s ease",

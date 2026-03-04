@@ -3,6 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useLives } from "@/context/LivesContext";
 import { soundManager } from "@/utils/soundManager";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 const games = [
   {
@@ -34,7 +36,17 @@ const games = [
 export default function ArcadePage() {
   const router = useRouter();
   const { lives } = useLives();
+  const { theme } = useTheme();
 
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const isDark = theme === "dark";
   const noLives = lives === 0;
 
   return (
@@ -43,6 +55,10 @@ export default function ArcadePage() {
         width: "100%",
         maxWidth: "900px",
         margin: "0 auto",
+        background: isDark ? "#121212" : "#F6FFF8",
+        minHeight: "100vh",
+        padding: "20px",
+        transition: "background 0.3s ease",
       }}
     >
       <div
@@ -64,11 +80,13 @@ export default function ArcadePage() {
             }}
             style={{
               cursor: noLives ? "not-allowed" : "pointer",
-              background: "white",
+              background: isDark ? "#1E1E1E" : "white",
+              color: isDark ? "#ffffff" : "#000000",
               borderRadius: "22px",
               padding: "24px",
-              boxShadow:
-                "0 12px 30px rgba(0,0,0,0.08)",
+              boxShadow: isDark
+                ? "0 12px 30px rgba(0,0,0,0.4)"
+                : "0 12px 30px rgba(0,0,0,0.08)",
               transition: "0.2s",
               opacity: noLives ? 0.5 : 1,
             }}
@@ -86,13 +104,18 @@ export default function ArcadePage() {
               {game.emoji}
             </div>
 
-            <h3 style={{ marginTop: "10px" }}>
+            <h3
+              style={{
+                marginTop: "10px",
+                color: isDark ? "#ffffff" : "#000000",
+              }}
+            >
               {game.title}
             </h3>
 
             <p
               style={{
-                color: "#666",
+                color: isDark ? "#bbbbbb" : "#666",
                 fontSize: "14px",
               }}
             >
