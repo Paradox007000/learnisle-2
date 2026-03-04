@@ -13,6 +13,10 @@ export default function DocumentPage() {
   >([]);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  const isDark =
+    typeof window !== "undefined" &&
+    document.documentElement.classList.contains("dark");
+
   useEffect(() => {
     const fetchNotes = async () => {
       try {
@@ -57,7 +61,7 @@ export default function DocumentPage() {
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       <TopBar openMenu={() => setIsMenuOpen(true)} />
 
-      {/* UPDATED MENU DRAWER */}
+      {/* MENU DRAWER */}
       {isMenuOpen && (
         <div
           style={{
@@ -66,10 +70,11 @@ export default function DocumentPage() {
             left: 0,
             width: "300px",
             height: "100vh",
-            background: "white",
+            background: isDark ? "#1E1E1E" : "white",
             zIndex: 999999,
             boxShadow: "5px 0 20px rgba(0,0,0,0.15)",
             padding: "30px 20px",
+            color: isDark ? "white" : "#111",
           }}
         >
           <button
@@ -82,6 +87,7 @@ export default function DocumentPage() {
               background: "none",
               border: "none",
               cursor: "pointer",
+              color: isDark ? "white" : "black",
             }}
           >
             ×
@@ -106,33 +112,31 @@ export default function DocumentPage() {
                 key={index}
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
-                style={menuStyle}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(128,128,128,0.08)";
-                  e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.boxShadow = "none";
+                style={{
+                  ...menuStyle,
+                  color: isDark ? "white" : "#111",
                 }}
               >
                 {item.icon} {item.label}
               </Link>
             ))}
 
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+            <hr
+              style={{
+                margin: "12px 0",
+                borderColor: isDark ? "#2A2A2A" : "#eee",
+              }}
+            />
 
             <Link
               href="/mimi"
               onClick={() => setIsMenuOpen(false)}
-              style={{ ...menuStyle, gap: "12px", display: "flex", alignItems: "center" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(128,128,128,0.08)";
-                e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.boxShadow = "none";
+              style={{
+                ...menuStyle,
+                gap: "12px",
+                display: "flex",
+                alignItems: "center",
+                color: isDark ? "white" : "#111",
               }}
             >
               <img
@@ -143,19 +147,19 @@ export default function DocumentPage() {
               Mimi
             </Link>
 
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+            <hr
+              style={{
+                margin: "12px 0",
+                borderColor: isDark ? "#2A2A2A" : "#eee",
+              }}
+            />
 
             <Link
               href="/account"
               onClick={() => setIsMenuOpen(false)}
-              style={menuStyle}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(128,128,128,0.08)";
-                e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "transparent";
-                e.currentTarget.style.boxShadow = "none";
+              style={{
+                ...menuStyle,
+                color: isDark ? "white" : "#111",
               }}
             >
               <User size={24} strokeWidth={2.5} color="#ec4899" /> Account
@@ -179,19 +183,30 @@ export default function DocumentPage() {
         />
       )}
 
-      {/* MAIN CONTENT (UNCHANGED) */}
-      <div style={{ display: "flex", flex: 1, background: "#FFFDF7" }}>
-        
+      {/* MAIN CONTENT */}
+      <div
+        style={{
+          display: "flex",
+          flex: 1,
+          background: isDark ? "#1E1E1E" : "#FFFDF7",
+        }}
+      >
         <div style={{ flex: 2, padding: "40px", overflowY: "auto" }}>
           <div
             style={{
-              background: "#FFFFFF",
+              background: isDark ? "#2A2A2A" : "#FFFFFF",
               borderRadius: "16px",
               padding: "32px",
               boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+              color: isDark ? "white" : "#444",
             }}
           >
-            <h1 style={{ marginBottom: "20px", color: "#3A4F41" }}>
+            <h1
+              style={{
+                marginBottom: "20px",
+                color: isDark ? "white" : "#3A4F41",
+              }}
+            >
               📄 Study Notes
             </h1>
 
@@ -199,7 +214,7 @@ export default function DocumentPage() {
               style={{
                 whiteSpace: "pre-wrap",
                 lineHeight: "1.7",
-                color: "#444",
+                color: isDark ? "#ddd" : "#444",
               }}
             >
               {notes}
@@ -210,14 +225,25 @@ export default function DocumentPage() {
         <div
           style={{
             flex: 1,
-            borderLeft: "1px solid #F0EAE2",
+            borderLeft: isDark
+              ? "1px solid #2A2A2A"
+              : "1px solid #F0EAE2",
             display: "flex",
             flexDirection: "column",
-            background: "#FFF9F2",
+            background: isDark ? "#1A1A1A" : "#FFF9F2",
           }}
         >
-          <div style={{ padding: "20px", borderBottom: "1px solid #F0EAE2" }}>
-            <h2 style={{ color: "#5C4033" }}>Chat with Mimi</h2>
+          <div
+            style={{
+              padding: "20px",
+              borderBottom: isDark
+                ? "1px solid #2A2A2A"
+                : "1px solid #F0EAE2",
+            }}
+          >
+            <h2 style={{ color: isDark ? "white" : "#5C4033" }}>
+              Chat with Mimi
+            </h2>
           </div>
 
           <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
@@ -250,11 +276,18 @@ export default function DocumentPage() {
                     padding: "12px 16px",
                     borderRadius: "18px",
                     background:
-                      msg.role === "user" ? "#DDF4E4" : "#FFFFFF",
+                      msg.role === "user"
+                        ? "#DDF4E4"
+                        : isDark
+                        ? "#2A2A2A"
+                        : "#FFFFFF",
                     border:
                       msg.role === "ai"
-                        ? "1px solid #F1F1F1"
+                        ? isDark
+                          ? "1px solid #2A2A2A"
+                          : "1px solid #F1F1F1"
                         : "none",
+                    color: isDark ? "white" : "#111",
                   }}
                 >
                   {msg.text}
@@ -263,7 +296,14 @@ export default function DocumentPage() {
             ))}
           </div>
 
-          <div style={{ padding: "15px", borderTop: "1px solid #F0EAE2" }}>
+          <div
+            style={{
+              padding: "15px",
+              borderTop: isDark
+                ? "1px solid #2A2A2A"
+                : "1px solid #F0EAE2",
+            }}
+          >
             <input
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
@@ -273,7 +313,11 @@ export default function DocumentPage() {
                 width: "100%",
                 padding: "12px",
                 borderRadius: "10px",
-                border: "1px solid #EADFD6",
+                border: isDark
+                  ? "1px solid #2A2A2A"
+                  : "1px solid #EADFD6",
+                background: isDark ? "#2A2A2A" : "white",
+                color: isDark ? "white" : "#111",
               }}
             />
           </div>
@@ -290,7 +334,6 @@ const menuStyle: React.CSSProperties = {
   padding: "16px 18px",
   borderRadius: "14px",
   textDecoration: "none",
-  color: "#111",
   fontWeight: 600,
   fontSize: "16px",
   transition: "all 0.2s ease",

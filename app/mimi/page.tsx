@@ -27,19 +27,15 @@ export default function MimiPage() {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
-  /* ----------------------------- */
-  /* AUTO SCROLL                   */
-  /* ----------------------------- */
+  const isDark =
+    typeof window !== "undefined" &&
+    document.documentElement.classList.contains("dark");
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
       behavior: "smooth",
     });
   }, [messages]);
-
-  /* ----------------------------- */
-  /* SEND MESSAGE                  */
-  /* ----------------------------- */
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -102,8 +98,12 @@ export default function MimiPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFDF7]">
-
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        background: isDark ? "#1E1E1E" : "#FFFDF7",
+      }}
+    >
       <TopBar openMenu={() => setIsMenuOpen(true)} />
 
       {/* MENU DRAWER */}
@@ -115,10 +115,11 @@ export default function MimiPage() {
             left: 0,
             width: "300px",
             height: "100vh",
-            background: "white",
+            background: isDark ? "#1E1E1E" : "white",
             zIndex: 999999,
             boxShadow: "5px 0 20px rgba(0,0,0,0.15)",
             padding: "30px 20px",
+            color: isDark ? "white" : "#111",
           }}
         >
           <button
@@ -131,6 +132,7 @@ export default function MimiPage() {
               background: "none",
               border: "none",
               cursor: "pointer",
+              color: isDark ? "white" : "black",
             }}
           >
             ×
@@ -155,26 +157,30 @@ export default function MimiPage() {
                 key={index}
                 href={item.href}
                 onClick={() => setIsMenuOpen(false)}
-                style={menuStyle}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(128,128,128,0.08)";
-                  e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.boxShadow = "none";
+                style={{
+                  ...menuStyle,
+                  color: isDark ? "white" : "#111",
                 }}
               >
                 {item.icon} {item.label}
               </Link>
             ))}
 
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+            <hr
+              style={{
+                margin: "12px 0",
+                borderColor: isDark ? "#2A2A2A" : "#eee",
+              }}
+            />
 
             <Link
               href="/mimi"
               onClick={() => setIsMenuOpen(false)}
-              style={{ ...menuStyle, gap: "12px" }}
+              style={{
+                ...menuStyle,
+                gap: "12px",
+                color: isDark ? "white" : "#111",
+              }}
             >
               <img
                 src="/mascot.png"
@@ -184,12 +190,20 @@ export default function MimiPage() {
               Mimi
             </Link>
 
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+            <hr
+              style={{
+                margin: "12px 0",
+                borderColor: isDark ? "#2A2A2A" : "#eee",
+              }}
+            />
 
             <Link
               href="/account"
               onClick={() => setIsMenuOpen(false)}
-              style={menuStyle}
+              style={{
+                ...menuStyle,
+                color: isDark ? "white" : "#111",
+              }}
             >
               <User size={24} strokeWidth={2.5} color="#ec4899" /> Account
             </Link>
@@ -234,6 +248,17 @@ export default function MimiPage() {
               className={`bubble ${
                 msg.role === "user" ? "userBubble" : "aiBubble"
               }`}
+              style={
+                msg.role === "assistant"
+                  ? {
+                      background: isDark ? "#2A2A2A" : "white",
+                      border: isDark
+                        ? "1px solid #2A2A2A"
+                        : "1px solid #eee",
+                      color: isDark ? "white" : "#333",
+                    }
+                  : {}
+              }
             >
               {msg.content}
             </div>
@@ -243,7 +268,16 @@ export default function MimiPage() {
         {loading && (
           <div className="messageRow aiRow">
             <img src="/mascot.png" className="avatar" />
-            <div className="bubble aiBubble typing">
+            <div
+              className="bubble aiBubble typing"
+              style={{
+                background: isDark ? "#2A2A2A" : "white",
+                border: isDark
+                  ? "1px solid #2A2A2A"
+                  : "1px solid #eee",
+                color: isDark ? "white" : "#333",
+              }}
+            >
               Mimi is thinking...
             </div>
           </div>
@@ -253,12 +287,27 @@ export default function MimiPage() {
       </div>
 
       {/* INPUT BAR */}
-      <div className="inputBar">
+      <div
+        className="inputBar"
+        style={{
+          background: isDark ? "#1E1E1E" : "white",
+          borderTop: isDark
+            ? "1px solid #2A2A2A"
+            : "1px solid #eee",
+        }}
+      >
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask Mimi anything..."
+          style={{
+            background: isDark ? "#2A2A2A" : "white",
+            color: isDark ? "white" : "#111",
+            border: isDark
+              ? "1px solid #2A2A2A"
+              : "1px solid #e5e7eb",
+          }}
         />
         <button onClick={sendMessage}>Send</button>
       </div>
@@ -311,9 +360,6 @@ export default function MimiPage() {
         }
 
         .aiBubble {
-          background: white;
-          border: 1px solid #eee;
-          color: #333;
           border-bottom-left-radius: 6px;
           box-shadow: 0 6px 18px rgba(0,0,0,0.05);
         }
@@ -327,15 +373,12 @@ export default function MimiPage() {
           display: flex;
           gap: 12px;
           padding: 18px;
-          background: white;
-          border-top: 1px solid #eee;
         }
 
         .inputBar input {
           flex: 1;
           padding: 14px 18px;
           border-radius: 999px;
-          border: 1px solid #e5e7eb;
           font-size: 15px;
           outline: none;
         }
@@ -370,7 +413,6 @@ const menuStyle: React.CSSProperties = {
   padding: "16px 18px",
   borderRadius: "14px",
   textDecoration: "none",
-  color: "#111",
   fontWeight: 600,
   fontSize: "16px",
   transition: "all 0.2s ease",
