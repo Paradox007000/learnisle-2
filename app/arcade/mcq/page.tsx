@@ -2,10 +2,8 @@
 
 import { useEffect, useState } from "react";
 import ProgressLoader from "@/components/ui/ProgressLoader";
-import { DEFAULT_STATE, processGameResult, ArcadeState } from "@/lib/arcade/arcadeEngine";
-import { useLives } from "@/context/LivesContext";
 import { soundManager } from "@/utils/soundManager";
-import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 
 type MCQ = {
   question: string;
@@ -18,53 +16,26 @@ export default function MCQGame() {
   const [index, setIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [finished, setFinished] = useState(false);
-  const [error, setError] = useState(false);
+  const [feedback, setFeedback] = useState("");
+  const [mascotComment, setMascotComment] = useState("");
 
-  const [arcadeState, setArcadeState] = useState<ArcadeState>(DEFAULT_STATE);
-  const { loseLife, lives } = useLives();
+  useEffect(() => {
+    soundManager.playBackground();
+    return () => soundManager.stopBackground();
+  }, []);
 
-  /* ===============================
-     LOAD QUESTIONS
-  =============================== */
   useEffect(() => {
     async function load() {
-      try {
-        const res = await fetch("/api/arcade/mcq");
-        const data = await res.json();
-
-        if (!data.questions || data.questions.length === 0) {
-          setError(true);
-        } else {
-          setQuestions(data.questions);
-        }
-      } catch {
-        setError(true);
-      } finally {
-        setLoading(false);
-      }
+      const res = await fetch("/api/arcade/mcq");
+      const data = await res.json();
+      setQuestions(data.questions || []);
+      setLoading(false);
     }
-
     load();
   }, []);
 
-  function applyResult(correct: boolean) {
-    setArcadeState((prev) => {
-      const updated = processGameResult(prev, { correct });
-
-      if (correct) {
-        soundManager.playCorrect();
-      } else {
-        soundManager.playWrong();
-        loseLife();
-      }
-
-      return updated;
-    });
-  }
-
   function handleOptionClick(option: string) {
-    if (selectedOption || finished || lives === 0) return;
+    if (selectedOption) return;
 
     soundManager.playClick();
 
@@ -72,77 +43,113 @@ export default function MCQGame() {
     const correct = option === current.answer;
 
     setSelectedOption(option);
-    applyResult(correct);
+
+    if (correct) {
+      soundManager.playCorrect();
+      setMascotComment("Sharp brain detected ✨");
+      setFeedback("Correct!");
+    } else {
+      soundManager.playWrong();
+      setMascotComment("Almost! Try the next one.");
+      setFeedback(`Correct answer: ${current.answer}`);
+    }
 
     setTimeout(() => {
       setSelectedOption(null);
-
-      if (index + 1 >= questions.length || lives <= 1) {
-        setFinished(true);
-      } else {
-        setIndex((prev) => prev + 1);
-      }
-    }, 1000);
+      setFeedback("");
+      setMascotComment("");
+      setIndex((i) => i + 1);
+    }, 1700);
   }
-
-  /* ===============================
-     STATES
-  =============================== */
 
   if (loading) return <ProgressLoader label="Generating MCQs..." />;
 
-  if (error)
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>No questions generated. Please create notes first.</p>
-      </div>
-    );
-
-  if (finished)
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center">
-        <h1 className="text-3xl font-semibold mb-4">🎉 Level Complete!</h1>
-        <p>⭐ XP: {arcadeState.score}</p>
-        <p>🔥 Streak: {arcadeState.streak}</p>
-      </div>
-    );
-
   const current = questions[index];
 
+  if (!current)
+    return (
+      <div
+        className="min-h-screen flex items-center justify-center bg-cover bg-center"
+        style={{ backgroundImage: "url('/bg-2.png')" }}
+      >
+        <div className="bg-white/70 backdrop-blur-lg p-12 rounded-3xl shadow-2xl text-center border border-pink-200">
+          <h2 className="text-3xl font-bold text-pink-600">
+            Level Complete 🎉
+          </h2>
+        </div>
+      </div>
+    );
+
   return (
-    <div className="min-h-screen flex flex-col items-center py-16 px-6">
-      <h1 className="text-3xl font-semibold mb-6">🎯 MCQ Challenge</h1>
-
-      <p className="mb-4">❤️ Lives: {lives}</p>
-      <p className="mb-8">⭐ XP: {arcadeState.score} | 🔥 {arcadeState.streak}</p>
-
-      <div className="max-w-2xl w-full">
-        <h2 className="text-xl font-medium mb-6">{current.question}</h2>
+    <div
+      className="relative min-h-screen flex items-center justify-center px-6 bg-cover bg-center"
+      style={{ backgroundImage: "url('/bg-2.png')" }}
+    >
+      <div
+        className="relative w-full max-w-2xl bg-white/60 backdrop-blur-xl
+        rounded-3xl shadow-2xl border border-pink-200
+        p-10 space-y-8 text-center"
+      >
+        <div className="bg-pink-100/70 border border-pink-200 p-8 rounded-2xl shadow-md">
+          <h2 className="text-2xl font-semibold text-pink-700">
+            {current.question}
+          </h2>
+        </div>
 
         <div className="flex flex-col gap-4">
           {current.options.map((option, i) => {
             const isSelected = selectedOption === option;
             const isCorrect = option === current.answer;
 
-            let bg = "bg-white";
+            let style = "bg-white";
 
             if (selectedOption) {
-              if (isCorrect) bg = "bg-green-200";
-              else if (isSelected) bg = "bg-red-200";
-              else bg = "opacity-60";
+              if (isCorrect) style = "bg-green-200";
+              else if (isSelected) style = "bg-red-200";
+              else style = "opacity-60";
             }
 
             return (
-              <Card
+              <button
                 key={i}
                 onClick={() => handleOptionClick(option)}
-                className={`cursor-pointer transition-all ${bg}`}
+                className={`p-5 rounded-xl border border-pink-200 ${style} hover:scale-105 transition`}
               >
-                <CardContent className="p-4">{option}</CardContent>
-              </Card>
+                {option}
+              </button>
             );
           })}
         </div>
+
+        <div className="flex justify-center">
+          <Image
+            src="/images/arcade/hearts.gif"
+            alt="heart"
+            width={32}
+            height={32}
+          />
+        </div>
+
+        {feedback && (
+          <div className="text-lg font-medium text-purple-700">
+            {feedback}
+          </div>
+        )}
+      </div>
+
+      <div className="absolute right-8 bottom-8 flex flex-col items-center">
+        <Image
+          src="/images/arcade/mascot-comment.png"
+          alt="Mascot"
+          width={140}
+          height={140}
+        />
+
+        {mascotComment && (
+          <div className="mt-4 bg-pink-100/90 px-5 py-3 rounded-2xl text-sm text-pink-700 shadow-lg border border-pink-200 max-w-[220px] text-center">
+            {mascotComment}
+          </div>
+        )}
       </div>
     </div>
   );

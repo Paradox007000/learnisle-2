@@ -2,12 +2,6 @@
 
 import { useEffect, useState } from "react";
 import ProgressLoader from "@/components/ui/ProgressLoader";
-import {
-  DEFAULT_STATE,
-  processGameResult,
-  ArcadeState,
-} from "@/lib/arcade/arcadeEngine";
-import { useLives } from "@/context/LivesContext";
 import { soundManager } from "@/utils/soundManager";
 import Image from "next/image";
 
@@ -24,12 +18,7 @@ export default function FillGame() {
   const [loading, setLoading] = useState(true);
   const [mascotComment, setMascotComment] = useState("");
 
-  const [arcadeState, setArcadeState] =
-    useState<ArcadeState>(DEFAULT_STATE);
-
-  const { loseLife } = useLives();
-
-  // 🎵 Background Music
+  // 🎵 Background music
   useEffect(() => {
     soundManager.playBackground();
     return () => {
@@ -37,7 +26,7 @@ export default function FillGame() {
     };
   }, []);
 
-  // Load Questions
+  // Load questions
   useEffect(() => {
     async function load() {
       const res = await fetch("/api/arcade/fill");
@@ -47,14 +36,6 @@ export default function FillGame() {
     }
     load();
   }, []);
-
-  function applyResult(correct: boolean) {
-    setArcadeState((prev) => {
-      const updated = processGameResult(prev, { correct });
-      if (!correct) loseLife();
-      return updated;
-    });
-  }
 
   function submit() {
     if (!input.trim()) return;
@@ -68,19 +49,13 @@ export default function FillGame() {
 
     if (correct) {
       soundManager.playCorrect();
-      setMascotComment("You unlocked genius mode.");
+      setMascotComment("You unlocked genius mode ✨");
+      setFeedback("Correct!");
     } else {
       soundManager.playWrong();
       setMascotComment("Almost there. Brain sparkles recalibrating.");
+      setFeedback(`Correct answer: ${current.answer}`);
     }
-
-    applyResult(correct);
-
-    setFeedback(
-      correct
-        ? "Correct"
-        : `Correct answer: ${current.answer}`
-    );
 
     setTimeout(() => {
       setInput("");
@@ -103,7 +78,7 @@ export default function FillGame() {
       >
         <div className="bg-white/70 backdrop-blur-lg p-12 rounded-3xl shadow-2xl text-center border border-pink-200">
           <h2 className="text-3xl font-bold text-pink-600">
-            Level Complete
+            Level Complete 🎉
           </h2>
           <p className="mt-3 text-gray-600">
             You dominated this round.
@@ -117,14 +92,14 @@ export default function FillGame() {
       className="relative min-h-screen flex items-center justify-center px-6 bg-cover bg-center"
       style={{ backgroundImage: "url('/bg-2.png')" }}
     >
+      {/* Card */}
       <div
         className="relative w-full max-w-2xl bg-white/60 backdrop-blur-xl
-                   rounded-3xl shadow-2xl border border-pink-200
-                   p-10 space-y-8 text-center"
+        rounded-3xl shadow-2xl border border-pink-200
+        p-10 space-y-8 text-center"
       >
         {/* Question */}
-        <div className="bg-pink-100/70 border border-pink-200 
-                        p-8 rounded-2xl shadow-md">
+        <div className="bg-pink-100/70 border border-pink-200 p-8 rounded-2xl shadow-md">
           <h2 className="text-2xl font-semibold text-pink-700 leading-relaxed">
             {current.question}
           </h2>
@@ -136,39 +111,29 @@ export default function FillGame() {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type your answer..."
           className="w-full p-6 rounded-2xl 
-                     bg-white/80 backdrop-blur-sm
-                     border-2 border-pink-300 
-                     focus:outline-none 
-                     focus:ring-4 focus:ring-pink-200
-                     text-center text-xl text-pink-700"
+          bg-white/80 backdrop-blur-sm
+          border-2 border-pink-200
+          focus:outline-none focus:ring-4 focus:ring-pink-200
+          text-center text-xl text-pink-700"
         />
 
-        {/* Submit + Hearts Row */}
+        {/* Button + Hearts */}
         <div className="flex items-center justify-center gap-6">
-          {/* Submit Button */}
           <button
             onClick={submit}
             className="px-10 py-4 rounded-2xl 
-                       bg-gradient-to-r from-pink-400 to-purple-400 
-                       text-white text-lg font-semibold 
-                       shadow-lg hover:scale-105 
-                       transition-all duration-300"
+            bg-pink-300 hover:bg-pink-400
+            text-white text-lg font-semibold
+            shadow-lg hover:scale-105
+            transition-all duration-300"
           >
             Submit
           </button>
 
-          {/* Hearts Display */}
-          <div className="flex items-center gap-2">
-            {Array.from({ length: arcadeState.lives }).map((_, i) => (
-              <Image
-                key={i}
-                src="/images/arcade/heart.png"
-                alt="life"
-                width={32}
-                height={32}
-                className="drop-shadow-md"
-              />
-            ))}
+          {/* Hearts */}
+          <div className="flex gap-2">
+            
+            <Image src="/images/arcade/hearts.gif" alt="heart" width={32} height={32} />
           </div>
         </div>
 
@@ -187,16 +152,17 @@ export default function FillGame() {
           alt="Mascot"
           width={140}
           height={140}
-          priority
           className="drop-shadow-2xl"
         />
 
         {mascotComment && (
-          <div className="mt-4 bg-pink-100/90 backdrop-blur-md 
-                          px-5 py-3 rounded-2xl 
-                          text-sm text-pink-700 
-                          shadow-lg border border-pink-200 
-                          max-w-[220px] text-center">
+          <div
+            className="mt-4 bg-pink-100/90 backdrop-blur-md
+            px-5 py-3 rounded-2xl
+            text-sm text-pink-700
+            shadow-lg border border-pink-200
+            max-w-[220px] text-center"
+          >
             {mascotComment}
           </div>
         )}

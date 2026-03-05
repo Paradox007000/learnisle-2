@@ -6,7 +6,7 @@ import path from "path";
 import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_ARCADE_KEY,
+  apiKey: process.env.GEMINI_SPEED_KEY,
 });
 
 export async function GET() {
