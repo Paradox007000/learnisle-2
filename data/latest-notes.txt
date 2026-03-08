@@ -1,73 +1,53 @@
-Here are your study notes for **Software Project Management**, based on the provided text.
+### Software Testing Life Cycle (STLC) Study Notes
+
+The **Software Testing Life Cycle (STLC)** is a sequence of specific activities performed during the testing process to ensure software quality.
 
 ---
 
-### **1. Project Scheduling**
-**Definition:** A process used to track tasks, deadlines, and resource allocation within a project timeframe.
+### The 6 Phases of STLC
 
-*   **Key Functions:**
-    *   Communicates tasks and start/end dates.
-    *   Identifies necessary resources (people, equipment, budget).
-    *   Shows dependencies (how tasks rely on one another).
+#### 1. Requirement Analysis
+*   **Explanation:** Testers study the software requirements to understand what needs to be tested.
+*   **Key Activities:**
+    *   Identify testable requirements.
+    *   Prepare the Requirement Traceability Matrix (RTM).
+*   **Example:** For a login page, the tester identifies scenarios like valid login, invalid login, and blank fields.
 
-**The 5-Step Scheduling Process:**
-1.  **Identify Activities:** Break the project into small, manageable tasks (e.g., design, coding).
-2.  **Identify Activity Dependencies:** Determine the order of tasks.
-    *   *Finish-to-Start (FS):* Task B starts only after Task A finishes.
-    *   *Start-to-Start (SS):* Task B starts when Task A starts.
-    *   *Finish-to-Finish (FF):* Task B finishes only when Task A finishes.
-    *   *Start-to-Finish (SF):* Task B finishes only when Task A starts (Rare).
-3.  **Allocate Resources:** Assign tools, software, and budget to each activity.
-4.  **Create Project Charts:** Use visual tools like Gantt Charts (timelines) or PERT/CPM Charts (critical paths).
-5.  **Allocate People:** Assign team members based on skills without overloading them.
+#### 2. Test Planning
+*   **Explanation:** Defining the strategy, resources, and schedule for testing.
+*   **Key Activities:**
+    *   Create a Test Plan.
+    *   Determine testing scope, tools (e.g., Selenium), and team resources.
+    *   Estimate the effort, cost, and duration.
+*   **Example:** Deciding that testing will take 2 weeks with a team of 3 testers.
 
----
+#### 3. Test Case Design / Development
+*   **Explanation:** Creating the detailed steps and data needed for testing.
+*   **Key Activities:**
+    *   Write specific test cases.
+    *   Prepare necessary test data.
+    *   Review the test cases for accuracy.
+*   **Example:** Writing a test case to verify that entering a valid email and password results in a successful login.
 
-### **2. Work Breakdown Structure (WBS)**
-**Definition:** A "Top-Down" hierarchical tree that breaks a complex project into smaller, independent parts.
+#### 4. Test Environment Setup
+*   **Explanation:** Preparing the hardware and software "lab" where the testing will happen.
+*   **Key Activities:**
+    *   Install the application.
+    *   Set up test servers, databases, and browsers (e.g., Chrome, Firefox).
+*   **Example:** Connecting the shopping app to a test server and database.
 
-*   **Structure Levels:**
-    *   **Level 1 (Project Goal):** The entire system (e.g., Library Management System).
-    *   **Level 2 (Major Modules):** Requirements, Design, Implementation, Testing, etc.
-    *   **Level 3 (Sub-Modules):** Specific activities like "Database Design" or "Unit Testing."
-    *   **Level 4 (Work Packages):** The smallest manageable tasks assigned to individuals.
+#### 5. Test Execution
+*   **Explanation:** The actual process of running the tests and finding bugs.
+*   **Key Activities:**
+    *   Execute the designed test cases.
+    *   Compare the actual results against the expected results.
+    *   Log defects (bugs) if the results do not match.
+*   **Example:** Finding that an error message does not appear when a wrong password is used and logging it as a defect.
 
----
-
-### **3. Activity Networks**
-**Definition:** A graphical map of project tasks showing their logical sequence and flow.
-
-*   **Two Representation Methods:**
-    1.  **Activity on Node (AON):** Activities are shown in circles/ovals. Arrows show the sequence.
-    2.  **Activity on Arrow (AOA):** Activities are represented by arrows. Nodes (circles) represent the start or end points of an activity.
-
----
-
-### **4. Project Tracking Tools**
-**A. Timeline / Gantt Chart**
-*   **What it is:** A bar chart showing horizontal lines that represent the duration of tasks against a timeline.
-*   **Purpose:** To visualize the schedule, identify overlaps, and monitor deadlines.
-
-**B. Earned Value Analysis (EVA)**
-*   **What it is:** A technique to measure project health by integrating cost, schedule, and scope.
-*   **Key Metrics:**
-    *   **Planned Value (PV):** Budgeted cost for work *planned* to be done.
-    *   **Earned Value (EV):** Budgeted cost for work *actually* completed.
-    *   **Actual Cost (AC):** The real money spent so far.
-*   **How to check project health:**
-    *   **Schedule Variance (SV = EV - PV):** If negative, you are behind schedule.
-    *   **Cost Variance (CV = EV - AC):** If negative, you are over budget.
-    *   **SPI (EV / PV):** If less than 1.0, the project is behind schedule.
-    *   **CPI (EV / AC):** If less than 1.0, the project is over budget.
-
----
-
-### **Quick Summary Table for Learning**
-
-| Concept | Short Explanation |
-| :--- | :--- |
-| **WBS** | Breaking the project into a tree-like hierarchy of tasks. |
-| **AON/AOA** | Visualizing how tasks flow and connect using nodes and arrows. |
-| **Gantt Chart** | A timeline showing when each task starts and ends. |
-| **EVA** | Calculating if the project is on time and under budget using cost data. |
-| **Dependency** | The relationship that determines which task must happen first. |
+#### 6. Test Closure
+*   **Explanation:** Wrapping up the testing cycle and documenting the final results.
+*   **Key Activities:**
+    *   Prepare a Test Summary Report.
+    *   Analyze the final test results (Pass/Fail counts).
+    *   Discuss lessons learned during the process.
+*   **Example:** Reporting that out of 120 test cases, 110 passed and 10 failed, with major defects fixed before release.

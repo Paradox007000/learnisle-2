@@ -26,11 +26,18 @@ export default function MCQGame() {
 
   useEffect(() => {
     async function load() {
-      const res = await fetch("/api/arcade/mcq");
-      const data = await res.json();
-      setQuestions(data.questions || []);
+      try {
+        const res = await fetch("/api/arcade/mcq");
+        const data = await res.json();
+        setQuestions(data.questions || []);
+      } catch (err) {
+        console.error("MCQ fetch failed", err);
+        setQuestions([]);
+      }
+
       setLoading(false);
     }
+
     load();
   }, []);
 
@@ -62,7 +69,8 @@ export default function MCQGame() {
     }, 1700);
   }
 
-  if (loading) return <ProgressLoader label="Generating MCQs..." />;
+  if (loading)
+    return <ProgressLoader label="Generating MCQs..." />;
 
   const current = questions[index];
 
@@ -76,6 +84,9 @@ export default function MCQGame() {
           <h2 className="text-3xl font-bold text-pink-600">
             Level Complete 🎉
           </h2>
+          <p className="mt-3 text-gray-600">
+            You finished all 5 questions.
+          </p>
         </div>
       </div>
     );

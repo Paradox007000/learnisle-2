@@ -11,171 +11,171 @@ import { Home, Gamepad2, FileText, Mic, CreditCard, User, Sun, Moon } from "luci
 import { useLanguage } from "@/context/LanguageContext";
 import { translations } from "@/translations";
 
-
-
 export default function Dashboard() {
-  const router = useRouter();
-  const { language } = useLanguage();
-  const t = translations[language];
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [files, setFiles] = useState([
-    { id: 1, name: "UML, Data Modeling, and V-Model Testing", type: "pdf", lastOpened: "1 day ago" },
-    { id: 2, name: "Java Basic Syntax and Constructs", type: "pdf", lastOpened: "3 days ago" },
-    { id: 3, name: "Java Programming Concepts and Examples", type: "docx", lastOpened: "7 days ago" },
-  ]);
-  const [dragOver, setDragOver] = useState(false);
-  const { theme, setTheme } = useTheme();
-  const isDark = theme === "dark";
-  const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      if (!currentUser) router.push("/login");
-    });
-    return () => unsubscribe();
-  }, [router]);
+const router = useRouter();
+const { language } = useLanguage();
+const t = translations[language];
 
-  useEffect(() => setMounted(true), []);
+const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>
-  ) => {
-    e.preventDefault();
-    let file: File | null = null;
+const [files, setFiles] = useState([
+{ id: 1, name: "UML, Data Modeling, and V-Model Testing", type: "pdf", lastOpened: "1 day ago" },
+{ id: 2, name: "Java Basic Syntax and Constructs", type: "pdf", lastOpened: "3 days ago" },
+{ id: 3, name: "Java Programming Concepts and Examples", type: "docx", lastOpened: "7 days ago" },
+]);
 
-    if ("dataTransfer" in e) {
-      file = e.dataTransfer.files[0];
-    } else {
-      file = e.target.files?.[0] || null;
-    }
+const [dragOver, setDragOver] = useState(false);
+const { theme, setTheme } = useTheme();
+const isDark = theme === "dark";
+const [mounted, setMounted] = useState(false);
 
-    if (!file) return;
+useEffect(() => {
+const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+if (!currentUser) router.push("/login");
+});
+return () => unsubscribe();
+}, [router]);
 
-    setDragOver(false);
+useEffect(() => setMounted(true), []);
 
-    const newFile = {
-      id: Date.now(),
-      name: file.name,
-      type: file.name.split(".").pop()?.toLowerCase() || "unknown",
-      lastOpened: "Just now",
-    };
+const handleFileUpload = async (
+e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>
+) => {
 
-    setFiles((prev) => [newFile, ...prev]);
+e.preventDefault();
+let file: File | null = null;
 
-    const formData = new FormData();
-    formData.append("pdf", file);
+if ("dataTransfer" in e) file = e.dataTransfer.files[0];
+else file = e.target.files?.[0] || null;
 
-    try {
-      const res = await fetch("/api/process-pdf", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.success && data.documentId) {
-        localStorage.setItem("latestDoc", data.documentId);
-        window.dispatchEvent(new Event("flashcardsUpdated"));
-      }
-    } catch (err) {
-      console.error("Upload failed:", err);
-    }
-  };
+if (!file) return;
 
-  const getFileIcon = (type: string) => {
-    switch (type) {
-      case "pdf": return "📄";
-      case "doc":
-      case "docx": return "📝";
-      default: return "📎";
-    }
-  };
+setDragOver(false);
 
-  const menuStyle: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  gap: "14px",
-  padding: "16px 18px",
-  borderRadius: "14px",
-  textDecoration: "none",
-  color: "#111",
-  fontWeight: 600,
-  fontSize: "16px",
-  transition: "all 0.2s ease",
+const newFile = {
+id: Date.now(),
+name: file.name,
+type: file.name.split(".").pop()?.toLowerCase() || "unknown",
+lastOpened: "Just now",
 };
 
+setFiles((prev) => [newFile, ...prev]);
 
+const formData = new FormData();
+formData.append("pdf", file);
 
-  const dividerStyle: React.CSSProperties = {
-    margin: "15px 0",
-    borderColor: "#ddd",
-  };
+try {
 
-  return (
-    <>
-    <div
-  className="min-h-screen pt-24 px-8 transition-colors duration-300"
-  style={{
-    background: theme === "dark"
-      ? "linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 50%, #3a3a3a 100%)" // subtle dark gray gradient
-      : "linear-gradient(135deg, #ffe6f0 0%, #e0f0ff 100%)",             // faded pink → faded blue
-  }}
->
+const res = await fetch("/api/process-pdf", {
+method: "POST",
+body: formData,
+});
 
-{/* HEADER */}
-        <header className="fixed top-0 left-0 right-0 h-20 bg-white dark:bg-[#1E1E1E] shadow-md flex items-center px-6 z-50 transition-colors duration-300">
-          <div className="w-full flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button onClick={() => setIsMenuOpen(true)} className="text-2xl dark:text-white">☰</button>
-              <img src="/logo.png" alt="Logo" className="h-24 w-auto object-contain" />
-            </div>
+const data = await res.json();
 
-            <div className="flex items-center gap-4">
-              <Link href="/account">
-                <Image src="/profile.png" alt="Profile" width={40} height={40} />
-              </Link>
+if (data.success && data.documentId) {
+localStorage.setItem("latestDoc", data.documentId);
+window.dispatchEvent(new Event("flashcardsUpdated"));
+}
 
-  {mounted && (
-  <div
-    onClick={() => setTheme(isDark ? "light" : "dark")}
-    style={{
-      width: "62px",
-      height: "32px",
-      backgroundColor: isDark ? "#1f2937" : "#fce7f3",
-      borderRadius: "999px",
-      display: "flex",
-      alignItems: "center",
-      padding: "4px",
-      cursor: "pointer",
-      transition: "all 0.3s ease",
-    }}
-  >
-    <div
-      style={{
-        width: "24px",
-        height: "24px",
-        backgroundColor: "#ffffff",
-        borderRadius: "50%",
-        transform: isDark ? "translateX(30px)" : "translateX(0px)",
-        transition: "transform 0.3s ease",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      {isDark ? (
-        <Moon size={14} color="#111827" />
-      ) : (
-        <Sun size={14} color="#ec4899" />
-      )}
-    </div>
-  </div>
-)}
+} catch (err) {
+console.error("Upload failed:", err);
+}
 
+};
 
-            </div>
-          </div>
-        </header>
+const getFileIcon = (type: string) => {
+switch (type) {
+case "pdf": return "📄";
+case "doc":
+case "docx": return "📝";
+default: return "📎";
+}
+};
 
+const menuStyle: React.CSSProperties = {
+display: "flex",
+alignItems: "center",
+gap: "14px",
+padding: "16px 18px",
+borderRadius: "14px",
+textDecoration: "none",
+color: "#111",
+fontWeight: 600,
+fontSize: "16px",
+transition: "all 0.2s ease",
+};
+
+return (
+
+<>
+
+<div
+className="min-h-screen pt-24 px-8 transition-colors duration-300 relative overflow-hidden"
+style={{
+backgroundImage: theme === "dark"
+? "linear-gradient(135deg, #1e1e1e 0%, #2a2a2a 50%, #3a3a3a 100%)"
+: "url('/bg-3.jpg')",
+backgroundSize: "cover",
+backgroundPosition: "center",
+backgroundRepeat: "no-repeat",
+}}
+><div
+className="absolute inset-0 backdrop-blur-md -z-10"
+style={{
+background: isDark
+? "rgba(0,0,0,0.45)"
+: "rgba(43,28,18,0.35)"
+}}
+></div><header className="fixed top-0 left-0 right-0 h-20 bg-white/70 dark:bg-[#1E1E1E]/70 backdrop-blur-lg shadow-md flex items-center px-6 z-50 transition-colors duration-300"><div className="w-full flex items-center justify-between"><div className="flex items-center gap-4"><button onClick={() => setIsMenuOpen(true)} className="text-2xl dark:text-white">
+☰
+</button>
+
+<img src="/logo.png" alt="Logo" className="h-24 w-auto object-contain" /></div><div className="flex items-center gap-4"><Link href="/account">
+<Image src="/profile.png" alt="Profile" width={40} height={40} />
+</Link>{mounted && (
+
+<div
+onClick={() => setTheme(isDark ? "light" : "dark")}
+style={{
+width: "62px",
+height: "32px",
+backgroundColor: isDark ? "#1f2937" : "#fce7f3",
+borderRadius: "999px",
+display: "flex",
+alignItems: "center",
+padding: "4px",
+cursor: "pointer",
+transition: "all 0.3s ease",
+}}
+><div
+style={{
+width: "24px",
+height: "24px",
+backgroundColor: "#ffffff",
+borderRadius: "50%",
+transform: isDark ? "translateX(30px)" : "translateX(0px)",
+transition: "transform 0.3s ease",
+boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+display: "flex",
+alignItems: "center",
+justifyContent: "center",
+}}
+>{isDark
+? <Moon size={14} color="#111827"/>
+: <Sun size={14} color="#ec4899"/>}
+
+</div>
+</div>)}
+
+</div>
+</div>
+</header><div className="mb-10"><h1 className="text-3xl font-semibold text-gray-800 dark:text-white">
+{t.dashboardTitle}
+</h1><p className="text-gray-500 dark:text-gray-400 mt-1">
+{t.dashboardSubtitle}
+</p></div>{/* FEATURE BOXES */}
 
 {/* MENU DRAWER */}
 {isMenuOpen && (
@@ -193,10 +193,8 @@ export default function Dashboard() {
       zIndex: 999999,
       boxShadow: "5px 0 20px rgba(0,0,0,0.15)",
       padding: "30px 20px",
-      transition: "background 0.3s ease, color 0.3s ease",
     }}
   >
-    {/* CLOSE BUTTON */}
     <button
       onClick={() => setIsMenuOpen(false)}
       style={{
@@ -213,111 +211,37 @@ export default function Dashboard() {
       ×
     </button>
 
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "6px",
-        marginTop: "40px",
-      }}
-    >
-      {[
-        { href: "/", label: t.home, icon: <Home size={24} strokeWidth={2.5} color="#ec4899" /> },
-        { href: "/arcade", label: t.arcade, icon: <Gamepad2 size={24} strokeWidth={2.5} color="#ec4899" /> },
-        { href: "/document", label: t.document, icon: <FileText size={24} strokeWidth={2.5} color="#ec4899" /> },
-        { href: "/podcast", label: t.podcast, icon: <Mic size={24} strokeWidth={2.5} color="#ec4899" /> },
-        { href: "/flashcards", label: t.flashcards, icon: <CreditCard size={24} strokeWidth={2.5} color="#ec4899" /> },
-      ].map((item, index) => (
-        <Link
-          key={index}
-          href={item.href}
-          onClick={() => setIsMenuOpen(false)}
-          style={{
-            ...menuStyle,
-            color: isDark ? "#ffffff" : "#111111",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = isDark
-              ? "rgba(255,255,255,0.08)"
-              : "rgba(128,128,128,0.08)";
-            e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = "transparent";
-            e.currentTarget.style.boxShadow = "none";
-          }}
-        >
-          {item.icon} {item.label}
-        </Link>
-      ))}
-
-      <hr
-        style={{
-          margin: "12px 0",
-          borderColor: isDark ? "#374151" : "#eee",
-        }}
-      />
-
-      <Link
-        href="/mimi"
-        onClick={() => setIsMenuOpen(false)}
-        style={{
-          ...menuStyle,
-          gap: "12px",
-          display: "flex",
-          alignItems: "center",
-          color: isDark ? "#ffffff" : "#111111",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = isDark
-            ? "rgba(255,255,255,0.08)"
-            : "rgba(128,128,128,0.08)";
-          e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "transparent";
-          e.currentTarget.style.boxShadow = "none";
-        }}
-      >
-        <img
-          src="/mascot.png"
-          alt="Mascot"
-          style={{ width: "28px", height: "28px", objectFit: "contain" }}
-        />
-        mimi
+    <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "40px" }}>
+      
+      <Link href="/" style={{ ...menuStyle, color: isDark ? "#fff" : "#111" }} onClick={() => setIsMenuOpen(false)}>
+        <Home size={24} strokeWidth={2.5} color="#ec4899" /> {t.home}
       </Link>
 
-      <hr
-        style={{
-          margin: "12px 0",
-          borderColor: isDark ? "#374151" : "#eee",
-        }}
-      />
+      <Link href="/arcade" style={{ ...menuStyle, color: isDark ? "#fff" : "#111" }} onClick={() => setIsMenuOpen(false)}>
+        <Gamepad2 size={24} strokeWidth={2.5} color="#ec4899" /> {t.arcade}
+      </Link>
 
-      <Link
-        href="/account"
-        onClick={() => setIsMenuOpen(false)}
-        style={{
-          ...menuStyle,
-          color: isDark ? "#ffffff" : "#111111",
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.background = isDark
-            ? "rgba(255,255,255,0.08)"
-            : "rgba(128,128,128,0.08)";
-          e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.background = "transparent";
-          e.currentTarget.style.boxShadow = "none";
-        }}
-      >
+      <Link href="/document" style={{ ...menuStyle, color: isDark ? "#fff" : "#111" }} onClick={() => setIsMenuOpen(false)}>
+        <FileText size={24} strokeWidth={2.5} color="#ec4899" /> {t.document}
+      </Link>
+
+      <Link href="/podcast" style={{ ...menuStyle, color: isDark ? "#fff" : "#111" }} onClick={() => setIsMenuOpen(false)}>
+        <Mic size={24} strokeWidth={2.5} color="#ec4899" /> {t.podcast}
+      </Link>
+
+      <Link href="/flashcards" style={{ ...menuStyle, color: isDark ? "#fff" : "#111" }} onClick={() => setIsMenuOpen(false)}>
+        <CreditCard size={24} strokeWidth={2.5} color="#ec4899" /> {t.flashcards}
+      </Link>
+
+      <hr style={{ margin: "12px 0", borderColor: isDark ? "#374151" : "#eee" }} />
+
+      <Link href="/account" style={{ ...menuStyle, color: isDark ? "#fff" : "#111" }} onClick={() => setIsMenuOpen(false)}>
         <User size={24} strokeWidth={2.5} color="#ec4899" /> {t.account}
       </Link>
+
     </div>
   </div>
 )}
-
 
 {/* OVERLAY */}
 {isMenuOpen && (
@@ -335,118 +259,174 @@ export default function Dashboard() {
   />
 )}
 
+<div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12"><Link href="/document">
+<div className="premiumCard">
+<div className="cardIcon bg-blue-100">
+<Image src="/mimi-doc.png" alt="Document" width={45} height={45}/>
+</div>
+<div>
+<h3>{t.summarize}</h3>
+<p>{t.uploadSmart}</p>
+</div>
+</div>
+</Link><Link href="/flashcards">
+<div className="premiumCard">
+<div className="cardIcon bg-blue-100">
+<Image src="/mimi-flash.png" alt="Flashcards" width={60} height={60}/>
+</div>
+<div>
+<h3>{t.generateFlashcards}</h3>
+<p>{t.revisionCards}</p>
+</div>
+</div>
+</Link><Link href="/podcast">
+<div className="premiumCard">
+<div className="cardIcon bg-blue-100">
+<Image src="/mimi-pod.png" alt="Podcast" width={45} height={45}/>
+</div>
+<div>
+<h3>{t.aiPodcast}</h3>
+<p>{t.turnNotes}</p>
+</div>
+</div>
+</Link><Link href="/arcade">
+<div className="premiumCard">
+<div className="cardIcon bg-indigo-100">
+<Image src="/mimi-arc.png" alt="Arcade" width={50} height={50}/>
+</div>
+<div>
+<h3>{t.arcade}</h3>
+<p>{t.playGames}</p>
+</div>
+</div>
+</Link></div><div className="flex justify-center mb-12"><div
+className={`uploadBox ${dragOver ? "dragActive" : ""}`}
+onDragOver={(e)=>{e.preventDefault();setDragOver(true)}}
+onDragLeave={()=>setDragOver(false)}
+onDrop={handleFileUpload}
+onClick={()=>document.getElementById("file-upload")?.click()}
+><input
+id="file-upload"
+type="file"
+onChange={handleFileUpload}
+style={{display:"none"}}
+accept=".pdf,.doc,.docx"
+/>
 
-        {/* TITLE */}
-        <div className="mb-10">
-          <h1 className="text-3xl font-semibold text-gray-800 dark:text-white">
-            {t.dashboardTitle}
-          </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
-            {t.dashboardSubtitle}
-          </p>
-        </div>
+<div className="text-4xl mb-3"></div><p className="text-lg font-semibold">
+{t.dropYourPDFFHere}
+</p></div></div><h2 className="text-lg font-semibold mb-4 dark:text-white">
+{t.myFiles}
+</h2><div className="space-y-4">{files.map((file)=>(
 
-        {/* FEATURE BOXES (Updated Order) */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-          <Link href="/document">
-            <div className="premiumCard">
-              <div className="cardIcon bg-purple-100 text-purple-600">📄</div>
-              <div>
-                <h3>{t.summarize}</h3>
-                <p>{t.uploadSmart}</p>
-              </div>
-            </div>
-          </Link>
+<div key={file.id} className="fileRow">
+    <div className="flex items-center gap-4"><div className="docIcon">
+<Image src="/doc.png" alt="doc" width={22} height={22}/>
+</div><div>
+<h4 className="font-medium dark:text-white">
+{file.name}
+</h4>
+<p className="text-sm text-gray-500 dark:text-gray-400">
+{file.lastOpened}
+</p>
+</div></div><span className="text-xl text-gray-400 cursor-pointer">
+⋮
+</span></div>
+))}</div><style jsx>{`
 
-          <Link href="/flashcards">
-            <div className="premiumCard">
-              <div className="cardIcon bg-pink-100 text-pink-600">🃏</div>
-              <div>
-                <h3>{t.generateFlashcards}</h3>
-                <p>{t.revisionCards}</p>
-              </div>
-            </div>
-          </Link>
-
-          <Link href="/podcast">
-            <div className="premiumCard">
-              <div className="cardIcon bg-blue-100 text-blue-600">🎙️</div>
-              <div>
-                <h3>{t.aiPodcast}</h3>
-                <p>{t.turnNotes}</p>
-              </div>
-            </div>
-          </Link>
-
-          <Link href="/arcade">
-            <div className="premiumCard">
-              <div className="cardIcon bg-indigo-100 text-indigo-600">🎮</div>
-              <div>
-                <h3>{t.arcade}</h3>
-                <p>{t.playGames}</p>
-              </div>
-            </div>
-          </Link>
-        </div>
-
-        {/* UPLOAD BOX & FILE LIST (unchanged) */}
-        <div className="flex justify-center mb-12">
-          <div
-            className={`uploadBox ${dragOver ? "dragActive" : ""}`}
-            onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={handleFileUpload}
-            onClick={() => document.getElementById("file-upload")?.click()}
-          >
-            <input
-              id="file-upload"
-              type="file"
-              onChange={handleFileUpload}
-              style={{ display: "none" }}
-              accept=".pdf,.doc,.docx"
-            />
-            <div className="text-4xl mb-3">📄</div>
-            <p className="text-lg font-semibold">
-              {t.dropYourPDFFHere}
-            </p>
-          </div>
-        </div>
-
-        <h2 className="text-lg font-semibold mb-4 dark:text-white">{t.myFiles}</h2>
-        <div className="space-y-4">
-          {files.map((file) => (
-            <div key={file.id} className="fileRow">
-              <div className="flex items-center gap-4">
-                <div className="docIcon">{getFileIcon(file.type)}</div>
-                <div>
-                  <h4 className="font-medium dark:text-white">{file.name}</h4>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">{file.lastOpened}</p>
-                </div>
-              </div>
-              <span className="text-xl text-gray-400 cursor-pointer">⋮</span>
-            </div>
-          ))}
-        </div>
-
-        {/* STYLES */}
-        <style jsx>{`
-          .premiumCard { display: flex; align-items: center; gap: 18px; padding: 24px; border-radius: 20px; background: white; box-shadow: 0 6px 20px rgba(0,0,0,0.06); transition: all 0.3s ease; cursor: pointer; }
-          .premiumCard:hover { transform: translateY(-5px); box-shadow: 0 12px 30px rgba(0,0,0,0.08); }
-          :global(.dark) .premiumCard { background: #2a2a2a; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
-          :global(.dark) .premiumCard h3 { color: #ffffff; }
-          :global(.dark) .premiumCard p { color: #cbd5e1; }
-          .cardIcon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-          .uploadBox { width: 65%; max-width: 750px; border: 2px dashed #ccc; border-radius: 20px; padding: 50px; text-align: center; background: white; transition: all 0.3s ease; cursor: pointer; }
-          :global(.dark) .uploadBox { background: #2a2a2a; border-color: #444; color: #ffffff; }
-          .dragActive { border-color: #6366f1; background: #f3f4ff; }
-          :global(.dark) .dragActive { background: #2f2f3f; }
-          .fileRow { display: flex; justify-content: space-between; align-items: center; padding: 20px; border-radius: 18px; background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: all 0.3s ease; }
-          .fileRow:hover { transform: translateY(-3px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
-          :global(.dark) .fileRow { background: #2a2a2a; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
-          .docIcon { width: 42px; height: 42px; border-radius: 12px; background: #4f46e5; color: white; display: flex; align-items: center; justify-content: center; }
-        `}</style>
-
-      </div>
-    </>
-  );
+.premiumCard{
+display:flex;
+align-items:center;
+gap:18px;
+padding:24px;
+border-radius:20px;
+background:rgba(255,255,255,0.65);
+backdrop-filter:blur(12px);
+border:1px solid rgba(255,255,255,0.3);
+box-shadow:0 6px 20px rgba(0,0,0,0.06);
+transition:all .3s ease;
+cursor:pointer;
 }
+
+.premiumCard:hover{
+transform:translateY(-5px);
+box-shadow:0 12px 30px rgba(0,0,0,0.08);
+}
+
+:global(.dark) .premiumCard{
+background:rgba(42,42,42,0.7);
+}
+
+.cardIcon{
+width:48px;
+height:48px;
+border-radius:14px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:20px;
+}
+
+.cardIcon img{
+object-fit:contain;
+}
+
+.uploadBox{
+width:65%;
+max-width:750px;
+border:2px dashed #ccc;
+border-radius:20px;
+padding:50px;
+text-align:center;
+background:rgba(255,255,255,0.65);
+backdrop-filter:blur(12px);
+cursor:pointer;
+transition:all .3s ease;
+}
+
+:global(.dark) .uploadBox{
+background:rgba(42,42,42,0.7);
+border-color:#444;
+color:#fff;
+}
+
+.dragActive{
+border-color:#6366f1;
+background:rgba(243,244,255,0.6);
+}
+
+.fileRow{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px;
+border-radius:18px;
+background:rgba(255,255,255,0.65);
+backdrop-filter:blur(12px);
+box-shadow:0 4px 15px rgba(0,0,0,0.05);
+transition:all .3s ease;
+}
+
+.fileRow:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+
+:global(.dark) .fileRow{
+background:rgba(42,42,42,0.7);
+}
+
+.docIcon{
+width:42px;
+height:42px;
+border-radius:12px;
+background:#FFE8F3;
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+`}</style></div>
+</>
+);}

@@ -13,19 +13,13 @@ export async function GET() {
   try {
     console.log("🧠 MCQ API called");
 
-    // -----------------------------
-    // 1️⃣ Check API key
-    // -----------------------------
-    if (!process.env.GEMINI_QUIZ_KEY) {
+    if (!process.env.GEMINI_MCQ_KEY) {
       return NextResponse.json(
-        { error: "GEMINI_QUIZ_KEY missing" },
+        { error: "GEMINI_MCQ_KEY missing" },
         { status: 500 }
       );
     }
 
-    // -----------------------------
-    // 2️⃣ Read notes
-    // -----------------------------
     const notesPath = path.join(
       process.cwd(),
       "data",
@@ -37,8 +31,6 @@ export async function GET() {
     try {
       notes = await fs.readFile(notesPath, "utf-8");
     } catch {
-      console.log("❌ latest-notes.txt not found");
-
       return NextResponse.json(
         { error: "Generate notes first." },
         { status: 404 }
@@ -54,16 +46,13 @@ export async function GET() {
 
     console.log("📏 Notes length:", notes.length);
 
-    // -----------------------------
-    // 3️⃣ Gemini Generate MCQ
-    // -----------------------------
     const response = await ai.models.generateContent({
       model: "models/gemini-2.5-flash",
       contents: `
-Create EXACTLY ONE multiple choice question.
+Create EXACTLY 5 multiple choice questions.
 
 RULES:
-- 4 options only
+- 4 options per question
 - Only ONE correct answer
 - Options must be short
 - No explanations
@@ -72,9 +61,13 @@ RULES:
 RETURN STRICT JSON ONLY:
 
 {
- "question": "string",
- "options": ["A","B","C","D"],
- "answer": "exact correct option text"
+ "questions": [
+  {
+   "question": "string",
+   "options": ["A","B","C","D"],
+   "answer": "exact correct option text"
+  }
+ ]
 }
 
 NOTES:
@@ -87,31 +80,17 @@ ${notes.slice(0, 8000)}
         ?.map((p: any) => p.text)
         .join("") || "";
 
-    if (!aiText) {
-      throw new Error("Empty AI response");
-    }
-
-    // -----------------------------
-    // 4️⃣ Safe JSON extraction
-    // -----------------------------
     const start = aiText.indexOf("{");
     const end = aiText.lastIndexOf("}") + 1;
-
     const cleanJSON = aiText.slice(start, end);
 
     const parsed = JSON.parse(cleanJSON);
 
-    // validation (VERY IMPORTANT)
-    if (
-      !parsed.question ||
-      !Array.isArray(parsed.options) ||
-      parsed.options.length !== 4 ||
-      !parsed.answer
-    ) {
+    if (!parsed.questions || parsed.questions.length === 0) {
       throw new Error("Invalid MCQ format");
     }
 
-    console.log("✅ MCQ generated");
+    console.log("✅ MCQs generated");
 
     return NextResponse.json(parsed);
   } catch (error) {
