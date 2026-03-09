@@ -13,21 +13,15 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 
-// ✅ ADDED
-import { useLanguage } from "@/context/LanguageContext";
-import { translations } from "@/translations";
-
 export default function LoginPage() {
   const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // ✅ ADDED
-  const { language } = useLanguage();
-  const t = translations[language];
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       router.push("/dashboard");
@@ -55,18 +49,19 @@ export default function LoginPage() {
       <div className="w-full max-w-md bg-white/85 backdrop-blur-md border border-gray-200 p-8 rounded-2xl shadow-lg">
 
         <h1 className="text-3xl font-semibold text-center mb-6 text-black">
-          {t.welcomeBack}
+          Welcome Back
         </h1>
 
         <form className="space-y-5" onSubmit={handleLogin}>
           <div>
             <Label htmlFor="email" className="text-black">
-              {t.email}
+              Email
             </Label>
+
             <Input
               id="email"
               type="email"
-              placeholder={t.emailPlaceholder}
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="text-black"
@@ -75,12 +70,13 @@ export default function LoginPage() {
 
           <div>
             <Label htmlFor="password" className="text-black">
-              {t.password}
+              Password
             </Label>
+
             <Input
               id="password"
               type="password"
-              placeholder={t.passwordPlaceholder}
+              placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="text-black"
@@ -90,12 +86,12 @@ export default function LoginPage() {
           <Button
             className="w-full bg-[#FFB7D5] hover:opacity-90 text-black rounded-xl"
           >
-            {t.loginButton}
+            Login
           </Button>
         </form>
 
         <div className="my-4 text-center text-black">
-          {t.or}
+          or
         </div>
 
         <Button
@@ -103,16 +99,16 @@ export default function LoginPage() {
           className="w-full text-black rounded-xl"
           onClick={handleGoogleLogin}
         >
-          {t.continueGoogle}
+          Continue with Google
         </Button>
 
         <p className="text-sm text-center text-black mt-5">
-          {t.noAccount}{" "}
+          Don't have an account?{" "}
           <Link
             href="/signup"
             className="text-pink-500 font-medium"
           >
-            {t.signup}
+            Sign up
           </Link>
         </p>
 
