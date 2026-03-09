@@ -4,6 +4,7 @@ import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { LivesProvider } from "@/context/LivesContext";
 import { StudyProvider } from "@/context/StudyContext";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "Learnisle",
@@ -31,6 +32,9 @@ export default function RootLayout({
             </StudyProvider>
           </LivesProvider>
         </LanguageProvider>
+
+        {/* ✅ Vercel Analytics */}
+        <Analytics />
       </body>
     </html>
   );
