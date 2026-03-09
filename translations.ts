@@ -16,6 +16,8 @@ export type TranslationKeys = {
   or: string;
   continueGoogle: string;
   noAccount: string;
+  haveAccount: string;   // ✅ added
+  signin: string;        // ✅ added
 
   // Dashboard
   home: string;
@@ -64,6 +66,8 @@ export const translations: Record<"en" | "hi", TranslationKeys> = {
     or: "— OR —",
     continueGoogle: "Continue with Google",
     noAccount: "Don’t have an account?",
+    haveAccount: "Already have an account?",   // ✅ added
+    signin: "Sign In",                         // ✅ added
 
     // Dashboard
     home: "Home",
@@ -111,6 +115,8 @@ export const translations: Record<"en" | "hi", TranslationKeys> = {
     or: "— या —",
     continueGoogle: "Google से जारी रखें",
     noAccount: "क्या आपका अकाउंट नहीं है?",
+    haveAccount: "क्या आपके पास पहले से अकाउंट है?",   // ✅ added
+    signin: "साइन इन",                                  // ✅ added
 
     // Dashboard
     home: "होम",
