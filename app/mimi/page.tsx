@@ -26,20 +26,18 @@ export default function MimiPage() {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
-  /* ----------------------------- */
-  /* AUTO SCROLL                   */
-  /* ----------------------------- */
+  const isDark =
+    typeof window !== "undefined" &&
+    document.documentElement.classList.contains("dark");
 
+  /* AUTO SCROLL */
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
       behavior: "smooth",
     });
   }, [messages]);
 
-  /* ----------------------------- */
-  /* SEND MESSAGE                  */
-  /* ----------------------------- */
-
+  /* SEND MESSAGE */
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -94,18 +92,22 @@ export default function MimiPage() {
     setLoading(false);
   };
 
-  const handleKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>
-  ) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") sendMessage();
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFDF7]">
-
+    <div
+      style={{
+        minHeight: "100vh",
+        backgroundImage: "url('/bg-4.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
       <TopBar openMenu={() => setIsMenuOpen(true)} />
 
-      {/* MENU DRAWER */}
+      {/* MENU */}
       {isMenuOpen && (
         <div
           style={{
@@ -114,7 +116,7 @@ export default function MimiPage() {
             left: 0,
             width: "300px",
             height: "100vh",
-            background: "white",
+            background: isDark ? "#1E1E1E" : "white",
             zIndex: 999999,
             boxShadow: "5px 0 20px rgba(0,0,0,0.15)",
             padding: "30px 20px",
@@ -130,146 +132,135 @@ export default function MimiPage() {
               background: "none",
               border: "none",
               cursor: "pointer",
+              color: isDark ? "#fff" : "#111",
             }}
           >
             ×
           </button>
 
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "6px",
-              marginTop: "40px",
-            }}
-          >
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px", marginTop: "40px" }}>
             {[
-              { href: "/dashboard", label: "Home", icon: <Home size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/arcade", label: "Arcade", icon: <Gamepad2 size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/document", label: "Document", icon: <FileText size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/podcast", label: "Podcast", icon: <Mic size={24} strokeWidth={2.5} color="#ec4899" /> },
-              { href: "/flashcards", label: "Flashcards", icon: <CreditCard size={24} strokeWidth={2.5} color="#ec4899" /> },
-            ].map((item, index) => (
-              <Link
-                key={index}
-                href={item.href}
-                onClick={() => setIsMenuOpen(false)}
-                style={menuStyle}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(128,128,128,0.08)";
-                  e.currentTarget.style.boxShadow = "0 6px 18px rgba(0,0,0,0.08)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                  e.currentTarget.style.boxShadow = "none";
-                }}
-              >
+              { href: "/dashboard", label: "Home", icon: <Home size={24} color="#ec4899" /> },
+              { href: "/arcade", label: "Arcade", icon: <Gamepad2 size={24} color="#ec4899" /> },
+              { href: "/document", label: "Document", icon: <FileText size={24} color="#ec4899" /> },
+              { href: "/podcast", label: "Podcast", icon: <Mic size={24} color="#ec4899" /> },
+              { href: "/flashcards", label: "Flashcards", icon: <CreditCard size={24} color="#ec4899" /> },
+            ].map((item, idx) => (
+              <Link key={idx} href={item.href} onClick={() => setIsMenuOpen(false)} style={menuStyle}>
                 {item.icon} {item.label}
               </Link>
             ))}
 
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+            <hr style={{ margin: "12px 0", borderColor: isDark ? "#333" : "#eee" }} />
 
-            <Link
-              href="/mimi"
-              onClick={() => setIsMenuOpen(false)}
-              style={{ ...menuStyle, gap: "12px" }}
-            >
-              <img
-                src="/mascot.png"
-                alt="Mascot"
-                style={{ width: "28px", height: "28px", objectFit: "contain" }}
-              />
+            <Link href="/mimi" onClick={() => setIsMenuOpen(false)} style={{ ...menuStyle, gap: "12px", display: "flex", alignItems: "center" }}>
+              <img src="/mascot.png" alt="Mimi" style={{ width: "28px", height: "28px" }} />
               Mimi
             </Link>
 
-            <hr style={{ margin: "12px 0", borderColor: "#eee" }} />
+            <hr style={{ margin: "12px 0", borderColor: isDark ? "#333" : "#eee" }} />
 
-            <Link
-              href="/account"
-              onClick={() => setIsMenuOpen(false)}
-              style={menuStyle}
-            >
-              <User size={24} strokeWidth={2.5} color="#ec4899" /> Account
+            <Link href="/account" onClick={() => setIsMenuOpen(false)} style={menuStyle}>
+              <User size={24} color="#ec4899" /> Account
             </Link>
           </div>
         </div>
       )}
 
-      {/* OVERLAY */}
       {isMenuOpen && (
         <div
+          onClick={() => setIsMenuOpen(false)}
           style={{
             position: "fixed",
             top: 0,
             left: 0,
             width: "100vw",
             height: "100vh",
-            background: "rgba(0,0,0,0.5)",
+            background: "rgba(0,0,0,0.4)",
             zIndex: 99999,
           }}
-          onClick={() => setIsMenuOpen(false)}
         />
       )}
 
-      {/* CHAT AREA */}
-      <div className="chatContainer">
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            className={`messageRow ${
-              msg.role === "user" ? "userRow" : "aiRow"
-            }`}
-          >
-            {msg.role === "assistant" && (
-              <img
-                src="/mascot.png"
-                className="avatar"
-                alt="Mimi"
-              />
+      {/* MAIN GLASS CONTAINER */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "60px",
+        }}
+      >
+        <div
+          style={{
+            width: "800px",
+            height: "70vh",
+            padding: "40px",
+            borderRadius: "40px",
+            background: "rgba(255,255,255,0.45)",
+            backdropFilter: "blur(30px)",
+            boxShadow: "0 40px 120px rgba(255,105,160,0.15)",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {/* CHAT AREA */}
+          <div className="chatContainer">
+            {messages.map((msg, i) => (
+              <div
+                key={i}
+                className={`messageRow ${
+                  msg.role === "user" ? "userRow" : "aiRow"
+                }`}
+              >
+                {msg.role === "assistant" && (
+                  <img
+                    src="/mascot.png"
+                    className="avatar"
+                    alt="Mimi"
+                  />
+                )}
+
+                <div
+                  className={`bubble ${
+                    msg.role === "user" ? "userBubble" : "aiBubble"
+                  }`}
+                >
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+
+            {loading && (
+              <div className="messageRow aiRow">
+                <img src="/mascot.png" className="avatar" />
+                <div className="bubble aiBubble typing">
+                  Mimi is thinking...
+                </div>
+              </div>
             )}
 
-            <div
-              className={`bubble ${
-                msg.role === "user" ? "userBubble" : "aiBubble"
-              }`}
-            >
-              {msg.content}
-            </div>
+            <div ref={bottomRef} />
           </div>
-        ))}
 
-        {loading && (
-          <div className="messageRow aiRow">
-            <img src="/mascot.png" className="avatar" />
-            <div className="bubble aiBubble typing">
-              Mimi is thinking...
-            </div>
+          {/* INPUT BAR */}
+          <div className="inputBar">
+            <input
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask Mimi anything..."
+            />
+            <button onClick={sendMessage}>Send</button>
           </div>
-        )}
-
-        <div ref={bottomRef} />
-      </div>
-
-      {/* INPUT BAR */}
-      <div className="inputBar">
-        <input
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask Mimi anything..."
-        />
-        <button onClick={sendMessage}>Send</button>
+        </div>
       </div>
 
       <style jsx>{`
         .chatContainer {
           flex: 1;
           overflow-y: auto;
-          padding: 40px 20px;
-          max-width: 900px;
-          width: 100%;
-          margin: auto;
+          padding-right: 10px;
         }
 
         .messageRow {
@@ -325,9 +316,7 @@ export default function MimiPage() {
         .inputBar {
           display: flex;
           gap: 12px;
-          padding: 18px;
-          background: white;
-          border-top: 1px solid #eee;
+          margin-top: 12px;
         }
 
         .inputBar input {
@@ -369,7 +358,6 @@ const menuStyle: React.CSSProperties = {
   padding: "16px 18px",
   borderRadius: "14px",
   textDecoration: "none",
-  color: "#111",
   fontWeight: 600,
   fontSize: "16px",
   transition: "all 0.2s ease",

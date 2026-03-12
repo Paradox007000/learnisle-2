@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import ProgressLoader from "@/components/ui/ProgressLoader";
 import { soundManager } from "@/utils/soundManager";
 import Image from "next/image";
+import useArcadeGame from "@/hooks/useArcadeGame";
 
 type Question = {
   question: string;
@@ -21,7 +22,8 @@ export default function SpeedRecallPage() {
 
   const answeringRef = useRef(false);
 
-  // 🎵 Background Music
+  const { registerWrong, finishGame } = useArcadeGame(questions.length);
+
   useEffect(() => {
     soundManager.playBackground();
     return () => {
@@ -29,7 +31,6 @@ export default function SpeedRecallPage() {
     };
   }, []);
 
-  // Load questions
   useEffect(() => {
     async function load() {
       const res = await fetch("/api/arcade/speed");
@@ -40,7 +41,6 @@ export default function SpeedRecallPage() {
     load();
   }, []);
 
-  // Timer
   useEffect(() => {
     if (loading || finished) return;
 
@@ -51,7 +51,6 @@ export default function SpeedRecallPage() {
     return () => clearInterval(timer);
   }, [loading, finished, index]);
 
-  // When time runs out
   useEffect(() => {
     if (time <= 0 && !finished) {
       handleAnswer(false);
@@ -67,6 +66,7 @@ export default function SpeedRecallPage() {
       setMascotComment("Speed brain activated ⚡");
     } else {
       soundManager.playWrong();
+      registerWrong(); // ❤️ track wrong
       setMascotComment("Too slow! Stay focused 💭");
     }
 
@@ -74,6 +74,7 @@ export default function SpeedRecallPage() {
       answeringRef.current = false;
 
       if (index + 1 >= questions.length) {
+        finishGame(); // ❤️ lose heart if mistakes
         setFinished(true);
       } else {
         setIndex((i) => i + 1);
@@ -124,7 +125,6 @@ export default function SpeedRecallPage() {
       className="relative min-h-screen flex items-center justify-center px-6 bg-cover bg-center"
       style={{ backgroundImage: "url('/bg-2.png')" }}
     >
-      {/* Decorative Hearts (UI only) */}
       <div className="absolute top-6 left-6 flex gap-2">
         <Image src="/images/arcade/heart.png" alt="heart" width={30} height={30} />
         <Image src="/images/arcade/heart.png" alt="heart" width={30} height={30} />
@@ -169,7 +169,6 @@ export default function SpeedRecallPage() {
         </button>
       </div>
 
-      {/* Mascot */}
       <div className="absolute right-8 bottom-6 flex flex-col items-center">
         <Image
           src="/images/arcade/mascot-comment.png"

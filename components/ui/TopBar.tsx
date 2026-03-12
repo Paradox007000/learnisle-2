@@ -19,16 +19,16 @@ export default function TopBar({
   const router = useRouter();
   const pathname = usePathname();
 
-    const { theme } = useTheme();
-const [mounted, setMounted] = useState(false);
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-useEffect(() => {
-  setMounted(true);
-}, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-if (!mounted) return null;
+  if (!mounted) return null;
 
-const isDark = theme === "dark";
+  const isDark = theme === "dark";
 
   /* -----------------------------
      PAGE DETECTION
@@ -45,15 +45,20 @@ const isDark = theme === "dark";
   return (
     <div
       style={{
-        height: "100px",
-        background: isDark ? "#1E1E1E" : "#F6FFF8",
-        borderBottom: isDark
-          ? "1px solid #2A2A2A"
-          : "1px solid #E0F2E9",
+        height: "90px",
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
+        background: isDark
+          ? "rgba(25,25,25,0.65)"
+          : "rgba(255,255,255,0.55)",
+        borderBottom: "1px solid rgba(255,255,255,0.2)",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         padding: "0 40px",
+        position: "sticky",
+        top: 0,
+        zIndex: 1000,
       }}
     >
       {/* =========================
@@ -70,11 +75,11 @@ const isDark = theme === "dark";
           <button
             onClick={openMenu}
             style={{
-              fontSize: "28px",
+              fontSize: "26px",
               background: "none",
               border: "none",
               cursor: "pointer",
-              color: isDark ? "#ffffff" : "#000000",
+              color: isDark ? "#ffffff" : "#1f2937",
             }}
           >
             ☰
@@ -92,8 +97,8 @@ const isDark = theme === "dark";
           <Image
             src="/logo.png"
             alt="Learnisle logo"
-            width={220}
-            height={140}
+            width={200}
+            height={120}
             style={{ objectFit: "contain" }}
           />
         </div>
@@ -106,7 +111,7 @@ const isDark = theme === "dark";
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "24px",
+          gap: "26px",
         }}
       >
         {showLives && <Hearts />}
@@ -119,21 +124,21 @@ const isDark = theme === "dark";
             style={{
               display: "flex",
               alignItems: "center",
-              gap: "14px",
-              cursor: "pointer",
+              gap: "12px",
               textDecoration: "none",
             }}
           >
             <div
               style={{
-                width: "50px",
-                height: "50px",
+                width: "44px",
+                height: "44px",
                 borderRadius: "50%",
                 overflow: "hidden",
-                background: isDark ? "#2A2A2A" : "#ffeef5",
-                border: isDark
-                  ? "2px solid #3A3A3A"
-                  : "2px solid #ffd6e7",
+                background: isDark
+                  ? "rgba(60,60,60,0.6)"
+                  : "rgba(255,230,240,0.8)",
+                border: "1px solid rgba(255,255,255,0.4)",
+                backdropFilter: "blur(10px)",
                 position: "relative",
               }}
             >
@@ -147,9 +152,10 @@ const isDark = theme === "dark";
 
             <span
               style={{
-                fontSize: "20px",
-                fontWeight: 600,
+                fontSize: "18px",
+                fontWeight: 500,
                 color: isDark ? "#ffffff" : "#2F3E34",
+                opacity: 0.9,
               }}
             >
               Mimi

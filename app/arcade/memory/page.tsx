@@ -5,6 +5,7 @@ import ProgressLoader from "@/components/ui/ProgressLoader";
 import { soundManager } from "@/utils/soundManager";
 import Image from "next/image";
 import { Card, CardContent } from "@/components/ui/card";
+import useArcadeGame from "@/hooks/useArcadeGame";
 
 type Pair = {
   question: string;
@@ -28,12 +29,13 @@ export default function MemoryGame() {
   const [mascotComment, setMascotComment] = useState("");
   const [previewing, setPreviewing] = useState(true);
 
+  const { registerWrong, finishGame } = useArcadeGame(cards.length / 2);
+
   useEffect(() => {
     soundManager.playBackground();
     return () => soundManager.stopBackground();
   }, []);
 
-  /* LOAD PAIRS */
   useEffect(() => {
     async function load() {
       const res = await fetch("/api/arcade/memory");
@@ -68,7 +70,6 @@ export default function MemoryGame() {
       setCards(allCards);
       setLoading(false);
 
-      /* 3 second preview */
       setTimeout(() => {
         setCards((prev) =>
           prev.map((c) => ({ ...c, flipped: false }))
@@ -133,6 +134,7 @@ export default function MemoryGame() {
       }, 900);
     } else {
       soundManager.playWrong();
+      registerWrong();
       setMascotComment("Not quite. Try again.");
 
       setCards((prev) =>
@@ -160,7 +162,13 @@ export default function MemoryGame() {
     }
   }
 
-  const allMatched = cards.every((c) => c.matched);
+  const allMatched = cards.length > 0 && cards.every((c) => c.matched);
+
+  useEffect(() => {
+    if (!loading && allMatched) {
+      finishGame();
+    }
+  }, [allMatched, loading]);
 
   if (loading)
     return <ProgressLoader label="Generating Memory Game..." />;
@@ -209,7 +217,6 @@ export default function MemoryGame() {
         </div>
       </div>
 
-      {/* Mascot */}
       <div className="absolute right-8 bottom-8 flex flex-col items-center">
         <Image src="/images/arcade/mascot-comment.png" alt="Mascot" width={140} height={140} className="drop-shadow-2xl"/>
         {mascotComment && (
@@ -246,22 +253,13 @@ function MemoryCardUI({
           card.flipped || card.matched ? "rotate-y-180" : ""
         }`}
       >
-        {/* FRONT (MIMI) */}
         <Card className="absolute w-full h-full backface-hidden flex items-center justify-center bg-pink-100 border border-pink-200">
           <CardContent className="flex items-center justify-center">
-            <Image
-              src="/mascot.png"
-              alt="mimi"
-              width={50}
-              height={50}
-            />
+            <Image src="/mascot.png" alt="mimi" width={50} height={50}/>
           </CardContent>
         </Card>
 
-        {/* BACK */}
-        <Card
-          className={`absolute w-full h-full backface-hidden rotate-y-180 flex items-center justify-center ${statusColor}`}
-        >
+        <Card className={`absolute w-full h-full backface-hidden rotate-y-180 flex items-center justify-center ${statusColor}`}>
           <CardContent className="text-center text-pink-700 text-sm font-medium">
             {card.text}
           </CardContent>

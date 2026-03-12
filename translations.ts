@@ -16,8 +16,8 @@ export type TranslationKeys = {
   or: string;
   continueGoogle: string;
   noAccount: string;
-  haveAccount: string;   // ✅ added
-  signin: string;        // ✅ added
+  haveAccount: string;
+  signin: string;
 
   // Dashboard
   home: string;
@@ -48,7 +48,6 @@ export type TranslationKeys = {
 
 export const translations: Record<"en" | "hi", TranslationKeys> = {
   en: {
-    // Landing
     title: "Your Personalized Learning Island",
     subtitle:
       "Discover AI-powered notes, flashcards, quizzes, and fun interactive learning tools designed just for you.",
@@ -56,7 +55,6 @@ export const translations: Record<"en" | "hi", TranslationKeys> = {
     loading: "Loading your island...",
     signup: "Sign Up",
 
-    // Auth
     welcomeBack: "Welcome Back",
     email: "Email",
     password: "Password",
@@ -66,10 +64,9 @@ export const translations: Record<"en" | "hi", TranslationKeys> = {
     or: "— OR —",
     continueGoogle: "Continue with Google",
     noAccount: "Don’t have an account?",
-    haveAccount: "Already have an account?",   // ✅ added
-    signin: "Sign In",                         // ✅ added
+    haveAccount: "Already have an account?",
+    signin: "Sign In",
 
-    // Dashboard
     home: "Home",
     arcade: "Arcade",
     document: "Document",
@@ -97,15 +94,13 @@ export const translations: Record<"en" | "hi", TranslationKeys> = {
   },
 
   hi: {
-    // Landing
     title: "आपका व्यक्तिगत लर्निंग आइलैंड",
     subtitle:
-      "AI-आधारित नोट्स, फ्लैशकार्ड, क्विज़ और मज़ेदार इंटरैक्टिव लर्निंग टूल्स खोजें जो सिर्फ आपके लिए डिज़ाइन किए गए हैं।",
+      "AI-आधारित नोट्स, फ्लैशकार्ड, क्विज़ और मज़ेदार इंटरैक्टिव लर्निंग टूल्स खोजें।",
     start: "अपनी यात्रा शुरू करें →",
     loading: "आपका आइलैंड लोड हो रहा है...",
     signup: "साइन अप",
 
-    // Auth
     welcomeBack: "वापसी पर स्वागत है",
     email: "ईमेल",
     password: "पासवर्ड",
@@ -115,10 +110,9 @@ export const translations: Record<"en" | "hi", TranslationKeys> = {
     or: "— या —",
     continueGoogle: "Google से जारी रखें",
     noAccount: "क्या आपका अकाउंट नहीं है?",
-    haveAccount: "क्या आपके पास पहले से अकाउंट है?",   // ✅ added
-    signin: "साइन इन",                                  // ✅ added
+    haveAccount: "क्या आपके पास पहले से अकाउंट है?",
+    signin: "साइन इन",
 
-    // Dashboard
     home: "होम",
     arcade: "आर्केड",
     document: "डॉक्यूमेंट",

@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
+
 import "./globals.css";
+
 import { LanguageProvider } from "@/context/LanguageContext";
 import { LivesProvider } from "@/context/LivesContext";
 import { StudyProvider } from "@/context/StudyContext";
+
 import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
@@ -19,22 +22,34 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="antialiased">
-        <LanguageProvider>
-          <LivesProvider>
-            <StudyProvider>
-              <ThemeProvider
-                attribute="class"
-                defaultTheme="light"
-                enableSystem={false}
-              >
-                {children}
-              </ThemeProvider>
-            </StudyProvider>
-          </LivesProvider>
-        </LanguageProvider>
 
-        {/* ✅ Vercel Analytics */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+        >
+
+          <LanguageProvider>
+
+            {/* ❤️ Lives System */}
+            <LivesProvider>
+
+              {/* 📚 Study Timer System */}
+              <StudyProvider>
+
+                {children}
+
+              </StudyProvider>
+
+            </LivesProvider>
+
+          </LanguageProvider>
+
+        </ThemeProvider>
+
+        {/* 📊 Vercel Analytics */}
         <Analytics />
+
       </body>
     </html>
   );

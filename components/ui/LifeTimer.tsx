@@ -1,22 +1,10 @@
 "use client";
 
 import Image from "next/image";
-import { useLives } from "@/context/LivesContext";
+import useStudySession from "@/hooks/useStudySession";
 
 export default function LifeTimer() {
-  const { lives, nextLifeIn } = useLives();
-
-  // Hide timer if lives are full
-  if (lives >= 5) return null;
-
-  const minutes = Math.floor(nextLifeIn / 60);
-  const seconds = nextLifeIn % 60;
-
-  const formatted = `${minutes
-    .toString()
-    .padStart(2, "0")}:${seconds
-    .toString()
-    .padStart(2, "0")}`;
+  const { formattedTime } = useStudySession();
 
   return (
     <div
@@ -45,7 +33,7 @@ export default function LifeTimer() {
           fontSize: "14px",
         }}
       >
-        {formatted}
+        {formattedTime}
       </span>
     </div>
   );

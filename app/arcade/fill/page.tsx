@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import ProgressLoader from "@/components/ui/ProgressLoader";
 import { soundManager } from "@/utils/soundManager";
 import Image from "next/image";
+import useArcadeGame from "@/hooks/useArcadeGame";
 
 type Question = {
   question: string;
@@ -17,6 +18,8 @@ export default function FillGame() {
   const [feedback, setFeedback] = useState("");
   const [loading, setLoading] = useState(true);
   const [mascotComment, setMascotComment] = useState("");
+
+  const { registerWrong, finishGame } = useArcadeGame(questions.length);
 
   // 🎵 Background music
   useEffect(() => {
@@ -37,6 +40,13 @@ export default function FillGame() {
     load();
   }, []);
 
+  // ✅ Detect when game ends (SAFE place for state updates)
+  useEffect(() => {
+    if (!loading && index >= questions.length && questions.length > 0) {
+      finishGame();
+    }
+  }, [index, questions.length, loading]);
+
   function submit() {
     if (!input.trim()) return;
 
@@ -53,6 +63,7 @@ export default function FillGame() {
       setFeedback("Correct!");
     } else {
       soundManager.playWrong();
+      registerWrong();
       setMascotComment("Almost there. Brain sparkles recalibrating.");
       setFeedback(`Correct answer: ${current.answer}`);
     }
@@ -132,7 +143,6 @@ export default function FillGame() {
 
           {/* Hearts */}
           <div className="flex gap-2">
-            
             <Image src="/images/arcade/hearts.gif" alt="heart" width={32} height={32} />
           </div>
         </div>
