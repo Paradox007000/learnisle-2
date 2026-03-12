@@ -25,7 +25,7 @@ export default function SignupPage() {
 
   // ✅ ADD THIS
   const { language } = useLanguage();
-  const t = translations[language];
+  const t = translations[language as "en" | "hi"];
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
